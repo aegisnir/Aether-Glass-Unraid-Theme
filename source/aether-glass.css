@@ -1,0 +1,2535 @@
+/*
+ * Aether Glass :: a deep-violet frosted-glass theme for the Unraid webGUI 7.2+
+ * Unofficial: not made or endorsed by Lime Technology.
+ * Built on the "Black" Dynamix theme ([Settings] -> [Display Settings]).
+ *
+ * Palette: cyan -> violet -> pink accents, periwinkle links, mint / amber / rose
+ * status colours, squircle corners.  Adds:
+ *   - a deep-violet aurora painted behind every page
+ *   - frosted glass panels (title bars, tables, dashboard tiles, menu, footer, dialogs)
+ *   - the system font (SF Pro on Mac and iPhone, Segoe UI on Windows) instead of Clear Sans
+ *   - extra padding so text never touches a rounded edge, and wrapping where it is safe
+ *   - Apple-style controls: pill buttons, fields and title bars, sentence-case labels,
+ *     Spotlight-style shading and a Siri-style glow on focus
+ *
+ * Installed by the aether-glass plugin, which appends this file to themes/black.css
+ * in RAM at boot.  Nothing on the flash drive's stock files is changed.
+ *
+ * Tuning: the --glass-* values control the whole glass look.
+ *   more see-through  -> lower --glass-alpha     (0.30)
+ *   frostier          -> raise --glass-blur      (30px)
+ *   slow browser      -> set --glass-blur to 0px (keeps the look, drops the blur cost)
+ */
+
+html:root {
+    /* ---- Aether palette ---- */
+    --aether-cyan: #00e5ff;
+    --aether-violet: #7c5cff;
+    --aether-pink: #ff3d9a;
+    --aether-gradient: linear-gradient(90deg, var(--aether-cyan) 0, var(--aether-violet) 50%, var(--aether-pink) 100%);
+
+    --aether-bg: #08051a;          /* deep dark violet */
+    --aether-surface: #0e0a24;
+    --aether-raised: #161033;
+    --aether-line: #251c4a;
+    --aether-line-strong: #3a2e6b;
+    --aether-text: #e6ebf7;
+    --aether-text-dim: #8b95b5;
+    --aether-text-faint: #5d6787;
+
+    /* ---- Font: the operating system's own UI font, nothing downloaded ---- */
+    --aether-font: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    /* ---- Glass recipe ---- */
+    --glass-alpha: 0.48;
+    --glass-blur: 22px;
+    --glass-radius: var(--r-lg);
+    --glass-tint: rgba(20, 12, 46, var(--glass-alpha));
+    --glass-tint-strong: rgba(20, 12, 46, 0.6);
+    --glass-edge: rgba(200, 190, 255, 0.12);
+    --glass-filter: blur(var(--glass-blur)) saturate(125%);  /* kept low: more saturation re-brightens the violet behind every panel */
+    --glass-shine:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),             /* specular top edge */
+        inset 0 0 0 1px var(--glass-edge),                   /* hairline rim */
+        inset 0 -12px 24px -18px rgba(124, 92, 255, 0.3);   /* violet glow pooling at the bottom */
+    --glass-drop: 0 12px 40px -12px rgba(0, 0, 0, 0.7);
+
+    /* ---- Apple-style pills ---- */
+    --pill: 999px;
+    --hairline: rgba(255, 255, 255, 0.10);
+    /* lighter at the top, darker at the bottom, like the Spotlight search bar */
+    --pill-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0, rgba(255, 255, 255, 0.03) 50%, rgba(0, 0, 0, 0.22) 100%);
+    --pill-edge:
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        inset 0 0 0 1px var(--hairline);
+
+    /* ---- Re-tint Unraid's dark greys toward violet ---- */
+    --black: var(--aether-bg);
+    --gray-800: var(--aether-surface);
+    --gray-700: var(--aether-raised);
+    --gray-600: var(--aether-line);
+    --gray-895: rgba(8, 5, 26, 0.92);
+    --theme-black--mild-gray-700: var(--aether-raised);
+
+    /* ---- Text ---- */
+    --text-color: var(--aether-text);
+    --alt-text-color: var(--aether-text-dim);
+    --disabled-text-color: var(--aether-text-faint);
+    --link-text-color: #a78bfa;         /* light brand violet, cohesive with the palette */
+    --link-visited-color: #8d7cc0;      /* a dustier violet for pages already opened */
+
+    /* ---- Surfaces: transparent so the glass panels show the aurora ---- */
+    --background-color: var(--aether-bg);
+    --opac-background-color: rgba(8, 5, 26, 0.85);
+    --mild-background-color: rgba(37, 28, 74, 0.45);
+    --dashboard-background-color: transparent;
+    --dashboard-border-color: var(--glass-edge);
+    --radio-background-color: rgba(37, 28, 74, 0.6);
+    --title-header-background-color: transparent;
+    --footer-background-color: transparent;
+    --shade-bg-color: rgba(26, 16, 58, 0.5);
+    --input-bg-color: rgba(8, 5, 26, 0.35);
+    --focus-input-bg-color: rgba(37, 28, 74, 0.6);
+    --dynamix-filetree-bg-color: var(--glass-tint-strong);
+    --dynamix-sweet-alert-icon-bg-color: transparent;
+
+    /* ---- Lines ---- */
+    --border-color: rgba(170, 155, 255, 0.12);
+    --disabled-border-color: rgba(170, 155, 255, 0.08);
+    --input-border-color: var(--aether-line-strong);
+    --disabled-input-border-color: var(--aether-line);
+    --textarea-border-color: var(--aether-line-strong);
+    --hr-color: rgba(170, 155, 255, 0.12);
+    --small-shadow: 0 0 3px var(--aether-line);
+
+    /* ---- Tables ---- */
+    --table-border-color: rgba(170, 155, 255, 0.1);
+    --table-background-color: rgba(255, 255, 255, 0.025);
+    --table-header-background-color: rgba(124, 92, 255, 0.08);
+    --hover-table-row-background-color: rgba(124, 92, 255, 0.14);
+
+    /* ---- Usage bars (status bars are recoloured under "Status colours") ---- */
+    --usage-bar-background-color: rgba(170, 155, 255, 0.12);
+    --usage-bar-used-background-color: var(--aether-violet);
+    --usage-disk-background-color: rgba(170, 155, 255, 0.08);
+
+    /* ---- Accent: replaces Unraid's orange/red brand colours ---- */
+    --brand-orange: #4fd8ff;
+    --brand-red: var(--aether-pink);
+    --checkbox-color: var(--aether-line-strong);
+    --checkbox-hover-color: var(--aether-violet);
+
+    /* ---- Buttons: glass pills, violet fill on hover (the Siri glow is added under "Controls") ---- */
+    --button-text-color: var(--aether-text);
+    --button-border: 0;
+    --button-background: var(--pill-sheen), rgba(40, 28, 82, 0.55);
+    --button-background-size: auto;
+    --hover-button-border: 0;
+    --hover-button-text-color: #ffffff;
+    --hover-button-background: linear-gradient(180deg, #9a82ff 0, #7354f0 55%, #5534c9 100%);
+
+    /* ---- Scrollbars ---- */
+    --scrollbar-color: var(--aether-line-strong);
+    --scrollbar-hover-color: #4d3f8a;
+
+    /*
+     * ---- Shape and space scales ----
+     * Radii: one small set.  Nested shapes follow Apple's "concentric" rule: the
+     * inner radius is the outer radius minus the gap between them, so the curves
+     * run parallel instead of pinching.
+     *   --r-xs   6px  tooltips, small chips
+     *   --r-sm  10px  tabs, folder boxes, the log well inside a dialog
+     *   --r-md  14px  multi-line text boxes
+     *   --r-lg  20px  panels: tables, dashboard tiles
+     *   --r-xl  28px  floating sheets: dialogs, the reboot card
+     *   --pill        anything one line tall: buttons, fields, title bars, usage bars
+     * Spacing: everything sits on a 4px grid.
+     */
+    --r-xs: 6px;
+    --r-sm: 10px;
+    --r-md: 14px;
+    --r-lg: 20px;
+    --r-xl: 28px;
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 20px;
+    --sp-6: 24px;
+    --sp-8: 32px;
+    --sp-12: 48px;
+    --gutter: var(--sp-6);     /* window edge to content */
+    --inset: var(--sp-5);      /* panel edge to text; title pills and tables share it so their text lines up */
+
+    /* Older names used further down, kept as aliases of the scale */
+    --aether-radius: var(--r-sm);
+    --aether-radius-small: var(--r-xs);
+}
+
+
+/* Native checkboxes, radio buttons and sliders take the theme violet instead of the Mac's
+   accent colour.  (Native dropdown menus can't be tinted from a web page: their highlight
+   comes from macOS, System Settings -> Appearance -> Accent colour.) */
+html:root {
+    accent-color: var(--aether-violet);
+}
+
+/* ===== Background: violet aurora for the glass to blur, plus the faint circuit grid ===== */
+
+body {
+    background-color: var(--aether-bg);
+    background-image:
+        linear-gradient(rgba(124, 92, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124, 92, 255, 0.035) 1px, transparent 1px),
+        radial-gradient(60vw 50vh at 12% 8%, rgba(109, 40, 217, 0.26), transparent 70%),
+        radial-gradient(45vw 40vh at 90% 18%, rgba(255, 61, 154, 0.09), transparent 70%),
+        radial-gradient(45vw 40vh at 85% 85%, rgba(0, 229, 255, 0.055), transparent 70%),
+        radial-gradient(70vw 60vh at 40% 100%, rgba(79, 70, 229, 0.19), transparent 70%);
+    background-size: 24px 24px, 24px 24px, auto, auto, auto, auto;
+    background-attachment: fixed;
+}
+
+
+/* ===== Font ===== */
+
+/* Unraid names Clear Sans in several places instead of inheriting, so each one is listed.
+   Icon fonts and the monospace log are deliberately left alone. */
+html,
+body input:not(.unapi *),
+body select:not(.unapi *),
+body textarea:not(.unapi *),
+body button:not(.unapi *),
+body a.button:not(.unapi *),
+body .textarea,
+body .font-sans,
+body .sweet-alert,
+body pre#swalbody,
+body #sb-title-inner,
+body #sb-info-inner,
+body .ui-dropdownchecklist-text,
+body .ui-dialog-buttonset button {
+    font-family: var(--aether-font);
+}
+
+
+/* ===== Glass panels ===== */
+
+/* Section title bars ("Array Devices", "Pool Devices", ...): glass pills */
+body div.title {
+    border-bottom: none;
+    border-radius: var(--pill);
+    background-color: var(--glass-tint);
+    background-image: var(--pill-sheen);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--pill-edge), var(--glass-drop);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* Data tables (Main, Shares, Docker, VMs, Plugins, ...).
+   clip-path rounds the corners without breaking Unraid's collapsed row borders.
+   A box-shadow rim (even an inset one) is sliced square at those rounded corners in Safari,
+   so instead the tables get the top highlight and a soft violet edge drawn by the gradients,
+   both of which fade cleanly into the curve. */
+body table:not(.unapi *):not(.dashboard) {
+    background-color: var(--glass-tint);
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 28px),
+        linear-gradient(0deg, rgba(124, 92, 255, 0.16), transparent 22px);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    clip-path: inset(0 round var(--glass-radius));
+}
+
+/* Column headers in sentence case and a softer colour, like a Finder list view */
+body table.unraid thead tr:first-child > td {
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--aether-text-dim);
+}
+
+/*
+ * Array Operation is six tables stacked on top of each other, most inside their
+ * own <form>.  They are joined into one panel: square seams in between, the
+ * rounded top and shine on the first (the only one without .noshift), the
+ * rounded bottom and glow on the last (the one with no array table after it).
+ */
+body table.array_status:not(.unapi *) {
+    clip-path: none;
+    background-image: none;
+}
+body table.array_status:not(.noshift):not(.unapi *) {
+    clip-path: inset(0 round var(--glass-radius) var(--glass-radius) 0 0);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 28px);
+}
+body :not(form) > table.array_status:not(:has(~ table.array_status, ~ form table.array_status)):not(.unapi *),
+body form:not(:has(~ table.array_status, ~ form table.array_status)) > table.array_status:not(.unapi *) {
+    clip-path: inset(0 round 0 0 var(--glass-radius) var(--glass-radius));
+    background-image: linear-gradient(0deg, rgba(124, 92, 255, 0.16), transparent 22px);
+}
+/* Tables nested inside another panel stay clear, or the glass doubles up */
+body table table:not(.unapi *),
+body .sweet-alert table:not(.unapi *),
+body .ui-dialog table:not(.unapi *) {
+    background-color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    clip-path: none;
+    box-shadow: none;
+}
+
+/*
+ * Dashboard: each tile is a <tbody> inside one big table.dashboard per column.
+ * Browsers ignore rounded corners and blur on table sections, so each tile is
+ * laid out as its own small table instead; then it can be a rounded glass card.
+ * The "stopgap" rows between tiles are Unraid's drag-and-drop targets: they stay,
+ * but lose the solid page colour Unraid paints them with (those were the dark strips).
+ */
+body table.dashboard {
+    display: block;
+    background-color: transparent;
+}
+body table.dashboard > tbody,
+body table.dashboard > thead {
+    display: table;
+    width: 100%;
+    table-layout: auto;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+body table.dashboard > tbody {
+    overflow: hidden;
+    border: 0;
+    /* Cells supply the left/right inset; the tile had almost no top/bottom to match it,
+       so content sat high and tight.  The tbody is display:table here, so padding lands
+       on the tile box and gives it the same breathing room top and bottom. */
+    padding: var(--inset) 0;
+    background: var(--glass-tint);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border-radius: var(--glass-radius);
+    corner-shape: squircle;
+    box-shadow: var(--glass-shine), var(--glass-drop);
+}
+body table.dashboard td.stopgap {
+    background-color: transparent;
+    height: var(--sp-4) !important;
+    line-height: var(--sp-4) !important;
+}
+/* The tbody padding above already gives the tile a 20px top/bottom frame, matching the
+   20px side inset.  Unraid adds its own ~10px on the header cell and the last row on top
+   of that, so the vertical frame measured 30px against the 20px sides.  Drop that extra
+   padding on the first and last rows so all four sides line up. */
+body table.dashboard > tbody > tr:first-child > td {
+    padding-top: 0;
+}
+body table.dashboard > tbody > tr:last-child > td {
+    padding-bottom: 0;
+}
+/* Container / app names on the dashboard tiles: Unraid lays each entry out as a
+   fixed ~185px box (.outer, float:left) holding a 42px icon plus the name over its
+   status, and lets the name grow with nowrap and no clipping.  Long names
+   (long-container-name-with-a-suffix) pushed past the box and overlapped
+   the next one.  Don't touch the box or the float (that changes how many columns fit):
+   just cap the name line to the space left beside the icon and clip it with an ellipsis.
+   The status sits on its own line after a <br>, so only the name span (first child of
+   .inner) is clamped. */
+body table.dashboard .outer .inner > span:first-child {
+    display: inline-block;
+    max-width: 140px;         /* ~185px cell minus the 42px icon, so the name never widens it */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+/* Tile buttons (settings, collapse): small glass circles instead of grey squares.
+   Unraid ties their icon colour to a background setting, which made them vanish. */
+body table.dashboard .control,
+body .tile-ctrl > .fa.hand {
+    /* exact circles; display is left to Unraid so buttons it hides stay hidden */
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    box-sizing: border-box;
+    line-height: 3rem;
+    text-align: center;
+    font-size: 1.3rem !important;
+    border-radius: 50%;
+    color: var(--aether-text-dim);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04) 55%, rgba(0, 0, 0, 0.18));
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    backdrop-filter: blur(10px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 2px 6px -2px rgba(0, 0, 0, 0.6);
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+body table.dashboard .control:hover,
+body .tile-ctrl > .fa.hand:hover {
+    color: #ffffff;
+    opacity: 1;
+    background: linear-gradient(180deg, rgba(167, 139, 250, 0.55), rgba(124, 92, 255, 0.3));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 0 0 1px rgba(200, 190, 255, 0.3), 0 0 12px rgba(124, 92, 255, 0.5);
+}
+body .tile-ctrl {
+    gap: var(--sp-2);
+}
+/* Tile header controls: the array / power actions (.tile-ctrl) and the view actions
+   (.tile-header-right-controls) read as two groups split by a faint hairline, not capsules. */
+body table.dashboard .tile-ctrl,
+body table.dashboard .tile-header-right-controls {
+    align-items: center;
+    gap: var(--sp-2);
+}
+body table.dashboard .tile-header-right {
+    gap: var(--sp-4);
+    align-items: center;
+    /* Align the controls to the top of the header instead of centring in the (tall, two-line)
+       title row, so the gap above them matches the gap to the tile's right edge. */
+    align-self: flex-start;
+}
+/* Faint vertical separator between the two groups, only when both are present */
+body table.dashboard .tile-ctrl + .tile-header-right-controls {
+    border-left: 1px solid var(--hairline);
+    padding-left: var(--sp-4);
+}
+
+/* Case icon (the server graphic on the main tile): Unraid's default-cases.css paints it
+   a fixed orange (rgb 241, 90, 44).  Retint it to the theme violet so it belongs. */
+body i#mycase,
+body [class^="case-"],
+body [class*=" case-"] {
+    color: var(--aether-violet) !important;
+}
+
+/* Holographic headers: an Apple-style pearlescent sheen for attention text.  The title is
+   filled with a soft cyan / violet / pink gradient that drifts slowly and continuously, so
+   it is always gently coloured rather than white with the odd flash.  The fill is clipped
+   to the glyphs; reduced-motion users get the same sheen held still. */
+@keyframes aether-holo {
+    from { background-position: 0% 50%; }
+    to   { background-position: 200% 50%; }
+}
+body .tile-header-main,
+body .tile-header-left i[class^="icon-"],
+body .tile-header-left i[class*=" icon-"],
+body div.title .left,
+body div.title .left i,
+body .sidenav :is(.rightTitle, .popupAuthorTitle) {
+    background: linear-gradient(90deg, #a9e3ff, #cdb9ff, #ffc2e2, #cdb9ff, #a9e3ff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aether-holo 14s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    body .tile-header-main,
+    body .tile-header-left i[class^="icon-"],
+    body .tile-header-left i[class*=" icon-"],
+    body div.title .left,
+    body div.title .left i,
+    body .sidenav :is(.rightTitle, .popupAuthorTitle) { animation: none; }
+}
+
+/* Dashboard charts.  The ring colours and percentage colours are status colours that
+   Unraid's script writes onto each element (green / orange / red by load), so they are
+   left alone.  Only the decorative defaults change:
+     - the donut centre was a fixed grey disc; now it matches the card, so it reads as a ring
+     - CPU load bars filled with light grey; now violet (a status colour Unraid sets still wins) */
+html:root {
+    --dashstats-pie-after-bg-color: #150d2c;
+}
+body div.pie::after {
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(200, 190, 255, 0.08);
+}
+/* The ring is one gradient drawn by Unraid's script, so its colours can't be swapped
+   directly.  A "color" blend layer on top keeps the ring's light and dark (how full it
+   is stays readable) but takes the theme violet as its hue.  The percentage in the
+   middle keeps its status colour. */
+body div.pie {
+    position: relative;
+    isolation: isolate;
+}
+body div.pie::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--aether-violet);   /* one hue, so filled vs empty reads by brightness alone */
+    mix-blend-mode: color;
+    pointer-events: none;
+}
+/* The RAM donut has a colour legend (System / VM / Docker / Free) whose dot colours the
+   script also writes inline.  Instead of the violet blend, the ring and its legend dots get
+   the same hue shift (orange -> violet, yellow -> pink; greys stay grey), so the legend still
+   matches.  The centre and the percentage get the opposite shift to keep their own colours. */
+body div.pie#sys0::before {
+    display: none;
+}
+body div.pie#sys0,
+body tbody[title*="Memory"] i.ups.fa-circle {
+    filter: hue-rotate(230deg) saturate(1.2);
+}
+body div.pie#sys0 > span,
+body div.pie#sys0::after {
+    filter: saturate(0.833) hue-rotate(-230deg);
+}
+body .usage-disk.sys > span:first-child {
+    background-color: var(--aether-violet);
+}
+
+/* Docker / VM items on the dashboard: soft rounded chips instead of sharp dark boxes */
+body span.outer {
+    border-radius: var(--r-sm);
+}
+body span.outer.solid {
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+body span.outer.solid:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+body .usage-disk.mm > span:first-child {
+    background-color: var(--aether-violet);
+}
+/* The processor history graph is a <canvas> the script paints orange.  CSS can't
+   recolour a canvas, but it can shift its hue: orange turns violet while the grey
+   grid lines (which have no hue) stay as they are. */
+body #cpuchart {
+    /* (Superseded by the height-gradient treatment at the end of this file.) */
+}
+
+/* Tile titles and column labels in sentence case, like the rest of the theme */
+body .tile-header-main,
+body span.header,
+body tr.header {
+    text-transform: none;
+    letter-spacing: 0.01em;
+}
+body span.header,
+body tr.header {
+    color: var(--aether-text-dim);
+    font-weight: 600;
+}
+
+/* Cinematic header: no hard bar edge, a Safari-ribbon-grade backdrop blur (vibrancy), and
+   a top-down violet wash that fades to transparent, so the chrome dissolves downward as
+   content scrolls under it instead of ending in a line. */
+#menu {
+    display: flex;
+    align-items: center;
+    /* Sticky, so the controls stay put as the page scrolls.  Breathing room above the
+       capsule so it isn't jammed under the Aether band. */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 10px 0;
+    background: none;
+    box-shadow: none;
+}
+/* Cinematic scrim: opaque dark and blurred at the top, fading GRADUALLY to perfectly clear
+   at the bottom.  The mask fades the blur out alongside the tint, so the bottom is truly
+   clear (no blur cliff), and because it's anchored to the top with no bottom edge it reads
+   as a top-down fade, not a bar.  It sits behind the controls, which stay sharp. */
+#menu::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: -40px;
+    z-index: -1;
+    pointer-events: none;
+    /* No colour wash, just the blur: solid behind the controls, fading out in the short strip
+       just below them so it never reaches down and washes out the page content. */
+    -webkit-backdrop-filter: blur(28px) saturate(120%);
+    backdrop-filter: blur(28px) saturate(120%);
+    -webkit-mask: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+    mask: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+}
+/* Utilities (the 90% usage bar + icon buttons) grouped on the right, on one baseline.
+   Left in normal flow so Unraid's search field expands and restores the way it expects. */
+#menu .nav-tile.right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+/* Keep the 90% bar at the start of the utilities group, so Unraid's search field (which
+   opens in the same row) pushes only the icons and the bar doesn't flip to the far side. */
+#menu .nav-tile.right .usage-bar {
+    order: -1;
+}
+/* Header utility icons: no box or circle, just the colour and hover treatment, the glyphs
+   sit on their own and brighten to white with a soft violet glow on hover. */
+#menu .nav-tile.right .nav-item.util > a > span {
+    display: none;
+}
+#menu .nav-tile.right .nav-item.util > a {
+    color: var(--aether-text-dim);
+    background: none;
+    box-shadow: none;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+#menu .nav-tile.right .nav-item.util > a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(167, 139, 250, 0.7);
+}
+#menu .nav-tile.right .nav-item.util:after {
+    display: none;
+}
+/* Power button (Dynamix System Buttons plugin): it's a red PNG, so CSS colour can't reach
+   it.  The image is swapped for a drawn power glyph in the same dim tone as the other header
+   icons (self-contained SVG, nothing is fetched).  Hover turns it crimson rose with a soft
+   glow instead of white/violet: it's a power action, so it should still say "careful". */
+#menu .nav-item.PowerButton img.system {
+    content: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b95b5%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M12%203v8%22%2F%3E%3Cpath%20d%3D%22M6.3%206.6a8%208%200%201%200%2011.4%200%22%2F%3E%3C%2Fsvg%3E");
+    width: 17px;
+    height: 17px;
+    transition: filter 0.2s;
+}
+/* The same plugin's dropdown header uses buttons.png, a tiny dark-grey icon that reads as a
+   broken image on the dark theme.  Matched by file name (the menu is drawn outside #menu)
+   and swapped for the power glyph in the theme's violet. */
+img[src$="/dynamix.system.buttons/icons/buttons.png"] {
+    content: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a78bfa%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M12%203v8%22%2F%3E%3Cpath%20d%3D%22M6.3%206.6a8%208%200%201%200%2011.4%200%22%2F%3E%3C%2Fsvg%3E");
+    width: 16px;
+    height: 16px;
+    border: 0;
+    background: none;
+}
+#menu .nav-item.PowerButton a:hover img.system {
+    content: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ff6f92%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M12%203v8%22%2F%3E%3Cpath%20d%3D%22M6.3%206.6a8%208%200%201%200%2011.4%200%22%2F%3E%3C%2Fsvg%3E");
+    filter: drop-shadow(0 0 6px rgba(244, 63, 110, 0.8));
+}
+/* The menu strip paints the header colour by default, which would hide the glass */
+#menu .nav-tile {
+    background-color: transparent;
+}
+/* Menu labels in sentence case, like macOS, instead of spaced-out capitals */
+#menu .nav-item a {
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-weight: 600;
+}
+/* The glowing marker under the current page, now a tiny pill */
+.nav-item:after,
+.nav-user.show:after {
+    height: 3px;
+    border-radius: var(--pill);
+}
+.nav-item:focus:after,
+.nav-item:hover:after,
+.nav-user.show:hover:after {
+    background: var(--aether-violet);
+}
+.nav-item.active:after {
+    background: var(--aether-gradient);
+    box-shadow: 0 0 10px rgba(124, 92, 255, 0.9), 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/*
+ * Header logos (drawn by Unraid's newer Vue components):
+ *   - the UNRAID wordmark is an <img> with the orange gradient baked in, so it is
+ *     repainted cyan -> violet -> pink through a mask of Unraid's own logo file
+ *   - the round avatar on the right is a red -> orange gradient circle; only that
+ *     exact element is targeted, so Unraid's red error text elsewhere stays red
+ */
+unraid-header-os-version a[href="https://unraid.net"] img {
+    /* Recolour Unraid's own wordmark without shipping a copy of it: the stock picture is
+       slid out of its box (object-position), the box is painted with the theme gradient,
+       and Unraid's logo file on this server is used as a stencil (mask) so the gradient
+       only shows through the letters. */
+    object-position: -9999px 0;
+    background: var(--aether-gradient);
+    -webkit-mask: url("/webGui/images/UN-logotype-gradient.svg") center / contain no-repeat;
+    mask: url("/webGui/images/UN-logotype-gradient.svg") center / contain no-repeat;
+}
+#UserProfile .rounded-full.from-unraid-red.to-orange {
+    background-image: linear-gradient(135deg, var(--aether-cyan) 0, var(--aether-violet) 55%, var(--aether-pink) 100%);
+    box-shadow: 0 0 14px rgba(124, 92, 255, 0.55);
+}
+
+/*
+ * Main menu tabs: a macOS-style segmented capsule.  All tabs sit in one glass capsule;
+ * the current page is a raised violet pill with a soft gradient glow all the way around
+ * it (like the Siri edge glow), and no hard ring; hover shows only a faint pill.
+ */
+#menu .nav-tile:not(.right) {
+    align-self: center;
+    gap: 2px;
+    width: max-content;
+    min-height: 0;
+    height: auto;
+    margin: 0 0 0 var(--gutter);
+    padding: 3px;
+    line-height: normal;
+    border-radius: var(--pill);
+    /* More opaque than before so the blur behind the header doesn't bleed through and make
+       the capsule look out of focus; crisper rim for definition. */
+    background: rgba(20, 13, 44, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(200, 190, 255, 0.2);
+    isolation: isolate;     /* keeps the active tab's glow behind the tab but inside the menu */
+}
+#menu .nav-tile:not(.right) .nav-item {
+    position: relative;
+    border-radius: var(--pill);
+    transition: background-color 0.2s;
+}
+#menu .nav-tile:not(.right) .nav-item a {
+    display: block;
+    padding: 6px var(--sp-4);
+    line-height: 2rem;
+    font-weight: 500;
+    /* Brighter than --aether-text-dim so resting tabs read as easily as the page tabs */
+    color: #b4bad6;
+    transition: color 0.2s;
+}
+/* Hover + press match the page tabs (Plugins, Docker...): a soft
+   fill and white text, eased in, with NO glow ring, plus a quick press-in on click. */
+#menu .nav-tile:not(.right) .nav-item {
+    transition: background-color 0.2s, transform 0.12s ease-out;
+}
+#menu .nav-tile:not(.right) .nav-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+#menu .nav-tile:not(.right) .nav-item:hover a {
+    color: #ffffff;
+}
+#menu .nav-tile:not(.right) .nav-item:active,
+body .tabs button[role="tab"]:active {
+    transform: scale(0.96);
+}
+/* Click feel for the main menu.  Page tabs switch in place, so the browser animates
+   pressed -> active for free.  A menu click loads a NEW page, so that can't carry over.
+   Faked in two halves: (1) while the mouse is down, a violet flash + press-in;
+   (2) on the new page, the active tab "settles" in from pressed and bright to normal. */
+/* While pressed (and while Safari waits for the next page, which can take a second), the tab
+   shows EXACTLY the first frame of the new page's settle animation: violet pill, pressed to
+   94%, full-strength gradient halo.  So old page -> new page is one continuous motion with no
+   flat-purple pause in between.  Same three-layer build as the active tab below. */
+#menu .nav-tile:not(.right) .nav-item:active {
+    isolation: isolate;
+    background: none;
+    transform: scale(0.94);
+}
+#menu .nav-tile:not(.right) .nav-item:active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: var(--pill);
+    background: linear-gradient(180deg, #3a2a78, #2a1d5c);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 1px rgba(200, 190, 255, 0.32);
+}
+#menu .nav-tile:not(.right) .nav-item:active::after {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: -6px;
+    z-index: -2;
+    border-radius: var(--pill);
+    background: var(--aether-gradient);
+    filter: blur(10px);
+    opacity: 1;
+}
+#menu .nav-tile:not(.right) .nav-item:active a {
+    color: #ffffff;
+    font-weight: 600;
+}
+/* The active tab is built as three fixed layers so its stacking never changes:
+     item  (isolated layer, no background of its own)
+     ::before  the violet pill + rim         z-index -1
+     ::after   the blurred gradient halo     z-index -2  (behind the pill = "backlit")
+   Why: the earlier version put the pill on the item itself.  Any animation using transform or
+   filter turns the item into its own layer while it runs, which pulled the halo IN FRONT of
+   the pill, and the instant the animation ended the halo snapped back behind it (the abrupt
+   change).  With the item always isolated and the pill on ::before, the order is
+   the same before, during and after, so the glow can fade smoothly.
+   On page load: the press-in springs back (0.35s) and the halo dims from full gradient glow
+   down to the soft backlight (1.4s). */
+#menu .nav-tile:not(.right) .nav-item.active {
+    isolation: isolate;
+    background: none;
+    box-shadow: none;
+    animation: aether-tab-press-out 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#menu .nav-tile:not(.right) .nav-item.active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: var(--pill);
+    background: linear-gradient(180deg, #3a2a78, #2a1d5c);
+    /* the thin light rim the page tabs' active pill has */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 1px rgba(200, 190, 255, 0.32);
+}
+@keyframes aether-tab-press-out {
+    from { transform: scale(0.94); }
+    to   { transform: none; }
+}
+@keyframes aether-tab-halo-dim {
+    0%   { opacity: 1;    inset: -6px; filter: blur(10px); }
+    20%  { opacity: 0.95; inset: -5px; filter: blur(9px); }
+    100% { opacity: 0.55; inset: -2px; filter: blur(7px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    #menu .nav-tile:not(.right) .nav-item.active,
+    #menu .nav-tile:not(.right) .nav-item.active:after { animation: none; }
+}
+#menu .nav-tile:not(.right) .nav-item.active a {
+    color: #ffffff;
+    font-weight: 600;
+}
+#menu .nav-tile:not(.right) .nav-item:after {
+    display: none;
+}
+#menu .nav-tile:not(.right) .nav-item.active:after {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: -2px;
+    z-index: -2;
+    animation: aether-tab-halo-dim 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+    width: auto;
+    height: auto;
+    margin: 0;
+    transform: none;
+    border-radius: var(--pill);
+    background: var(--aether-gradient);
+    filter: blur(7px);
+    opacity: 0.55;
+    box-shadow: none;
+}
+
+/* Footer: frosted, with the gradient hairline along the top edge */
+#footer {
+    background: rgba(10, 6, 30, 0.55);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border-top: 1px solid transparent;
+    border-image: var(--aether-gradient) 1;
+}
+
+
+/* ===== Dialogs (update log, plugin installs, confirmations) ===== */
+
+.sweet-overlay,
+.ui-widget-overlay {
+    background-color: rgba(8, 5, 26, 0.45) !important;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+.sweet-alert,
+.ui-dialog {
+    background: var(--glass-tint-strong) !important;
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    backdrop-filter: blur(32px) saturate(180%);
+    border: 0 !important;
+    border-radius: var(--r-xl) !important;
+    box-shadow: var(--glass-shine), 0 30px 80px -20px rgba(0, 0, 0, 0.85), 0 0 60px -20px rgba(124, 92, 255, 0.5) !important;
+}
+.ui-dialog .ui-widget-content,
+.ui-dialog .ui-dialog-titlebar,
+.ui-dialog .ui-dialog-buttonpane {
+    background: transparent !important;
+    border-color: var(--glass-edge) !important;
+}
+.sweet-alert h2,
+.sweet-alert p {
+    color: var(--aether-text);
+}
+/* Modal headers (System Info, the Release Notes title + its section headers, the update
+   log window, confirmations): the holographic shimmer, no grey strip.  These dialogs share
+   the SAME pre#swalbody for their body (the release notes render into it just like the live
+   log does), so there's no reliable class to single out the log window - and its title looks
+   just as good shimmering.  So every sweet-alert header gets one treatment, and the old
+   gradient strip + bottom hairline (the "boxy bar") is gone.  Scoped with .nchan to match the
+   specificity that was proven to win over Unraid's own header rules. */
+/* Modal headers get the SAME glass pill as the main-page section headers (body div.title):
+   a glass-tint capsule with the pill sheen and edge, shimmer text inside.  The pill sits on a
+   ::before so it reads as a capsule behind the text while the text itself stays clipped to the
+   shimmer gradient (div.title can put the two on parent + child; a heading can't, so ::before
+   carries the capsule). */
+/* Shimmer text on a capsule styled like the main menu's.
+   Why it used to look "ghosted": the shimmer IS the heading's own background,
+   clipped to the letters, and the capsule is a ::before at z-index -1.  The heading also had
+   z-index: 0, which made it its own stacking layer, so the -1 capsule painted INSIDE it, on
+   top of its background, i.e. over the text.  With no z-index on the heading, the capsule
+   drops to the dialog's layer instead: above the dialog's background, below the heading. */
+.sweet-alert.nchan h1,
+.sweet-alert.nchan h2,
+.sweet-alert.nchan h3 {
+    position: relative;
+    margin: var(--sp-3) 0 var(--sp-4);
+    padding: 10px var(--inset);
+    background: linear-gradient(90deg, #a9e3ff, #cdb9ff, #ffc2e2, #cdb9ff, #a9e3ff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-weight: 600;
+    box-shadow: none;
+    animation: aether-holo 14s linear infinite;
+}
+.sweet-alert.nchan h1::before,
+.sweet-alert.nchan h2::before,
+.sweet-alert.nchan h3::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: var(--pill);
+    background: rgba(20, 13, 44, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(200, 190, 255, 0.2);
+}
+@media (prefers-reduced-motion: reduce) {
+    .sweet-alert.nchan h1,
+    .sweet-alert.nchan h2,
+    .sweet-alert.nchan h3 { animation: none; }
+}
+/* The log itself sits in a darker inset well so it stays easy to read */
+.sweet-alert pre#swaltext,
+.sweet-alert pre#swalbody {
+    background: rgba(4, 2, 12, 0.55);
+    border-radius: var(--aether-radius);
+    box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(170, 155, 255, 0.08);
+}
+
+/* ===== GUI search autocomplete (the header search-box dropdown) ===== */
+/* Unraid's search is powered by Awesomplete: a bare <ul id="awesomplete_list_N"> of
+   <li role="option"> rows, with the typed match wrapped in <mark>.  Out of the box the
+   list is transparent (the dark page just shows through), the selected row is Awesomplete's
+   flat blue (rgb 59,89,152) and <mark> is browser-yellow.  Dress it as a glass sheet with
+   violet pill rows, matching the <select> menus.  Targeted by the id prefix (stable; the
+   trailing number increments) so it works regardless of the .awesomplete wrapper. */
+ul[id^="awesomplete_list_"] {
+    margin-top: var(--sp-2);
+    padding: var(--sp-2);
+    background: var(--glass-tint-strong);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--r-md);
+    box-shadow: var(--glass-shine), var(--glass-drop);
+}
+/* Awesomplete draws a small pointer triangle above the list; drop it for a clean sheet */
+ul[id^="awesomplete_list_"]::before {
+    display: none;
+}
+ul[id^="awesomplete_list_"] > li {
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--r-sm);
+    color: var(--aether-text);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+/* Hover and the keyboard-selected row (aria-selected) both get the violet pill */
+ul[id^="awesomplete_list_"] > li:hover,
+ul[id^="awesomplete_list_"] > li[aria-selected="true"] {
+    background: linear-gradient(180deg, rgba(167, 139, 250, 0.55), rgba(124, 92, 255, 0.3));
+    color: #ffffff;
+}
+/* The typed match: a soft violet highlight pill (not Awesomplete's yellow, not a neon swap).
+   On the active violet-pill row it shifts to a frosted white so it still reads. */
+ul[id^="awesomplete_list_"] mark {
+    background: rgba(124, 92, 255, 0.35);
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 0 2px;
+    font-weight: 600;
+}
+ul[id^="awesomplete_list_"] > li:hover mark,
+ul[id^="awesomplete_list_"] > li[aria-selected="true"] mark {
+    background: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
+/* The Apps-page search uses the same Awesomplete widget, but Community Applications
+   ships its own stylesheet with a solid-white `.awesomplete > ul` (and a white pointer
+   triangle).  That rule ties the one above on specificity, so on the Apps page CA wins
+   and the dropdown comes out white.  Override `.awesomplete > ul` directly: the `body`
+   prefix lifts specificity past CA's, so the same glass sheet lands on both searches. */
+body .awesomplete > ul {
+    margin: var(--sp-2) 0 0;
+    padding: var(--sp-2);
+    background: var(--glass-tint-strong);
+    background-image: none;
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--r-md);
+    box-shadow: var(--glass-shine), var(--glass-drop);
+    text-shadow: none;
+}
+body .awesomplete > ul::before {
+    display: none;            /* CA's white pointer triangle */
+}
+body .awesomplete > ul > li {
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--r-sm);
+    color: var(--aether-text);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+body .awesomplete > ul > li:hover,
+body .awesomplete > ul > li[aria-selected="true"] {
+    background: linear-gradient(180deg, rgba(167, 139, 250, 0.55), rgba(124, 92, 255, 0.3));
+    color: #ffffff;
+}
+body .awesomplete mark {
+    background: rgba(124, 92, 255, 0.35);
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 0 2px;
+    font-weight: 600;
+}
+body .awesomplete > ul > li:hover mark,
+body .awesomplete > ul > li[aria-selected="true"] mark {
+    background: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
+
+/* ===== Controls: Apple-style pills with a Siri-style glow ===== */
+
+/*
+ * The glow: a violet ring with cyan bleeding out on the left and pink on the
+ * right, which slowly trade places while a field has focus, like the edge glow
+ * when Siri is listening.  Browsers can't put a glow on the text cursor itself,
+ * so the cursor is tinted lavender and the field around it does the glowing.
+ */
+@keyframes aether-siri {
+    0%, 100% {
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.16),
+            0 0 0 1px rgba(124, 92, 255, 0.6),
+            -8px 0 18px -6px rgba(0, 229, 255, 0.55),
+            8px 0 18px -6px rgba(255, 61, 154, 0.55),
+            0 0 24px -8px rgba(124, 92, 255, 0.8);
+    }
+    50% {
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.16),
+            0 0 0 1px rgba(124, 92, 255, 0.6),
+            -8px 0 18px -6px rgba(255, 61, 154, 0.55),
+            8px 0 18px -6px rgba(0, 229, 255, 0.55),
+            0 0 24px -8px rgba(124, 92, 255, 0.8);
+    }
+}
+
+/* Buttons: sentence-case glass pills; hover fills violet and lights the glow */
+body input[type="button"]:not(.unapi *),
+body input[type="reset"]:not(.unapi *),
+body input[type="submit"]:not(.unapi *),
+body button:not(.unapi *),
+body a.button:not(.unapi *) {
+    border-radius: var(--pill);
+    text-transform: capitalize;    /* "add-folder" -> "Add-folder"; Unraid's own labels are already Title Case */
+    letter-spacing: 0.01em;
+    font-size: 1.25rem;
+    font-weight: 600;
+    box-shadow: var(--pill-edge);
+    transition: box-shadow 0.25s, background 0.25s;
+}
+body input[type="button"]:not(.unapi *):hover,
+body input[type="submit"]:not(.unapi *):hover,
+body button:not(.unapi *):hover,
+body a.button:not(.unapi *):hover,
+body input[type="button"]:not(.unapi *):focus-visible,
+body input[type="submit"]:not(.unapi *):focus-visible,
+body button:not(.unapi *):focus-visible,
+body a.button:not(.unapi *):focus-visible {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        -8px 0 18px -6px rgba(0, 229, 255, 0.5),
+        8px 0 18px -6px rgba(255, 61, 154, 0.5);
+}
+body input[type="button"][disabled]:not(.unapi *),
+body input[type="reset"][disabled]:not(.unapi *),
+body input[type="submit"][disabled]:not(.unapi *),
+body button[disabled]:not(.unapi *),
+body a.button[disabled]:not(.unapi *) {
+    background: rgba(40, 28, 82, 0.45);
+    color: var(--aether-text-dim);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+    cursor: not-allowed;
+}
+
+/* The menu-bar search box: Unraid gives it a solid grey background with an ID rule,
+   which showed through the glass as pale lavender; this matches it to the other fields */
+body #guiSearchBox {
+    background-color: rgba(8, 5, 26, 0.45);
+    color: var(--aether-text);
+    caret-color: #c4b5fd;
+}
+
+/* Text fields and dropdowns: Spotlight-style pills instead of Unraid's underline */
+body input[type="text"]:not(.unapi *),
+body input[type="password"]:not(.unapi *),
+body input[type="number"]:not(.unapi *),
+body input[type="url"]:not(.unapi *),
+body input[type="email"]:not(.unapi *),
+body select:not(.unapi *) {
+    border: 0;
+    border-radius: var(--pill);
+    background-color: rgba(8, 5, 26, 0.45);
+    box-shadow: var(--pill-edge);
+    caret-color: #c4b5fd;
+    transition: box-shadow 0.25s;
+}
+/* Text fields get a recessed "well" instead of the raised pill sheen, so they read as a
+   type-able input, clearly distinct from the pill buttons and the dropdowns (which stay
+   pills).  Rounded-rectangle, darker inset, soft inner shadow. */
+body input[type="text"]:not(.unapi *),
+body input[type="password"]:not(.unapi *),
+body input[type="number"]:not(.unapi *),
+body input[type="url"]:not(.unapi *),
+body input[type="email"]:not(.unapi *) {
+    border-radius: var(--r-sm);
+    background-image: none;
+    background-color: rgba(8, 5, 26, 0.6);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5), inset 0 0 0 1px var(--hairline);
+}
+/* Unraid draws the dropdown arrow with two background gradients; pull it in from the curved
+   edge.  Every select (Shares' SMB filter, Settings menus, plugin selects) gets the same
+   room on both sides and a consistent minimum height, so they all read as one control. */
+body select:not(.unapi *) {
+    background-position: calc(100% - 16px), calc(100% - 12px);
+    padding: 2px 2.6rem 2px var(--sp-3);
+    min-height: 2.4rem;
+}
+/* Dashboard graph timeframe pickers (#cpuline, #netline): DashStats.css sets an
+   ID-level padding of 0 12px 0 0 that beat the theme and jammed the value against
+   the pill's left curve, so these two need the padding restated at ID weight to win. */
+body select#cpuline:not(.unapi *),
+body select#netline:not(.unapi *) {
+    padding: 2px 2.4rem 2px var(--sp-3);
+}
+/* Multi-line boxes: a dark glass well.  !important because many plugins write
+   background: #111 / border: #444 straight onto their textareas, which would
+   otherwise win and leave a flat grey box. */
+body textarea:not(.unapi *) {
+    border: 0 !important;
+    border-radius: var(--r-md);
+    background: rgba(26, 17, 56, 0.6) !important;
+    color: var(--aether-text) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 0 1px rgba(200, 190, 255, 0.2),
+        inset 0 2px 10px rgba(0, 0, 0, 0.35);
+    caret-color: #c4b5fd;
+}
+/* Code and log blocks: the same well instead of Unraid's grey outline */
+body pre:not(.unapi *) {
+    border: 0;
+    border-radius: var(--r-sm);
+    background: rgba(8, 5, 26, 0.45);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+}
+body input[type="text"]:not(.unapi *):focus,
+body input[type="password"]:not(.unapi *):focus,
+body input[type="number"]:not(.unapi *):focus,
+body input[type="url"]:not(.unapi *):focus,
+body input[type="email"]:not(.unapi *):focus,
+body select:not(.unapi *):focus,
+body textarea:not(.unapi *):focus {
+    outline: none;
+    animation: aether-siri 4s ease-in-out infinite;
+}
+
+/* Toggle switches (autostart, "All Apps"): macOS-style pills, violet when on */
+body .switch-button-background {
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 0;
+    border-radius: var(--pill);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+body .switch-button-background.checked {
+    background-color: var(--aether-violet);
+}
+body .switch-button-button {
+    top: 0;
+    background-color: #ffffff;
+    border: 0;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+body .switch-button-label {
+    text-transform: none;
+    letter-spacing: 0.01em;
+}
+body .switch-button-label.on {
+    color: #c4b5fd;
+}
+
+/* Dropdown menus: browsers with customisable selects get a glass menu with a violet
+   highlight.  Chrome/Edge render it fully frosted.  Safari supports base-select and
+   ::picker but does not composite backdrop-filter in the popup's top layer, so there it
+   falls back to a dark translucent panel (still on-brand, just without the live blur).
+   Browsers without base-select use their native menu unchanged. */
+@supports (appearance: base-select) {
+    body select:not(.unapi *),
+    body select:not(.unapi *)::picker(select) {
+        appearance: base-select;
+    }
+    body select:not(.unapi *)::picker-icon {
+        display: none;          /* Unraid already draws its own arrow */
+    }
+    body select:not(.unapi *)::picker(select) {
+        padding: 6px;
+        border: 0;
+        border-radius: 16px;
+        /* Dark glass: Safari paints the colour but not backdrop-filter in the popup's
+           top layer, so the tint is kept dark enough to read as glass on its own; the
+           bright rim and top highlight do the "glass" work there, and Chrome/Edge add
+           the real frost on top. */
+        background: rgba(12, 7, 28, 0.78);
+        -webkit-backdrop-filter: blur(28px) saturate(120%);
+        backdrop-filter: blur(28px) saturate(120%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 0 1px rgba(200, 190, 255, 0.28), 0 20px 50px -15px rgba(0, 0, 0, 0.85);
+    }
+    /* Items: rounded violet pills, violet hover and a filled current item */
+    body select:not(.unapi *) option {
+        min-height: 0;
+        margin: 2px;
+        padding: 6px 14px;
+        line-height: 1.5;
+        text-align: left;
+        border-radius: 10px;
+        color: var(--aether-text);
+        background: transparent;
+        outline: none;
+    }
+    body select:not(.unapi *) option:hover,
+    body select:not(.unapi *) option:focus-visible {
+        color: #ffffff;
+        background: rgba(124, 92, 255, 0.45);
+        outline: none;
+    }
+    body select:not(.unapi *) option:checked {
+        background: rgba(124, 92, 255, 0.3);
+        font-weight: 600;
+    }
+    body select:not(.unapi *) option::checkmark {
+        color: #c4b5fd;
+    }
+}
+
+/* Capacity bars: pill track and pill fill; plain bars get the accent gradient */
+body .usage-disk,
+body .usage-disk > span:first-child,
+body .usage-bar,
+body .usage-bar > span {
+    border-radius: var(--pill);
+}
+.usage-bar > span:not([class]) {
+    background: var(--aether-gradient);
+}
+
+/* Loading animation (the bouncing Unraid bars): an inline SVG whose nine bars share
+   a two-stop orange gradient.  CSS can't add a third stop, so each bar gets its own
+   colour instead, stepping cyan -> violet -> pink from left to right. */
+/* (No glow filter here: Safari clips a filtered SVG to its resting box, which
+   chopped the bouncing bars into pieces.) */
+svg.unraid_mark .unraid_mark_1 { fill: #00e5ff; }
+svg.unraid_mark .unraid_mark_2 { fill: #1fc3ff; }
+svg.unraid_mark .unraid_mark_3 { fill: #3ea1ff; }
+svg.unraid_mark .unraid_mark_4 { fill: #5d7eff; }
+svg.unraid_mark .unraid_mark_5 { fill: #7c5cff; }
+svg.unraid_mark .unraid_mark_6 { fill: #9d54e6; }
+svg.unraid_mark .unraid_mark_7 { fill: #be4dcd; }
+svg.unraid_mark .unraid_mark_8 { fill: #de45b3; }
+svg.unraid_mark .unraid_mark_9 { fill: #ff3d9a; }
+
+/* Links: a light violet from the brand palette instead of Unraid's fixed dark blue
+   (--blue-800), which was hard to read on violet and read as "off" next to the theme.
+   :visited is claimed too, so pages you've already opened no longer fall through to the
+   browser's leftover purple.  Same low specificity as Unraid's own rule, so menu items
+   and other styled links keep their colours.  Order follows LVHA so hover still wins. */
+a {
+    color: var(--link-text-color);
+}
+a:visited {
+    color: var(--link-visited-color);
+}
+a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(167, 139, 250, 0.7);
+}
+::selection {
+    color: #ffffff;
+    background: rgba(124, 92, 255, 0.55);
+}
+
+/* Tooltips: a small frosted pill with no arrow, like macOS */
+.tooltipster-sidetip .tooltipster-box {
+    background: rgba(20, 12, 46, 0.82);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    backdrop-filter: blur(20px) saturate(170%);
+    border: 0 !important;      /* Unraid adds a 3px orange edge per tooltip direction */
+    border-radius: var(--r-sm);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 0 0 1px rgba(200, 190, 255, 0.18),
+        0 8px 24px -8px rgba(0, 0, 0, 0.7);
+}
+.tooltipster-sidetip .tooltipster-content {
+    color: var(--aether-text);
+    padding: var(--sp-2) var(--sp-3);
+}
+.tooltipster-sidetip .tooltipster-arrow {
+    display: none;
+}
+
+/* Docker / VM folder boxes, tabs, tooltips and shaded panels */
+body .folder-preview {
+    border-radius: var(--aether-radius);
+    corner-shape: squircle;
+}
+/* Page tabs (Plugins, Docker, VMs and other sub-pages): the tabs sit in one glass capsule,
+   the same segmented control as the main nav, with the current tab a raised violet pill.
+   The action buttons Unraid appends to the row (Check For Updates, Update All ...) are
+   lifted out of the capsule and pinned to the far right. */
+body nav.tabs {
+    position: relative;
+    border: 0;
+    overflow: visible;   /* see .tabs-container: no scroll bars from the press glow */
+}
+/* Built to match the main menu capsule exactly (#menu .nav-tile:not(.right)): the same
+   near-opaque deep-violet fill and crisp rim (the old 5% white fill read as ghosted),
+   the same tab type (no button letter-spacing, weight 500, full opacity), and the same
+   raised active pill with the soft gradient glow behind it. */
+body .tabs-container {
+    /* Unraid makes this row scrollable; the glow around a pressed tab reached past the edge
+       and summoned scroll bars.  It's a single short row, so nothing needs to scroll. */
+    overflow: visible;
+    display: inline-flex;
+    width: max-content;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border-radius: var(--pill);
+    background: rgba(20, 13, 44, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(200, 190, 255, 0.2);
+    isolation: isolate;     /* keeps the active tab's glow behind the tab but inside the capsule */
+}
+body .tabs button[role="tab"] {
+    position: relative;
+    border: 0;
+    border-radius: var(--pill);
+    padding: 6px var(--sp-4);
+    margin: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #b4bad6;
+    font-weight: 500;
+    letter-spacing: normal;
+    text-transform: none;
+    line-height: 2rem;
+    opacity: 1;
+    transition: background 0.2s, color 0.2s, box-shadow 0.25s, transform 0.12s ease-out;
+}
+body .tabs button[role="tab"] :is(i, span) {
+    color: inherit;
+    opacity: 1;
+}
+body .tabs button[role="tab"]:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: #ffffff;
+}
+/* Selected tab: the same three fixed layers and backlit fade as the main menu (see the
+   long note at #menu ... .nav-item.active): the button is its own isolated layer with no
+   background, the violet pill is ::before (z -1), the gradient halo ::after (z -2).
+   Pressing shows full glow; when the tab becomes selected the halo dims to the backlight.
+   Tabs switch in place, so here the browser plays it all in one go. */
+body .tabs button[role="tab"]:is([aria-selected="true"], :active) {
+    isolation: isolate;
+    background: none;
+    box-shadow: none;
+    color: #ffffff;
+    /* "Bold" drawn with a hairline stroke instead of font-weight, so the label never gets
+       wider: a wider label resized the capsule and pushed the pill off-centre. */
+    font-weight: 500;
+    -webkit-text-stroke: 0.35px currentColor;
+}
+body .tabs button[role="tab"]:is([aria-selected="true"], :active)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: var(--pill);
+    background: linear-gradient(180deg, #3a2a78, #2a1d5c);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 1px rgba(200, 190, 255, 0.32);
+    pointer-events: none;
+}
+body .tabs button[role="tab"]:is([aria-selected="true"], :active)::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -2;
+    border-radius: var(--pill);
+    background: var(--aether-gradient);
+    filter: blur(7px);
+    opacity: 0.55;
+    pointer-events: none;
+}
+body .tabs button[role="tab"][aria-selected="true"]::after {
+    animation: aether-tab-halo-dim 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+body .tabs button[role="tab"][aria-selected="true"] {
+    animation: aether-tab-press-out 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* While pressed: the first frame of the fade (pressed in, full-strength halo) */
+body .tabs button[role="tab"]:active {
+    transform: scale(0.94);
+}
+body .tabs button[role="tab"]:active::after {
+    inset: -6px;
+    filter: blur(10px);
+    opacity: 1;
+    animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    body .tabs button[role="tab"][aria-selected="true"],
+    body .tabs button[role="tab"][aria-selected="true"]::after { animation: none; }
+}
+/* Action buttons: out of the capsule (absolute, so they don't widen it), pinned right */
+body .tabs-container #checkall,
+body .tabs-container #updateall,
+body .tabs-container #removeall {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    margin: 0;
+}
+body .shade,
+body a.info span,
+body .clipboard-tooltip {
+    border-radius: var(--aether-radius-small);
+}
+
+/* ---- Plugins page table ---- */
+/* Headers: sentence case + dim, matching the other tables (these are <th> with a
+   .tablesorter-header-inner wrapper the generic <td> rule never reached).  tablesorter
+   darkens the *sorted* columns (Plugin, Status) with a per-cell background of its own,
+   which made those two look different from the rest; !important clears that highlight so
+   every header is uniform, like the Main page.  (Its two-class selector outweighs ours.) */
+body table.tablesorter thead th,
+body table.tablesorter thead th.tablesorter-headerAsc,
+body table.tablesorter thead th.tablesorter-headerDesc {
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--aether-text-dim);
+    background: transparent !important;
+    padding-top: var(--sp-2);
+    padding-bottom: var(--sp-2);
+    vertical-align: middle;
+}
+/* Row icons in list tables (plugins, device links, ...): a consistent near-white, so they
+   match across every page instead of inheriting the violet link colour inside <a> wrappers.
+   Image logos keep their own colours; status dots aren't .list so they stay too. */
+body i.list {
+    color: var(--aether-text);
+}
+/* Plugin names sit in full theme text, not the dimmer body colour */
+body table.plugins .desc_readmore h4,
+body table.plugins .desc_readmore strong {
+    color: var(--aether-text);
+}
+
+
+/*
+ * ---- Status colours ----
+ * Replaces Unraid's green / orange / red with softer versions that sit
+ * with the Aether palette: mint, amber and rose, with periwinkle links.
+ * Change the values below to retune everything in this section.
+ */
+html:root {
+    --aether-ok: #10c98f;
+    --aether-attention: #f59e0b;
+    --aether-problem: #f43f6e;
+
+    --aether-bar-ok: linear-gradient(90deg, #0a9a6e 0, #10c98f 70%, #3ee0ae 100%);
+    --aether-bar-attention: linear-gradient(90deg, #c77a06 0, #f59e0b 70%, #ffbf4d 100%);
+    --aether-bar-problem: linear-gradient(90deg, #c22a55 0, #f43f6e 70%, #ff6f92 100%);
+    --aether-bar-ink: #0a0f1c;
+}
+
+/* Status text and icons: started / stopped, "up-to-date", "update ready", container names with an update, errors */
+/* Unraid's palette status colours (status dots, "Parity is valid", share dots, and more) */
+html:root {
+    --green-200: #10c98f;
+    --green-500: #0fb07e;
+    --green-800: #10c98f;
+    --green-900: #0a9a6e;
+    --orange-300: #f59e0b;
+    --red-500: #f43f6e;
+    --red-600: #f43f6e;
+    --red-700: #f43f6e;
+    --red-800: #f43f6e;
+}
+html:root .unapi,
+html:root .unapi.dark {
+    --color-unraid-red: #f43f6e;    /* bell alert dot and error text in the newer components */
+}
+
+/* The dashboard script writes one of three fixed colours straight onto load figures
+   (CPU %, donut %): #4f8a10 normal, #e68a00 warning, #f0000c critical.  Match them
+   and swap in the theme's mint / amber / rose.  The rings themselves are a single
+   script-drawn gradient, which CSS can't recolour. */
+body [style*="color: rgb(79, 138, 16)"] { color: var(--aether-ok) !important; }
+body [style*="color: rgb(230, 138, 0)"] { color: var(--aether-attention) !important; }
+body [style*="color: rgb(240, 0, 12)"] { color: var(--aether-problem) !important; }
+
+body .green-text,
+body .passed {
+    color: var(--aether-ok);
+}
+body .orange-text,
+body .warning {
+    color: var(--aether-attention);
+}
+body .red-text,
+body .failed {
+    color: var(--aether-problem);
+}
+
+/* Capacity bars on Main, Shares and Dashboard, and the array usage bar in the header */
+body .greenbar {
+    background: var(--aether-bar-ok);
+}
+body .orangebar {
+    background: var(--aether-bar-attention);
+}
+body .redbar {
+    background: var(--aether-bar-problem);
+}
+/* A soft glow in each bar's own colour */
+body .greenbar { box-shadow: 0 0 8px rgba(16, 201, 143, 0.45); }
+body .orangebar { box-shadow: 0 0 8px rgba(245, 158, 11, 0.45); }
+body .redbar { box-shadow: 0 0 8px rgba(244, 63, 110, 0.45); }
+body .green-text, body .passed, body .green { text-shadow: 0 0 6px rgba(16, 201, 143, 0.3); }
+body .orange-text, body .warning { text-shadow: 0 0 6px rgba(245, 158, 11, 0.3); }
+body .red-text, body .failed { text-shadow: 0 0 6px rgba(244, 63, 110, 0.3); }
+/* The header bar prints its percentage on top of the fill; white is unreadable on mint and amber */
+body .usage-bar > span.greenbar,
+body .usage-bar > span.orangebar {
+    color: var(--aether-bar-ink);
+}
+/* Disk bars print the size across the fill and the empty track, so it gets a dark halo instead.
+   The label is pinned to the bar's own height: Unraid nudged it up by a fixed amount
+   that assumed its original row height, so taller rows left it sitting low. */
+body .usage-disk:not(.sys):not(.mm) > span:last-child:not(:first-child) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    line-height: 1.8rem;
+}
+body .usage-disk > span:last-child {
+    text-shadow: 0 1px 1px var(--aether-bar-ink), 0 0 3px var(--aether-bar-ink);
+}
+
+
+/*
+ * ---- Spacing and wrapping ----
+ * Rounded glass clips anything that sits in a corner, so outer cells and bars
+ * get extra room.  Table cells keep Unraid's single line with "..." on purpose:
+ * wrapping them would make rows uneven and break the column layout.
+ */
+
+/* First and last column of every table: clear of the rounded corners */
+html body table:not(.unapi *) tr > :is(td, th):first-child {
+    padding-left: var(--inset);
+}
+html body table:not(.unapi *) tr > :is(td, th):last-child {
+    padding-right: var(--inset);
+}
+html body table table:not(.unapi *) tr > :is(td, th):first-child,
+html body table table:not(.unapi *) tr > :is(td, th):last-child {
+    padding-left: var(--sp-2);
+    padding-right: var(--sp-2);
+}
+
+/* Rows: Unraid packs them at 26px; 32px gives each line room to breathe without
+   making the Main page much longer.  Limited to Unraid's standard tables. */
+html body table.unraid thead td,
+html body table.unraid tbody td {
+    height: 3.2rem;
+    line-height: 3.2rem;
+}
+
+/* Page: wider margins at the window edges and more air between sections than
+   between a section's title and its own table, so each section reads as a group */
+html body #displaybox {
+    padding-top: var(--sp-6);
+    padding-right: var(--gutter);
+    padding-bottom: var(--sp-12);
+}
+html:not(.Theme--sidebar) body #displaybox {
+    padding-left: var(--gutter);
+}
+html body div.title {
+    margin: var(--sp-8) 0 var(--sp-3);
+}
+html body div.title:first-of-type,
+html body div.title + div.title {
+    margin-top: 0;
+}
+
+/* Title pills: text clear of the round ends, and long titles or crowded controls wrap instead of overlapping */
+body div.title {
+    padding: 10px var(--inset);
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-4);
+    line-height: 1.4;
+}
+
+/* Buttons: pill ends need more side room than square corners did */
+body input[type="button"]:not(.unapi *),
+body input[type="reset"]:not(.unapi *),
+body input[type="submit"]:not(.unapi *),
+body button:not(.unapi *),
+body a.button:not(.unapi *) {
+    padding: var(--sp-2) var(--sp-5);
+}
+
+/* Text boxes: text clear of the curved ends */
+/* Same priority as Unraid's own input rule (not higher), so plugins that place an
+   icon inside a field, like the file manager's "file type" filter, keep their padding */
+input:is([type="text"], [type="password"], [type="number"], [type="url"], [type="email"]):where(:not(.unapi *)) {
+    padding-left: var(--sp-4);
+    padding-right: var(--sp-4);
+}
+body textarea:not(.unapi *) {
+    padding: var(--sp-3) var(--sp-4);
+}
+
+/* Footer and menu: keep text off the window edges */
+#footer {
+    padding: var(--sp-2) var(--gutter);
+}
+
+/* Dialogs: centred title with room on both sides; logs and changelogs wrap long lines
+   instead of running off the right edge */
+.sweet-alert h2 {
+    text-align: center;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    overflow-wrap: anywhere;
+}
+.sweet-alert p {
+    overflow-wrap: anywhere;
+}
+.sweet-alert pre#swaltext,
+.sweet-alert pre#swalbody {
+    padding: var(--sp-4) var(--sp-5);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+
+/*
+ * ---- Reboot / shutdown page (webGui/include/Boot.php) ----
+ * That page loads the theme stylesheet but not custom-CSS plugins, so these rules
+ * only show up when this file is delivered through the theme stylesheet itself.
+ * Its own inline styles load after the theme, hence the "html body" prefix.
+ * The aurora moves to <html> and <body> becomes one centred glass card.
+ */
+html:has(.boot-title) {
+    min-height: 100%;
+    background-color: var(--aether-bg);
+    background-image:
+        radial-gradient(60vw 50vh at 12% 8%, rgba(109, 40, 217, 0.26), transparent 70%),
+        radial-gradient(45vw 40vh at 90% 18%, rgba(255, 61, 154, 0.09), transparent 70%),
+        radial-gradient(45vw 40vh at 85% 85%, rgba(0, 229, 255, 0.055), transparent 70%),
+        radial-gradient(70vw 60vh at 40% 100%, rgba(79, 70, 229, 0.19), transparent 70%);
+    background-attachment: fixed;
+}
+html body:has(> .boot-title) {
+    box-sizing: border-box;
+    max-width: min(72rem, calc(100% - 3.2rem));
+    margin: 14vh auto 0;
+    padding: var(--sp-8) var(--sp-6);
+    background: var(--glass-tint);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border-radius: var(--r-xl);
+    corner-shape: squircle;
+    box-shadow: var(--glass-shine), var(--glass-drop), 0 0 80px -30px rgba(124, 92, 255, 0.6);
+}
+html body .boot-title {
+    margin: 0 0 var(--sp-4);
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-weight: 700;
+    text-transform: none;     /* sentence case, matching the rest of the theme */
+    letter-spacing: 0.01em;
+    overflow-wrap: anywhere;
+    background: var(--aether-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+html body .boot-subtext {
+    margin: var(--sp-2) 0;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    color: var(--aether-text);
+    overflow-wrap: anywhere;
+}
+html body .boot-subtext .green { color: var(--aether-ok); }
+html body .boot-subtext .orange { color: var(--aether-attention); }
+html body .boot-subtext .red { color: var(--aether-problem); }
+html body .boot-subtext .blue { color: #7b8ff5; }
+
+
+/* Phones: a narrower window gutter so panels keep their width */
+@media (max-width: 767px) {
+    html:root {
+        --gutter: var(--sp-3);
+        --inset: var(--sp-4);
+    }
+}
+
+
+/*
+ * ---- Unraid's newer components (notifications, header menus, toasts) ----
+ * These take their colours from one token set on .unapi: an orange "primary"
+ * scale and neutral greys.  Swapping the scales restyles all of them at once.
+ * Unraid's red (errors) is a separate token and is left alone.
+ */
+html:root .unapi,
+html:root .unapi.dark {
+    --ui-color-primary-50: #f5f3ff;
+    --ui-color-primary-100: #ede9fe;
+    --ui-color-primary-200: #ddd6fe;
+    --ui-color-primary-300: #c4b5fd;
+    --ui-color-primary-400: #a78bfa;
+    --ui-color-primary-500: #7c5cff;
+    --ui-color-primary-600: #6d4be0;
+    --ui-color-primary-700: #5b3bc4;
+    --ui-color-primary-800: #4a2fa0;
+    --ui-color-primary-900: #3b2580;
+    --ui-color-primary-950: #241455;
+    --primary: 252 100% 68%;
+    --ring: 252 100% 68%;
+}
+html:root .unapi.dark {
+    --ui-color-neutral-700: #2c2052;
+    --ui-color-neutral-800: #1d1438;
+    --ui-color-neutral-900: #130c28;
+    --ui-color-neutral-950: #0a0619;
+    --background: 252 60% 6%;
+    --popover: 252 55% 9%;
+    --card: 252 55% 9%;
+    --muted: 252 35% 16%;
+    --secondary: 252 35% 16%;
+    --accent: 252 35% 18%;
+    --border: 252 30% 20%;
+    --input: 252 30% 20%;
+    --color-border: #2c2052;
+}
+
+/* Toasts ("Action Centre Enabled" and friends): frosted, with a status-coloured edge
+   instead of solid yellow / green / red boxes */
+html:root [data-sonner-toaster] {
+    --normal-bg: rgba(20, 12, 46, 0.88);
+    --normal-border: rgba(200, 190, 255, 0.18);
+    --normal-text: var(--aether-text);
+    --success-bg: rgba(20, 12, 46, 0.88);
+    --success-border: rgba(16, 201, 143, 0.5);
+    --success-text: var(--aether-ok);
+    --info-bg: rgba(20, 12, 46, 0.88);
+    --info-border: rgba(123, 143, 245, 0.5);
+    --info-text: var(--aether-text);
+    --warning-bg: rgba(20, 12, 46, 0.88);
+    --warning-border: rgba(245, 158, 11, 0.55);
+    --warning-text: var(--aether-attention);
+    --error-bg: rgba(20, 12, 46, 0.88);
+    --error-border: rgba(244, 63, 110, 0.55);
+    --error-text: var(--aether-problem);
+}
+html:root [data-sonner-toast] {
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    backdrop-filter: blur(20px) saturate(170%);
+}
+
+/* Right-click menus (Docker / VM icons): frosted dark menu, violet hover, no arrow tips */
+body .dropdown-menu {
+    padding: var(--sp-1);
+    background: rgba(20, 12, 46, 0.9);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    backdrop-filter: blur(24px) saturate(170%);
+    border: 0;
+    border-radius: var(--r-md);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 0 0 1px rgba(200, 190, 255, 0.16),
+        0 16px 40px -12px rgba(0, 0, 0, 0.8);
+}
+body .dropdown-menu a {
+    color: var(--aether-text);
+    border-radius: var(--r-xs);
+    padding: 3px 20px 3px 8px;
+}
+body .dropdown-menu li > a:hover,
+body .dropdown-menu li > a:focus,
+body .dropdown-submenu:hover > a,
+body .dropdown-menu .active > a,
+body .dropdown-menu .active > a:hover {
+    color: #ffffff;
+    background: rgba(124, 92, 255, 0.4);
+    background-image: none;
+    filter: none;
+    text-shadow: none;
+}
+body .dropdown-menu .divider {
+    margin: var(--sp-1) 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-bottom: 0;
+}
+body .dropdown-menu .disabled > a {
+    color: var(--aether-text-faint);
+}
+body .nav-header {
+    color: var(--aether-text-dim);
+    background: none;
+    text-shadow: none;
+    text-transform: none;
+}
+body .dropdown-context:before,
+body .dropdown-context:after,
+body .dropdown-context-up:before,
+body .dropdown-context-up:after {
+    display: none;
+}
+
+/* Banners at the top of the page ("Action Centre Enabled", update notices): a frosted
+   pill with a status-coloured edge instead of a yellow, green or red box */
+body .upgrade_notice,
+body .ca_element_notice {
+    color: var(--aether-text);
+    background: rgba(20, 12, 46, 0.88);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    backdrop-filter: blur(24px) saturate(170%);
+    border: 0;
+    border-radius: var(--r-lg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(200, 190, 255, 0.22), 0 12px 32px -10px rgba(0, 0, 0, 0.8);
+}
+body .upgrade_notice.done {
+    color: var(--aether-ok);
+    background: rgba(20, 12, 46, 0.88);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(16, 201, 143, 0.55), 0 12px 32px -10px rgba(0, 0, 0, 0.8);
+}
+body .upgrade_notice.alert {
+    color: var(--aether-problem);
+    background: rgba(20, 12, 46, 0.88);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(244, 63, 110, 0.55), 0 12px 32px -10px rgba(0, 0, 0, 0.8);
+}
+body .bannerDismiss::before,
+body .bannerInfo::before {
+    color: var(--aether-text-dim);
+}
+
+/* Community Applications (the Apps page) styles itself through these variables */
+html:root {
+    --template-background: rgba(20, 12, 46, 0.58);
+    --template-hover-background: rgba(40, 28, 82, 0.7);
+    --template-favourite: rgba(124, 92, 255, 0.18);
+    --sidebar-background: transparent;
+    --sidebar-text: var(--aether-text);
+    --a-color: var(--link-text-color);
+    --unraid-66-color: var(--aether-violet);
+    --ca-legacy-background-color: transparent;
+    --tooltipster-content: var(--aether-text);
+    --chart-grid: rgba(255, 255, 255, 0.06);
+    --ca-shadow-color: rgba(124, 92, 255, 0.45);
+    --ca-orange-color: var(--aether-pink);
+}
+body .ca_holder,
+body .dockerHubHolder {
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px var(--hairline);
+}
+body .ca_holder:hover,
+body .dockerHubHolder:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(200, 190, 255, 0.2), 0 10px 28px -10px rgba(124, 92, 255, 0.6);
+}
+/* The Apps search box: a pill like every other field, sitting level with its row */
+body #searchBox {
+    top: 0;
+    margin-bottom: 0;
+    padding: var(--sp-2) var(--sp-4);
+    border: 0;
+    border-radius: var(--pill);
+    background-color: rgba(8, 5, 26, 0.45);
+    background-image: var(--pill-sheen);
+    box-shadow: var(--pill-edge);
+    caret-color: #c4b5fd;
+}
+body #searchBox:focus {
+    outline: none;
+    animation: aether-siri 4s ease-in-out infinite;
+}
+body .searchArea {
+    align-items: center;
+}
+body .searchAreaHolder {
+    padding-top: var(--sp-3);
+    padding-bottom: var(--sp-2);
+}
+body #searchBox {
+    padding-right: 40px;
+}
+body .searchSubmit {
+    left: -44px;
+    padding: 0 10px;
+    color: var(--aether-text-dim);
+    background: transparent;
+    box-shadow: none;
+    min-width: 0;
+}
+/* Cards: 22px taller so the description no longer runs past the rounded bottom edge
+   (homepage cards are forced to 24rem with !important, hence the second rule) */
+body .ca_holder,
+body .dockerHubHolder {
+    height: calc(20rem + 22px);
+}
+body .ca_holder.spotlightHome {
+    height: calc(24rem + 22px) !important;
+}
+/* Room between the cards and each row's horizontal scroll bar */
+body .ca_homeTemplates {
+    padding-bottom: var(--sp-4);
+}
+/* Info popup (slides in from the right) and the card buttons: Apps used a white box
+   with black text for these; now dark glass with light text */
+html:root {
+    --support-popup-background: rgba(255, 255, 255, 0.08);
+    --support-popup-text: var(--aether-text);
+}
+body .sidenav {
+    background: rgba(14, 9, 32, 0.94);
+    -webkit-backdrop-filter: blur(28px) saturate(170%);
+    backdrop-filter: blur(28px) saturate(170%);
+    box-shadow: inset 1px 0 0 rgba(200, 190, 255, 0.15), -24px 0 60px -20px rgba(0, 0, 0, 0.8);
+}
+/* Card flags (Official, Beta, Installed, Deprecated...): small glass pills in the top-right
+   corner instead of sharp coloured triangles.
+   CA 2026.x puts each flag NEXT TO its card, in a plain wrapper <div>, not inside .ca_holder.
+   Without a positioned wrapper the pill pins itself to the whole page, so every card's flag
+   piled up in one blob at the top right ("INSTALL BETA").  Making the wrapper the anchor
+   fixes that.  The wrapper is ~30px wider than the card (the gap to the next card), so the
+   pill is placed from the LEFT edge at the card's width, then slid back by its own width. */
+body .ca_holder,
+body div:has(> .ca_holder) {
+    position: relative;
+}
+html:root {
+    --aether-ca-card-w: 360px;  /* measured .ca_holder width on the Apps home page */
+}
+body :is(.officialCardBackground, .LTOfficialCardBackground, .betaCardBackground, .spotlightCardBackground, .greenCardBackground, .installedCardBackground, .warningCardBackground, .upgradeCardBackground) {
+    position: absolute;
+    z-index: 2;  /* the card comes after the flag in the page, so it would paint over it */
+    top: var(--sp-3);
+    right: auto;
+    left: calc(var(--aether-ca-card-w) - var(--sp-3));
+    transform: translateX(-100%);
+    width: auto;
+    height: auto;
+    margin: 0;
+    /* Flex-centre the label so it sits dead centre both ways, whatever CA wraps it in */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    clip-path: none;
+    border-radius: var(--pill);
+    /* Each flag sets --flag (an "R, G, B" triplet); one recipe turns it into a lit pill:
+       bright top fading down, a crisp coloured rim, and a soft outer glow so it catches the eye */
+    --flag: 124, 92, 255;
+    background: linear-gradient(180deg, rgba(var(--flag), 0.75) 0%, rgba(var(--flag), 0.45) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 0 0 1px rgba(var(--flag), 0.9), 0 0 14px -2px rgba(var(--flag), 0.65);
+}
+/* One colour per meaning, all from the Aether palette, none close enough to confuse:
+   Official = violet (default above), LimeTech = cyan, Installed / Template = sea green,
+   Beta / Updated = amber ("caution"), Deprecated / Blacklisted / Incompatible = crimson rose */
+body .LTOfficialCardBackground {
+    --flag: 0, 190, 220;
+}
+body :is(.greenCardBackground, .installedCardBackground) {
+    --flag: 16, 201, 143;
+}
+body .betaCardBackground {
+    --flag: 245, 158, 11;
+}
+body .warningCardBackground {
+    --flag: 244, 63, 110;
+}
+
+/* "Monthly Spotlight" badge: CA draws it as an orange-ring PNG, so CSS can't recolour the
+   ring directly.  A hue shift turns the orange into Aether violet-magenta; the white text
+   inside the badge has no hue, so it stays white. */
+body img.spotlightIcon {
+    filter: hue-rotate(255deg) saturate(1.15) drop-shadow(0 0 10px rgba(124, 92, 255, 0.35));
+    /* 85% size and nudged down, so a corner flag pill (Official, Installed...) clears the top
+       of the ring while its "Monthly Spotlight" text stays readable (70% was too small to read).
+       Transform doesn't move the date below. */
+    transform: translateY(12px) scale(0.85);
+    transform-origin: center;
+}
+/* The flag's label.  CA lays each one out rotated 45deg to sit on its corner triangle,
+   under a different class per flag (.installedCardText, .betaPopupText, .officialPopupText...).
+   The pill needs them all flat: reset EVERY label class, or Beta / Official / Upgrade come
+   out as an unreadable rotated sliver (only Installed was being reset before). */
+body :is(.officialCardBackground, .LTOfficialCardBackground, .betaCardBackground, .spotlightCardBackground, .greenCardBackground, .installedCardBackground, .warningCardBackground, .upgradeCardBackground) :is(.installedCardText, .installedPopupText, .betaPopupText, .officialPopupText, .ltofficialPopupText, .upgradePopupText) {
+    position: static;
+    transform: none;
+    top: auto;
+    right: auto;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    font-size: 1rem;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    display: block;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    /* Why the text sat off-centre: letter-spacing adds a gap after the LAST letter too,
+       and CA pads some labels with non-breaking spaces ("Deprecated&nbsp;", "&nbsp;&nbsp;INSTALLED&nbsp;&nbsp;").
+       The negative margin cancels the trailing letter gap; the negative word-spacing shrinks
+       those padding spaces to almost nothing (a two-word label keeps a hairline gap). */
+    margin-right: -0.08em;
+    word-spacing: -0.22em;
+}
+/* A card can carry more than one flag (e.g. Official + Installed).  Each is absolutely
+   pinned to the same top-right spot, so they pile into one garbled blob.  Step every
+   flag after the first down by a pill-height so they stack as a tidy column. */
+body :is(.officialCardBackground, .LTOfficialCardBackground, .betaCardBackground, .spotlightCardBackground, .greenCardBackground, .installedCardBackground, .warningCardBackground, .upgradeCardBackground) ~ :is(.officialCardBackground, .LTOfficialCardBackground, .betaCardBackground, .spotlightCardBackground, .greenCardBackground, .installedCardBackground, .warningCardBackground, .upgradeCardBackground) {
+    top: calc(var(--sp-3) + 2.1rem);
+}
+body :is(.officialCardBackground, .LTOfficialCardBackground, .betaCardBackground, .spotlightCardBackground, .greenCardBackground, .installedCardBackground, .warningCardBackground, .upgradeCardBackground) ~ :is(.officialCardBackground, .LTOfficialCardBackground, .betaCardBackground, .spotlightCardBackground, .greenCardBackground, .installedCardBackground, .warningCardBackground, .upgradeCardBackground) ~ :is(.officialCardBackground, .LTOfficialCardBackground, .betaCardBackground, .spotlightCardBackground, .greenCardBackground, .installedCardBackground, .warningCardBackground, .upgradeCardBackground) {
+    top: calc(var(--sp-3) + 4.2rem);
+}
+
+/* Card + toolbar controls: CA paints Info / Support / Install / Actions and the
+   "Results Per Page" and DockerHub controls with its orange "donate" button (and locks
+   the text to white with !important).  Dress them as the same glass pills as every other
+   button so the Apps page matches the rest of the theme. */
+body .infoButton,
+body .infoButton_docker,
+body .supportButton,
+body .actionsButton,
+body .maxPerPage,
+body .initDockerSearch,
+body a.initDockerSearch {
+    color: var(--aether-text) !important;
+    background: rgba(8, 5, 26, 0.45);
+    background-image: var(--pill-sheen);
+    border: 0;
+    border-radius: var(--pill);
+    box-shadow: var(--pill-edge);
+    padding: var(--sp-1) var(--sp-3);
+    font-weight: 600;
+    text-decoration: none;
+    transition: box-shadow 0.25s, background 0.25s;
+}
+body .infoButton:hover,
+body .infoButton_docker:hover,
+body .supportButton:hover,
+body .actionsButton:hover,
+body .maxPerPage:hover,
+body .initDockerSearch:hover,
+body a.initDockerSearch:hover {
+    background: linear-gradient(180deg, rgba(167, 139, 250, 0.5), rgba(124, 92, 255, 0.3));
+    color: #ffffff !important;
+    text-decoration: none;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        -8px 0 18px -6px rgba(0, 229, 255, 0.5),
+        8px 0 18px -6px rgba(255, 61, 154, 0.5);
+}
+/* Level the floated Results Per Page / DockerHub pills with the search field's row */
+body .maxPerPage,
+body .dockerSearch {
+    margin-top: 0;
+    line-height: 1.6;
+    vertical-align: middle;
+}
+
+/* Shadowbox: the frame around legacy openBox() popups (e.g. nvidia "Downloading Package").
+   The log page inside is themed separately (aether-logging.css, inserted into logging.htm
+   by apply.sh); this is the frame on the main page: a light-grey title bar, a white strip
+   at the bottom and an orange close.png.  Now a dark glass sheet like the other modals. */
+html:root {
+    --dynamix-sb-title-bg-color: transparent;
+    --dynamix-sb-title-text-color: var(--aether-text);
+    --dynamix-sb-wrapper-bg-color: #0e0a24;
+    --dynamix-sb-wrapper-border-color: transparent;
+    --dynamix-sb-wrapper-text-color: var(--aether-text);
+    --dynamix-sb-body-bg-color: #0e0a24;
+    --dynamix-sb-body-text-color: var(--aether-text);
+    --dynamix-sb-message-bg-color: transparent;
+    --dynamix-sb-message-text-color: var(--aether-text-dim);
+    --dynamix-sb-message-link-color: #a78bfa;
+}
+/* Dim AND soften the page behind, like a macOS sheet */
+body #sb-overlay {
+    -webkit-backdrop-filter: blur(6px) saturate(140%);
+    backdrop-filter: blur(6px) saturate(140%);
+}
+body #sb-wrapper {
+    border: 0;
+    border-radius: var(--r-lg);
+    background: #0e0a24;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(200, 190, 255, 0.18), 0 30px 80px -20px rgba(0, 0, 0, 0.9), 0 0 60px -20px rgba(124, 92, 255, 0.45);
+}
+body #sb-wrapper-inner {
+    border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+/* Title bar: a faint violet glass strip with a hairline under it; the title text shimmers
+   like the System Info / Release Notes modal titles (holo on the inner span only, so the
+   bar's own background isn't clipped to the text) */
+body #sb-title {
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    background: linear-gradient(180deg, rgba(124, 92, 255, 0.16), rgba(124, 92, 255, 0.04));
+    box-shadow: inset 0 -1px 0 var(--hairline);
+}
+body #sb-title-inner {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-indent: 0;
+    background: linear-gradient(90deg, #a9e3ff, #cdb9ff, #ffc2e2, #cdb9ff, #a9e3ff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aether-holo 14s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    body #sb-title-inner { animation: none; }
+}
+/* Bottom strip (the white bar): blend into the sheet */
+body #sb-info,
+body #sb-info-inner {
+    background: transparent;
+}
+/* Close: the round glass X button used by the side panel, instead of the orange close.png */
+body #sb-nav-close {
+    background-image: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: -12px;
+    right: -12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: var(--aether-text);
+    background-color: rgba(20, 13, 44, 0.9);
+    box-shadow: var(--pill-edge), 0 6px 16px -6px rgba(0, 0, 0, 0.8);
+    transition: box-shadow 0.25s, background 0.25s;
+}
+body #sb-nav-close::before {
+    content: "\2715";  /* ✕ */
+    font-size: 13px;
+    line-height: 1;
+}
+body #sb-nav-close:hover {
+    background-color: rgba(124, 92, 255, 0.55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 1px rgba(124, 92, 255, 0.6), 0 0 18px -4px rgba(124, 92, 255, 0.8);
+}
+
+/* Apps "Info" side panel (.sidenav): built from the same parts as the rest of the theme.
+   CA's own version uses tiny transparent buttons, a 15px-radius grey box, a borderless
+   table and a maintainer icon floated to the far edge.  Here: glass pill buttons (Install
+   gets the violet "primary" fill), glass cards on the radius scale, shimmer section
+   headers like the Dashboard's, a grouped list for Details, and the maintainer as one row. */
+
+/* Close: a round liquid-glass icon button at the top right, like a macOS sheet,
+   instead of a tiny "CLOSE" capsule at the top left.  The text is hidden and an X drawn. */
+body .sidenav .popupCloseArea {
+    text-align: right;
+    padding-right: var(--sp-4);
+    box-sizing: border-box;
+    z-index: 3;
+}
+body .sidenav .popUpClose.caButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    font-size: 0;
+    border-radius: 50%;
+    color: var(--aether-text) !important;
+    background: rgba(8, 5, 26, 0.45);
+    background-image: var(--pill-sheen);
+    box-shadow: var(--pill-edge);
+    transition: box-shadow 0.25s, background 0.25s;
+}
+body .sidenav .popUpClose.caButton::before {
+    content: "\2715";  /* ✕ */
+    font-size: 14px;
+    line-height: 1;
+}
+body .sidenav .popUpClose.caButton:hover {
+    background: linear-gradient(180deg, rgba(167, 139, 250, 0.5), rgba(124, 92, 255, 0.3));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 1px rgba(124, 92, 255, 0.6), 0 0 18px -4px rgba(124, 92, 255, 0.8);
+}
+
+/* Header: app icon as a rounded "squircle" tile, name and author spaced on the 4px grid */
+body .sidenav img.popupIcon {
+    border-radius: var(--r-lg);
+    padding: 0;
+    background: var(--aether-line);
+    box-shadow: inset 0 0 0 1px var(--hairline), 0 10px 26px -12px rgba(124, 92, 255, 0.7);
+}
+body .sidenav .popupName {
+    font-size: 28px;
+    letter-spacing: -0.01em;
+}
+body .sidenav .popupAuthorMain {
+    font-size: 15px;
+    color: var(--aether-text-dim);
+    margin: var(--sp-1) 0 var(--sp-3);
+}
+
+/* Every button in the panel: the same glass pill as the card buttons */
+body .sidenav .caButton {
+    color: var(--aether-text) !important;
+    background: rgba(8, 5, 26, 0.45);
+    background-image: var(--pill-sheen);
+    border: 0;
+    border-radius: var(--pill);
+    box-shadow: var(--pill-edge);
+    padding: var(--sp-1) var(--sp-3);
+    margin: 0 var(--sp-2) var(--sp-2) 0;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: box-shadow 0.25s, background 0.25s;
+}
+body .sidenav .caButton:hover {
+    background: linear-gradient(180deg, rgba(167, 139, 250, 0.5), rgba(124, 92, 255, 0.3));
+    color: #ffffff !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        -8px 0 18px -6px rgba(0, 229, 255, 0.5),
+        8px 0 18px -6px rgba(255, 61, 154, 0.5);
+}
+/* Install (the main action) is the one filled violet pill, so the eye lands on it first */
+body .sidenav .actionsPopup {
+    background: linear-gradient(180deg, rgba(124, 92, 255, 0.8), rgba(124, 92, 255, 0.5));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(200, 190, 255, 0.5), 0 6px 18px -8px rgba(124, 92, 255, 0.9);
+}
+
+/* Description: a glass card matching the app cards, full width instead of an odd 596px box */
+body .sidenav .popupDescription {
+    display: block;
+    box-sizing: border-box;
+    width: auto;
+    margin: var(--sp-4) var(--sp-3) 0;
+    padding: var(--sp-4) var(--sp-5);
+    border-radius: var(--r-lg);
+    background: var(--template-background);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px var(--hairline);
+    line-height: 1.55;
+}
+
+/* Section headers ("Details", "Maintainer"): shimmer like the Dashboard's (added to the
+   holo rule above), sized down from CA's 25px to sit with the theme's other headers */
+body .sidenav :is(.rightTitle, .popupAuthorTitle) {
+    font-size: 17px;
+    font-weight: 600;
+    height: auto;
+    margin: var(--sp-6) 0 var(--sp-3);
+    display: inline-block;
+}
+
+/* Details: a grouped list (like iOS Settings) - one glass card, hairlines between rows,
+   labels dimmed.  CA sets the table to display:contents, which can't have a background. */
+body .sidenav .popupTable {
+    display: table !important;
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--template-background);
+    background-image: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px var(--hairline);
+}
+body .sidenav .popupTable :is(.popupTableLeft, .popupTableRight) {
+    padding: var(--sp-2) var(--sp-5);
+    height: auto;
+    vertical-align: middle;
+}
+body .sidenav .popupTable .popupTableLeft {
+    color: var(--aether-text-dim);
+    width: 40%;
+}
+body .sidenav .popupTable tr + tr > td {
+    border-top: 1px solid var(--hairline);
+}
+
+/* Maintainer: icon, name and buttons as one tidy row group, icon on the left, instead of
+   the name at the left and the icon floated alone to the far right edge */
+body .sidenav div:has(> .popupAuthor) {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-3);
+}
+body .sidenav div.popupAuthorIcon {
+    order: -1;
+    float: none;
+    width: 44px;
+    height: 44px;
+}
+body .sidenav img.popupAuthorIcon {
+    float: none;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-sm);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+}
+body .sidenav .popupAuthor {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Footnote: quiet, dimmed, with breathing room */
+body .sidenav .ca_note {
+    display: inline-block;
+    margin: var(--sp-4) var(--sp-3);
+    font-weight: 400;
+    color: var(--aether-text-dim);
+}
+
+/* Folder View plugin: give its small chevron button back its compact size (the theme's
+   button padding made it wide enough to drop onto its own line next to long names) */
+body .folder-dropdown {
+    padding: 6px;
+    min-width: 0;
+}
+
+/* Accessibility: users who ask the OS to reduce motion get a steady glow */
+@media (prefers-reduced-motion: reduce) {
+    body :focus {
+        animation: none !important;
+    }
+}
+
+/* Accessibility: users who ask the OS for less transparency get solid panels */
+@media (prefers-reduced-transparency: reduce) {
+    html:root {
+        --glass-tint: var(--aether-raised);
+        --glass-tint-strong: var(--aether-surface);
+        --glass-filter: none;
+    }
+}
+
+/* Click glow for regular pill buttons (Apply, Done, Check For Updates, the Apps card and
+   side-panel buttons...): pressing lights the full Aether glow (violet ring, cyan/pink
+   sides) and presses in; letting go fades it back over ~1.2s.  These have no "active"
+   state to rest in, so they fade to normal (or to the hover glow if still hovered).
+   Done with box-shadow, not a ::after halo, because <input> buttons can't have
+   pseudo-elements.  The press uses the separate `scale` property so it doesn't fight
+   buttons already positioned with transform (e.g. Check For Updates).
+   How the fade works: a transition runs at the speed of the state it's going TO, so the
+   pressed state switches instantly (0s) and the normal/hover states take 1.2s back.
+   :is() with .sidenav .caButton lifts the specificity to beat the side-panel rule. */
+body :is(input[type="button"], input[type="reset"], input[type="submit"], button, a.button):not(.unapi *):not([role="tab"]):not([disabled]),
+body :is(.infoButton, .infoButton_docker, .supportButton, .actionsButton, .maxPerPage, .initDockerSearch, .sidenav .caButton, .caButton) {
+    transition: box-shadow 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.25s, scale 0.2s ease-out;
+}
+body :is(input[type="button"], input[type="reset"], input[type="submit"], button, a.button):not(.unapi *):not([role="tab"]):not([disabled]):active,
+body :is(.infoButton, .infoButton_docker, .supportButton, .actionsButton, .maxPerPage, .initDockerSearch, .sidenav .caButton, .caButton):active {
+    scale: 0.96;
+    transition: box-shadow 0s, background 0s, scale 0.08s;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 0 0 1px rgba(200, 190, 255, 0.7),
+        0 0 22px 2px rgba(124, 92, 255, 0.85),
+        -12px 0 26px -4px rgba(0, 229, 255, 0.75),
+        12px 0 26px -4px rgba(255, 61, 154, 0.75);
+}
+@media (prefers-reduced-motion: reduce) {
+    body :is(input[type="button"], input[type="reset"], input[type="submit"], button, a.button):not(.unapi *):not([role="tab"]),
+    body :is(.infoButton, .infoButton_docker, .supportButton, .actionsButton, .maxPerPage, .initDockerSearch, .sidenav .caButton, .caButton) {
+        transition: none;
+    }
+}
+
+/* ===== Revealed-gradient meters (usage bars, CPU bars, header usage bar) =====
+   The bar is ONE fixed gradient (green -> amber -> rose) laid across the whole
+   track; the fill only reveals more of it as the value grows.  50% shows green into early
+   amber and never any rose; 100% shows every colour.  (A tip glow was tried and
+   removed in favour of the clean gradient.)
+   How: the track is a CSS "container", so `100cqw` means "the track's full width".  The
+   fill's gradient is sized to 100cqw instead of to the fill itself, so it stays put while
+   the fill grows over it.
+   Colour bands roughly follow Unraid's warning/critical levels (see --aether-meter). */
+html:root {
+    /* Colours spread evenly across the track (v1 was 58% green, then everything crammed
+       into the last stretch), slightly muted so they sit in the dark theme. */
+    /* Bands roughly follow Unraid's default thresholds (Settings -> Disk Settings: warning
+       70%, critical 90%): amber from ~70, rose from ~90, so the tip mostly agrees with the
+       text colour.  Green starts warming toward gold from ~45% on purpose; strict 70%
+       alignment made every bar mostly green.  The CPU graph below uses the same stops. */
+    --aether-meter: linear-gradient(90deg,
+        #12a57c 0%, #3cc48e 25%, #8fd27a 45%, #d4c457 60%,
+        #f0a23a 72%, #f2733f 84%, #ec4470 92%, #e0388f 100%);
+    /* Glass sheen over the fill: a light top edge and a slightly darker bottom */
+    --aether-meter-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 45%, rgba(0, 0, 0, 0.18) 100%);
+}
+body .usage-disk,
+body .usage-bar {
+    container-type: inline-size;
+    isolation: isolate;
+}
+body .usage-disk > span:first-child:is(.greenbar, .orangebar, .redbar),
+body .usage-disk.sys:not(.none) > span:first-child,
+body .usage-bar > span:is(.greenbar, .orangebar, .redbar) {
+    background: var(--aether-meter-sheen), var(--aether-meter);
+    background-size: 100% 100%, 100cqw 100%;
+    background-repeat: no-repeat;
+    box-shadow: none;
+}
+body .usage-bar > span {
+    position: relative;
+}
+/* (A blurred tip glow was tried here and removed in favour of the clean gradient.) */
+/* Percentage text next to Dashboard bars (CPU cores, overall load, array/pool utilization)
+   takes the gradient's colour at the bar's tip, in 10% steps.  How: Unraid writes each
+   fill's width into its style attribute as text ("width:97%" from the server, "width: 62%"
+   once the script animates it), and CSS can match text inside an attribute.  Each rule
+   matches one tens digit (and skips single-digit values like "width: 6%").  Colours are
+   sampled from --aether-meter at the middle of each step.  Unraid also sets the text colour
+   inline, hence !important.  0-9% (and anything unmatched) falls back to the first rule. */
+body span.load:not([style*="color"]):has(+ .usage-disk:not(.none)) {
+    color: #1aab80 !important;
+    /* No colour fade: the colour is read from the bar, so it always matches the bar.  (A
+       fade was tried and made the text lag the bar on top of the bar lagging the number.) */
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:1"]:not([style*="width:1%"]):not([style*="width:1."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 1"]:not([style*="width: 1%"]):not([style*="width: 1."])) {
+    color: #2bb887 !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:2"]:not([style*="width:2%"]):not([style*="width:2."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 2"]:not([style*="width: 2%"]):not([style*="width: 2."])) {
+    color: #3cc48e !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:3"]:not([style*="width:3%"]):not([style*="width:3."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 3"]:not([style*="width: 3%"]):not([style*="width: 3."])) {
+    color: #65cb84 !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:4"]:not([style*="width:4%"]):not([style*="width:4."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 4"]:not([style*="width: 4%"]):not([style*="width: 4."])) {
+    color: #8fd27a !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:5"]:not([style*="width:5%"]):not([style*="width:5."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 5"]:not([style*="width: 5%"]):not([style*="width: 5."])) {
+    color: #bdc963 !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:6"]:not([style*="width:6%"]):not([style*="width:6."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 6"]:not([style*="width: 6%"]):not([style*="width: 6."])) {
+    color: #e0b64b !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:7"]:not([style*="width:7%"]):not([style*="width:7."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 7"]:not([style*="width: 7%"]):not([style*="width: 7."])) {
+    color: #f0963b !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:8"]:not([style*="width:8%"]):not([style*="width:8."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 8"]:not([style*="width: 8%"]):not([style*="width: 8."])) {
+    color: #f16d45 !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width:9"]:not([style*="width:9%"]):not([style*="width:9."])), body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child[style*="width: 9"]:not([style*="width: 9%"]):not([style*="width: 9."])) {
+    color: #e8407c !important;
+}
+body span.load:not([style*="color"]):has(+ .usage-disk > span:first-child:is([style*="width:100"], [style*="width: 100"])) {
+    color: #e0388f !important;
+}
+
+/* CPU cores / overall load: plain theme text; the bar alone carries the colour.
+   Unraid sets these numbers' colour inline on every update, hence !important.  (Colour-
+   matching them to the bar was tried: Safari doesn't reliably re-check :has() rules when
+   only a bar's width changes, so numbers kept stale colours.)  Disk/pool utilization
+   numbers have no inline colour and keep the 10%-step colours above. */
+body span.load[style*="color"] {
+    color: var(--aether-text) !important;
+}
+
+
+/* Size labels on Main / Shares bars ("1.2 TB"): the original light halo.  (A dark chip hid
+   the tip; a heavy halo made the labels look outlined and smudgy.  Both dropped.) */
+
+/* CPU history graph: the same green -> amber -> rose treatment as the meters, by HEIGHT.
+   The chart is a script-drawn <canvas> on a fixed 0-100% scale, so height = load: a line
+   near the bottom is green, and the higher it climbs the more amber and rose it shows.
+   CSS can't colour canvas pixels by value, so it's a blending trick:
+     1. the canvas is made black with its line turned white (grayscale + brightness);
+     2. the gradient is laid over it with `multiply`: black stays black, white takes the
+        gradient's colour at that height;
+     3. the whole cell is blended onto the panel with `screen`, where black vanishes,
+        leaving only the coloured line (the faint grid and the % labels pick up the
+        gradient too, dimly).
+   The earlier rule (a hue-rotate to violet) is emptied further up. */
+body td:has(> canvas#cpuchart) {
+    position: relative;
+    padding: 0;
+    mix-blend-mode: screen;
+    isolation: isolate;
+}
+body canvas#cpuchart {
+    display: block;
+    background: #000;
+    /* High contrast pushes the canvas's own dim grid to pure black (so it vanishes in the
+       blend and doesn't pick up the gradient) while the bright line stays white. */
+    filter: grayscale(1) contrast(4);
+}
+/* Our own soft grey grid, painted on the row BEHIND the chart cell, outside the blend:
+   horizontal lines at 0/25/50/75/100% (the chart's 4 sections) and vertical lines every
+   24px.  Static, so it doesn't scroll with the line the way the old canvas grid did. */
+body tr:has(> td > canvas#cpuchart) {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 100% 25%, 24px 100%;
+    background-position: 0 0, 0 0;
+}
+body td:has(> canvas#cpuchart)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+        #12a57c 0%, #3cc48e 25%, #8fd27a 45%, #d4c457 60%,
+        #f0a23a 72%, #f2733f 84%, #ec4470 92%, #e0388f 100%);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+
+/* Header usage bar number ("90%"): white with the same light dark halo as the disk labels,
+   so it reads on any part of the gradient (it had no halo, and the old dark-ink colour for
+   green/amber fills no longer suits the multi-colour gradient). */
+body .usage-bar > span:is(.greenbar, .orangebar, .redbar) {
+    color: #ffffff;
+    text-shadow: 0 1px 1px var(--aether-bar-ink), 0 0 3px var(--aether-bar-ink);
+}

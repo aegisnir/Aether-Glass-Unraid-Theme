@@ -1,0 +1,121 @@
+/*
+ * Aether Glass :: /logging.htm
+ *
+ * logging.htm is the page inside Unraid's legacy openBox() popup (for example the nvidia
+ * plugin's "Downloading Package" window).  It is a standalone page with its own hardcoded
+ * light colours and never loads Unraid's theme stylesheets, so the main theme can't reach it.
+ * apply.sh inserts this file into the page's <head>, after the stock <style>, so these
+ * rules win on equal footing.
+ *
+ * Kept self-contained on purpose: the main theme's variables don't exist on this page.
+ */
+
+:root {
+    color-scheme: dark;
+    --lg-bg: #0e0a24;
+    --lg-text: #e6ebf7;
+    --lg-dim: #8b95b5;
+    --lg-violet: #7c5cff;
+    --lg-ok: #10c98f;
+    --lg-attention: #f59e0b;
+    --lg-problem: #f43f6e;
+    --lg-cyan: #00e5ff;
+}
+
+/* Deep violet sheet with the same faint top glow as the theme's glass panels */
+html {
+    background: var(--lg-bg);
+}
+body {
+    color: var(--lg-text);
+    background:
+        radial-gradient(120% 60% at 50% 0%, rgba(124, 92, 255, 0.12) 0%, transparent 60%),
+        var(--lg-bg);
+    min-height: 100%;
+}
+
+/* Log text: a clean system monospace instead of Bitstream, a touch more line height */
+.logLine {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1.2rem;
+    line-height: 1.8rem;
+}
+
+/* Links in the log (rare) use the theme's violet */
+a {
+    color: #a78bfa;
+}
+
+/* Coloured log lines: Unraid paints them as pale pastel bars meant for a white page.
+   On dark they become tinted strips with readable text in the theme's status colours. */
+span.error,
+span.warn,
+span.system,
+span.array,
+span.login {
+    border-radius: 6px;
+    padding: 1px 6px;
+}
+span.error {
+    color: #ff9db6;
+    background-color: rgba(244, 63, 110, 0.16);
+}
+span.warn {
+    color: #ffd48a;
+    background-color: rgba(245, 158, 11, 0.16);
+}
+span.system {
+    color: #8ff3ff;
+    background-color: rgba(0, 229, 255, 0.12);
+}
+span.array {
+    color: #7ff0c6;
+    background-color: rgba(16, 201, 143, 0.15);
+}
+span.login {
+    color: #c4b5fd;
+    background-color: rgba(124, 92, 255, 0.18);
+}
+
+/* The "Done" button: a glass pill like every other button in the theme,
+   replacing Unraid's orange outline gradient */
+input[type=button],
+input[type=reset],
+input[type=submit],
+button,
+button[type=button],
+a.button {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    padding: 8px 22px;
+    border: 0;
+    border-radius: 999px;
+    color: var(--lg-text);
+    background: linear-gradient(180deg, rgba(124, 92, 255, 0.55) 0%, rgba(124, 92, 255, 0.32) 100%);
+    background-size: auto;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 0 0 1px rgba(200, 190, 255, 0.35), 0 6px 18px -8px rgba(124, 92, 255, 0.8);
+    transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+input:hover[type=button],
+input:hover[type=reset],
+input:hover[type=submit],
+button:hover,
+button:hover[type=button],
+a.button:hover {
+    color: #fff;
+    background: linear-gradient(180deg, rgba(124, 92, 255, 0.75) 0%, rgba(124, 92, 255, 0.5) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(200, 190, 255, 0.5), 0 0 22px -4px rgba(124, 92, 255, 0.9);
+}
+button:focus-visible {
+    outline: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 3px rgba(0, 229, 255, 0.45);
+}
+
+/* Thin violet scrollbar to match the rest of the theme */
+html {
+    scrollbar-color: rgba(124, 92, 255, 0.45) transparent;
+    scrollbar-width: thin;
+}

@@ -1,0 +1,117 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+<!ENTITY name      "aether-glass">
+<!ENTITY author    "aegisnir">
+<!ENTITY version   "2026.10.30">
+<!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
+<!ENTITY src       "&repo;/&version;/source">
+<!ENTITY cfg       "/boot/config/plugins/&name;">
+<!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
+<!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
+<!ENTITY sha_css     "d37d1a54f431e4b15636db6b8eb3b1c1bad1ff245eeb710ee1a25a882ddd19f6">
+<!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
+<!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
+<!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
+<!ENTITY sha_page    "e69167bf2e62bbc8d411bd624c86dd26edfa7982a2fb56b2548c512d0cfa17d8">
+]>
+
+<PLUGIN name="&name;"
+        author="&author;"
+        version="&version;"
+        pluginURL="&repo;/main/aether-glass.plg"
+        support="https://github.com/aegisnir/Aether-Glass-Unraid-Theme/issues"
+        icon="paint-brush"
+        min="7.2.0">
+
+<CHANGES>
+### 2026.10.30
+- First release.
+</CHANGES>
+
+<!--
+  Unofficial theme, not made or endorsed by Lime Technology.
+
+  How this installs:
+  1. Downloads the theme files to the flash drive (&cfg;), each checked against its
+     SHA256.  Unraid keeps them there and reuses them at every boot, so booting
+     without internet still works.
+  2. Copies the Settings page and apply.sh into the webGUI folder in RAM (&emhttp;).
+  3. Runs apply.sh in boot mode.  It only themes the webGUI if this Unraid version
+     has been approved on the Settings page and the kill switch is off.
+-->
+
+<FILE Name="&cfg;/aether-glass.css">
+<URL>&src;/aether-glass.css</URL>
+<SHA256>&sha_css;</SHA256>
+</FILE>
+
+<FILE Name="&cfg;/aether-glass-login.css">
+<URL>&src;/aether-glass-login.css</URL>
+<SHA256>&sha_login;</SHA256>
+</FILE>
+
+<FILE Name="&cfg;/aether-glass-logging.css">
+<URL>&src;/aether-glass-logging.css</URL>
+<SHA256>&sha_logging;</SHA256>
+</FILE>
+
+<FILE Name="&cfg;/apply.sh">
+<URL>&src;/apply.sh</URL>
+<SHA256>&sha_apply;</SHA256>
+</FILE>
+
+<FILE Name="&cfg;/AetherGlass.page">
+<URL>&src;/AetherGlass.page</URL>
+<SHA256>&sha_page;</SHA256>
+</FILE>
+
+<!-- Shown on the Plugins page -->
+<FILE Name="&emhttp;/README.md">
+<INLINE>
+**Aether Glass**
+
+An unofficial deep-violet frosted-glass theme for the Unraid webGUI.  CSS only: it changes how pages look, nothing else.  Pauses itself after every Unraid update until you approve the new version in Settings -> Aether Glass.
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash">
+<INLINE>
+# Put the Settings page and the apply script in the webGUI folder (RAM, rebuilt every boot)
+mkdir -p "&emhttp;"
+cp "&cfg;/AetherGlass.page" "&emhttp;/AetherGlass.page"
+cp "&cfg;/apply.sh" "&emhttp;/apply.sh"
+chmod 755 "&emhttp;/apply.sh"
+
+# Theme the webGUI if approved.  Always exit 0: a failed install script makes Unraid
+# move the plugin to plugins-error, and a theme problem should never do that.
+"&emhttp;/apply.sh" || true
+
+echo ""
+echo "Aether Glass is installed.  Open Settings -> Aether Glass to approve this Unraid version and turn it on."
+exit 0
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+# Back to stock: apply.sh copies back the untouched files it saved in RAM
+[ -x "&emhttp;/apply.sh" ] &amp;&amp; "&emhttp;/apply.sh" --remove
+
+# Delete only this plugin's own files, by name.  rmdir then removes each folder only
+# if it is empty, so anything else someone put there is kept.
+for f in AetherGlass.page apply.sh README.md; do
+    rm -f "&emhttp;/$f"
+done
+rmdir "&emhttp;" 2>/dev/null
+
+for f in aether-glass.css aether-glass-login.css aether-glass-logging.css apply.sh AetherGlass.page approved-version DISABLED; do
+    rm -f "&cfg;/$f"
+done
+rmdir "&cfg;" 2>/dev/null
+
+echo "Aether Glass is removed.  Reload the page to see the stock look."
+exit 0
+</INLINE>
+</FILE>
+
+</PLUGIN>

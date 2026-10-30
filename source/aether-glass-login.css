@@ -1,0 +1,315 @@
+/*
+ * Aether Glass :: the Unraid login page (/login)
+ *
+ * The login page is a standalone page: it loads no theme and no plugin CSS,
+ * only its own inline styles plus /webGui/styles/default-cases.css (the case
+ * icon font).  This file is meant to be appended to default-cases.css at boot.
+ * That link comes after the inline styles, so these rules win without any
+ * PHP being edited.
+ *
+ * default-cases.css is also loaded by normal webGUI pages, so every rule here
+ * is scoped to the login page (#login) and does nothing anywhere else.
+ * No url() anywhere: nothing is fetched from outside the server.
+ */
+
+html:has(#login) {
+    --aether-cyan: #00e5ff;
+    --aether-violet: #7c5cff;
+    --aether-pink: #ff3d9a;
+    --aether-gradient: linear-gradient(90deg, var(--aether-cyan) 0, var(--aether-violet) 50%, var(--aether-pink) 100%);
+    --aether-bg: #08051a;
+    --aether-text: #e6ebf7;
+    --aether-text-dim: #8b95b5;
+    --aether-link: #7b8ff5;
+    --aether-problem: #f43f6e;
+    --aether-font: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    --glass-tint: rgba(26, 16, 58, 0.42);
+    --glass-filter: blur(22px) saturate(170%);
+    --glass-edge: rgba(200, 190, 255, 0.12);
+    --pill: 999px;
+    /* Same radius and 4px spacing scale as aether-liquid-glass.css (see there).
+       The login page uses the browser's 16px root size, so values are in px. */
+    --r-xl: 28px;
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 20px;
+    --sp-6: 24px;
+    --sp-8: 32px;
+    --sp-10: 40px;
+    --sp-12: 48px;
+    --pill-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0, rgba(255, 255, 255, 0.03) 50%, rgba(0, 0, 0, 0.22) 100%);
+    --pill-edge: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+
+    min-height: 100%;
+    background-color: var(--aether-bg);
+    background-image:
+        linear-gradient(rgba(124, 92, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124, 92, 255, 0.035) 1px, transparent 1px),
+        radial-gradient(60vw 50vh at 12% 8%, rgba(109, 40, 217, 0.40), transparent 70%),
+        radial-gradient(45vw 40vh at 90% 18%, rgba(255, 61, 154, 0.14), transparent 70%),
+        radial-gradient(45vw 40vh at 85% 85%, rgba(0, 229, 255, 0.08), transparent 70%),
+        radial-gradient(70vw 60vh at 40% 100%, rgba(79, 70, 229, 0.30), transparent 70%);
+    background-size: 24px 24px, 24px 24px, auto, auto, auto, auto;
+    background-attachment: fixed;
+}
+html body:has(> #login) {
+    background: transparent;
+    color: var(--aether-text);
+    font-family: var(--aether-font);
+    /* Centre the card vertically on the page */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* The card */
+html body #login {
+    box-sizing: border-box;
+    width: min(460px, calc(100% - 2 * var(--sp-6)));
+    margin: var(--sp-6) auto;
+    overflow: hidden;
+    border-radius: var(--r-xl);
+    corner-shape: squircle;
+    background: var(--glass-tint);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 0 0 1px var(--glass-edge),
+        0 30px 80px -20px rgba(0, 0, 0, 0.8),
+        0 0 80px -30px rgba(124, 92, 255, 0.6);
+}
+
+/* Header: Unraid's hard skewed banner becomes a soft gradient wash that fades into the glass */
+html body #login .logo {
+    border-radius: 0;
+}
+html body #login .angle:after {
+    transform: none;
+    height: 96px;             /* the header box (below) clips at 96px, so the fade must finish by then */
+    background: var(--aether-gradient);
+    opacity: 0.55;
+    -webkit-mask-image: linear-gradient(180deg, #000 0, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0, transparent 100%);
+}
+html body #login .logo {
+    height: 96px;
+}
+html body #login .wordmark {
+    display: flex;
+    justify-content: center;
+    padding: var(--sp-8) var(--sp-8) 0;
+}
+
+/*
+ * Layout: Unraid lays the card out as a form on the left with the server-case
+ * icon floated right.  This turns it into one centred column, like the macOS
+ * login screen: case icon (in the avatar spot), name, description, fields,
+ * button, then the error and recovery link.
+ */
+html body #login .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 var(--sp-10) var(--sp-10);
+}
+html body #login .case {
+    order: -1;
+    float: none;
+    width: auto;
+    font-size: 5.6rem;
+    line-height: 1;
+    color: #c4b5fd;
+    filter: drop-shadow(0 0 14px rgba(124, 92, 255, 0.55));
+}
+/* Space under the icon only when there is one (no case chosen = no gap) */
+html body #login .case > * {
+    display: inline-block;
+    margin-bottom: var(--sp-4);
+}
+html body #login h1 {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    overflow-wrap: anywhere;
+}
+html body #login h2 {
+    margin-top: var(--sp-1);
+    margin-bottom: var(--sp-8);
+    color: var(--aether-text-dim);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+/* Shimmer: the title and the case icon get the holographic sheen, drifting slowly, the
+   same soft cyan / violet / pink as the rest of the theme. */
+@keyframes aether-login-holo {
+    from { background-position: 0% 50%; }
+    to   { background-position: 200% 50%; }
+}
+html body #login h1,
+html body #login .case,
+html body #login .case > * {
+    background: linear-gradient(90deg, #a9e3ff, #cdb9ff, #ffc2e2, #cdb9ff, #a9e3ff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aether-login-holo 14s linear infinite;
+}
+html body #login .form {
+    width: 100%;
+    max-width: 320px;
+}
+html body #login .form form p {
+    margin: 0;
+}
+html body #login input[type="text"],
+html body #login input[type="password"] {
+    display: block;
+    width: 100%;
+    margin: 0 0 var(--sp-3);
+    text-align: left;
+}
+html body #login .button {
+    display: block;
+    width: 100%;
+    /* A deliberate, larger gap above the button so it reads as its own step, not a field */
+    margin-top: var(--sp-8);
+}
+html body #login .form p.error {
+    margin: var(--sp-4) 0 0;
+}
+html body #login .content > a {
+    margin-top: var(--sp-6);
+}
+
+/* Fields: Spotlight-style pills, lighter on top and darker underneath */
+html body #login input[type="text"],
+html body #login input[type="password"] {
+    font-family: var(--aether-font);
+    font-size: 16px;          /* 16px or more stops iPhone Safari zooming in on focus */
+    color: var(--aether-text);
+    caret-color: #c4b5fd;
+    border: 0;
+    border-radius: var(--pill);
+    height: 44px;             /* Apple's minimum touch target; fields and button match */
+    padding: 0 var(--sp-5);
+    background-color: rgba(8, 5, 26, 0.45);
+    background-image: var(--pill-sheen);
+    box-shadow: var(--pill-edge);
+    transition: box-shadow 0.25s;
+}
+html body #login input::placeholder {
+    color: var(--aether-text-dim);
+}
+/* Focus: Siri-style glow (see aether-liquid-glass.css for how it works) */
+html body #login input[type="text"]:focus,
+html body #login input[type="password"]:focus {
+    outline: none;
+    animation: aether-login-siri 4s ease-in-out infinite;
+}
+@keyframes aether-login-siri {
+    0%, 100% {
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.16),
+            0 0 0 1px rgba(124, 92, 255, 0.6),
+            -8px 0 18px -6px rgba(0, 229, 255, 0.55),
+            8px 0 18px -6px rgba(255, 61, 154, 0.55),
+            0 0 24px -8px rgba(124, 92, 255, 0.8);
+    }
+    50% {
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.16),
+            0 0 0 1px rgba(124, 92, 255, 0.6),
+            -8px 0 18px -6px rgba(255, 61, 154, 0.55),
+            8px 0 18px -6px rgba(0, 229, 255, 0.55),
+            0 0 24px -8px rgba(124, 92, 255, 0.8);
+    }
+}
+/* Safari / Chrome autofill paints fields pale yellow-blue; keep them dark */
+html body #login input:-webkit-autofill {
+    -webkit-text-fill-color: var(--aether-text);
+    -webkit-box-shadow: 0 0 0 100px #140c2e inset;
+    caret-color: #c4b5fd;
+}
+
+/* Log in: the one primary action, so it's a filled violet pill */
+html body #login .button {
+    font-family: var(--aether-font);
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    color: #ffffff;
+    border: 0;
+    border-radius: var(--pill);
+    height: 44px;
+    padding: 0 var(--sp-8);
+    background: linear-gradient(180deg, #9a82ff 0, #7354f0 55%, #5534c9 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 14px -4px rgba(124, 92, 255, 0.6);
+    transition: box-shadow 0.25s;
+}
+html body #login .button:hover,
+html body #login .button:focus-visible {
+    outline: none;
+    background: linear-gradient(180deg, #a892ff 0, #7d60f5 55%, #5c3bd3 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        -8px 0 18px -6px rgba(0, 229, 255, 0.5),
+        8px 0 18px -6px rgba(255, 61, 154, 0.5);
+}
+
+/* Links and errors: plain sentence-case link, rose error text */
+html body #login a {
+    color: var(--aether-link);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 500;
+}
+html body #login a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(167, 139, 250, 0.7);
+}
+html body #login .error {
+    color: var(--aether-problem);
+    overflow-wrap: anywhere;
+}
+
+/* Phones: Unraid makes the card full-bleed; keep it a floating glass card instead */
+@media (max-width: 500px) {
+    html body:has(> #login) {
+        background: transparent;
+    }
+    html body #login {
+        width: calc(100% - 2 * var(--sp-4));
+        margin: 8vh auto var(--sp-8);
+    }
+    html body #login .content {
+        padding: 0 var(--sp-6) var(--sp-8);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html body #login input:focus {
+        animation: none;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgba(124, 92, 255, 0.6), 0 0 20px -6px rgba(124, 92, 255, 0.8);
+    }
+    html body #login h1,
+    html body #login .case,
+    html body #login .case > * {
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    html:has(#login) {
+        --glass-tint: #161033;
+        --glass-filter: none;
+    }
+}

@@ -1,0 +1,52 @@
+Menu="UserPreferences"
+Title="Aether Glass"
+Icon="paint-brush"
+Tag="paint-brush"
+Markdown="false"
+---
+<?php
+/* Aether Glass Settings page: shows the theme's status and offers three buttons.
+ * Each button posts to Unraid's own /update.php, which runs apply.sh with one fixed
+ * argument.  update.php only runs scripts inside the webGUI folder and quotes the
+ * arguments, and apply.sh rejects anything that isn't one of its known options.
+ */
+$apply  = '/usr/local/emhttp/plugins/aether-glass/apply.sh';
+$status = shell_exec(escapeshellarg($apply).' --status 2>&1');
+?>
+<style>
+#aether-glass-status { font-family: ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; line-height: 1.6; }
+.aether-glass-actions form { display: inline-block; margin-right: 1rem; }
+</style>
+
+<p>An unofficial deep-violet frosted-glass theme for the webGUI.  It changes how pages look and nothing else.
+Main pages need <b>Settings -> Display Settings -> Dynamix color theme = Black</b>; the login page is themed on any setting.</p>
+
+<p><b>Update pause:</b> the theme only loads on the Unraid version you approved.  After installing, and after every
+Unraid update, it stays off until you look over the stock pages and click <b>Approve</b>.</p>
+
+<div id="aether-glass-status"><?=htmlspecialchars($status ?? 'apply.sh did not answer')?></div>
+
+<div class="aether-glass-actions">
+  <form method="POST" action="/update.php" target="progressFrame">
+    <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
+    <input type="hidden" name="#command" value="<?=$apply?>">
+    <input type="hidden" name="#arg[0]" value="--approve">
+    <input type="submit" value="Approve this version and turn on">
+  </form>
+  <form method="POST" action="/update.php" target="progressFrame">
+    <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
+    <input type="hidden" name="#command" value="<?=$apply?>">
+    <input type="hidden" name="#arg[0]" value="--disable">
+    <input type="submit" value="Turn off (stays off after reboot)">
+  </form>
+  <form method="POST" action="/update.php" target="progressFrame">
+    <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
+    <input type="hidden" name="#command" value="<?=$apply?>">
+    <input type="hidden" name="#arg[0]" value="--enable">
+    <input type="submit" value="Turn back on">
+  </form>
+</div>
+
+<p>Reload the page after a change.  If it still looks the same, reload while holding Shift.
+If the webGUI is unreachable, create an empty file named <code>DISABLED</code> in
+<code>config/plugins/aether-glass/</code> on the flash drive and reboot: the theme will not load.</p>
