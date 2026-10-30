@@ -4,6 +4,14 @@ A deep-violet frosted-glass theme for the Unraid webGUI.
 
 > **Unofficial.**  Aether Glass is a community theme.  It is not made, endorsed or supported by Lime Technology.  "Unraid" is a trademark of Lime Technology, Inc.
 
+![Dashboard](screenshots/dashboard.png)
+
+| Login | Settings |
+|---|---|
+| ![Login page](screenshots/login.png) | ![Settings page](screenshots/settings.png) |
+
+<sub>Screenshots use anonymized data.</sub>
+
 ## What it changes
 
 - **Look:** a violet aurora behind frosted-glass panels, cyan → violet → pink accents, the system font (SF Pro on Apple devices, Segoe UI on Windows).
