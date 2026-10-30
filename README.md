@@ -108,7 +108,11 @@ grep aether-glass /var/log/syslog
 1. **Edit** files in `source/`.
 2. **Run** `tools/release.sh 2026.11.02` (new version).  It writes the version and every file's SHA256 into the `.plg` and checks the XML.
 3. **Add** a line under `<CHANGES>` in the `.plg`.
-4. **Commit**, tag the commit with the version, and push both: `git tag 2026.11.02 && git push && git push --tags`.  The `.plg` downloads its files from that tag.
+4. **Commit**, then **tag** that commit with the same version **before pushing**: `git tag 2026.11.02`.  The `.plg` downloads its files from that tag, so a release pushed without it fails to install.
+5. **Push** the commit and the tag: `git push && git push --tags`.
+6. **Check** the tag is on GitHub and each file in the `.plg` downloads with a matching SHA256.
+
+Changes that don't touch `source/` or the `.plg` (README, screenshots, tools) need no new version and no tag.
 
 ## License
 
