@@ -1,7 +1,6 @@
 Menu="UserPreferences"
 Title="Aether Glass"
-Icon="paint-brush"
-Tag="paint-brush"
+Icon="aether-glass.png"
 Markdown="false"
 ---
 <?php

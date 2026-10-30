@@ -36,6 +36,7 @@ set_sha sha_login   aether-glass-login.css
 set_sha sha_logging aether-glass-logging.css
 set_sha sha_apply   apply.sh
 set_sha sha_page    AetherGlass.page
+set_sha sha_icon    aether-glass.png
 
 grep '<!ENTITY version' "$PLG"
 xmllint --noout --noent "$PLG" && echo "$PLG parses cleanly"

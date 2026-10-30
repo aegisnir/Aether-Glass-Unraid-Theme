@@ -1,4 +1,4 @@
-# Aether Glass
+# <img src="source/aether-glass.png" width="48" height="48" alt="" align="top"> Aether Glass
 
 A deep-violet frosted-glass theme for the Unraid webGUI.
 

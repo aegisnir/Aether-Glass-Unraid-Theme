@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.30">
+<!ENTITY version   "2026.10.30a">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
@@ -12,7 +12,8 @@
 <!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
-<!ENTITY sha_page    "e69167bf2e62bbc8d411bd624c86dd26edfa7982a2fb56b2548c512d0cfa17d8">
+<!ENTITY sha_page    "077fa82565d5862318379402bf41a6fac30e07c28fc2bdb7fdcce814ed7a755f">
+<!ENTITY sha_icon    "ec8be7110f1cc9d0fe440edfb2d4d3de394dc482519ba26eccbd7a7e2e2d6159">
 ]>
 
 <PLUGIN name="&name;"
@@ -20,10 +21,13 @@
         version="&version;"
         pluginURL="&repo;/main/aether-glass.plg"
         support="https://github.com/aegisnir/Aether-Glass-Unraid-Theme/issues"
-        icon="paint-brush"
+        icon="aether-glass.png"
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.30a
+- New icon: a small glass window with the theme's gradient title bar.
+
 ### 2026.10.30
 - First release.
 </CHANGES>
@@ -65,6 +69,11 @@
 <SHA256>&sha_page;</SHA256>
 </FILE>
 
+<FILE Name="&cfg;/aether-glass.png">
+<URL>&src;/aether-glass.png</URL>
+<SHA256>&sha_icon;</SHA256>
+</FILE>
+
 <!-- Shown on the Plugins page -->
 <FILE Name="&emhttp;/README.md">
 <INLINE>
@@ -81,6 +90,9 @@ mkdir -p "&emhttp;"
 cp "&cfg;/AetherGlass.page" "&emhttp;/AetherGlass.page"
 cp "&cfg;/apply.sh" "&emhttp;/apply.sh"
 chmod 755 "&emhttp;/apply.sh"
+# Icon for the Plugins list and the Settings grid (Unraid looks in images/)
+mkdir -p "&emhttp;/images"
+cp "&cfg;/aether-glass.png" "&emhttp;/images/aether-glass.png"
 
 # Theme the webGUI if approved.  Always exit 0: a failed install script makes Unraid
 # move the plugin to plugins-error, and a theme problem should never do that.
@@ -102,9 +114,11 @@ exit 0
 for f in AetherGlass.page apply.sh README.md; do
     rm -f "&emhttp;/$f"
 done
+rm -f "&emhttp;/images/aether-glass.png"
+rmdir "&emhttp;/images" 2>/dev/null
 rmdir "&emhttp;" 2>/dev/null
 
-for f in aether-glass.css aether-glass-login.css aether-glass-logging.css apply.sh AetherGlass.page approved-version DISABLED; do
+for f in aether-glass.css aether-glass-login.css aether-glass-logging.css apply.sh AetherGlass.page aether-glass.png approved-version DISABLED; do
     rm -f "&cfg;/$f"
 done
 rmdir "&cfg;" 2>/dev/null
