@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.31g-dev">
+<!ENTITY version   "2026.10.31h-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "8b6037ab32f660be2677ed9b0f738e35d7d1843e8835afdc4b34db6bce3ee1c3">
+<!ENTITY sha_css     "63f394825c84d924974516455f01032ec124fe1d3df51f36266f3a2efa941a68">
 <!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -26,6 +26,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31h
+- Scroll buttons: side by side in one capsule, always visible (auto-hide removed; Safari didn't update it reliably).
+
 ### 2026.10.31g
 - Scroll buttons: after clicking down, the up button appears right away instead of looking greyed out (Safari).
 

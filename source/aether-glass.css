@@ -2570,16 +2570,17 @@ body fieldset.CMD:not(.unapi *) > legend {
 
 /* ===== Main page polish ===== */
 
-/* Scroll-to-top / scroll-to-end buttons: a glass capsule holding two round buttons.
-   Stock Unraid draws two red circle-arrow glyphs 24px off the bottom, where the frosted
-   footer clipped them.  Unraid shows each one on its own: "down" whenever the page can
-   scroll, "up" only once you've scrolled.  The capsule always has both slots, drawn by
-   "down" (its ::before), with a dimmed placeholder "up" in the top slot (its ::after).
-   The real "up" sits exactly on top of the placeholder and covers it while it's shown,
-   so at the top of the page the up button simply looks disabled.
-   (A version that resized the capsule with :has() on "up"'s style attribute failed in
-   Safari: it doesn't recheck :has() when a script changes that attribute, so the
-   capsule only caught up after a hover.)
+/* Scroll-to-top / scroll-to-end buttons: two round buttons side by side in a glass
+   capsule, up on the left and down on the right, like stock.  Stock Unraid draws two red
+   circle-arrow glyphs 24px off the bottom, where the frosted footer clipped them.
+   Unraid shows each one on its own: "down" whenever the page can scroll, "up" only once
+   you've scrolled.  The capsule always has both slots, drawn by "down" (its ::before),
+   with a dimmed placeholder "up" in the left slot (its ::after).  The real "up" sits
+   exactly on the placeholder and covers it while it's shown, so at the top of the page
+   the up button simply looks disabled.
+   (Tried and dropped: resizing the capsule with :has() on "up"'s style attribute, and
+   auto-hiding until hover.  Safari doesn't recheck those rules when the page script
+   shows "up", so the capsule or the up button got stuck in the old state.)
    Layering: each link keeps Unraid's z-index, so it's its own stack.  The capsule sits
    at z-index -1 inside "down", behind the circle, which is the <i> (not the link itself:
    a background on the link would paint under the capsule).  "Up" comes later in the page,
@@ -2588,7 +2589,7 @@ body fieldset.CMD:not(.unapi *) > legend {
    set display inline, so centring is done with line-height, not flexbox.) */
 body a.back_to_top,
 body a.move_to_end {
-    right: 1.6rem;
+    bottom: 4.8rem;   /* 0.4rem of capsule above a 4.4rem gap over the footer */
     width: 2.6rem;
     height: 2.6rem;
     line-height: 2.6rem;
@@ -2603,8 +2604,8 @@ body a.back_to_top:is(:hover, :focus),
 body a.move_to_end:is(:hover, :focus) {
     text-decoration: none;
 }
-body a.move_to_end { bottom: 4.8rem; }   /* 0.4rem of capsule above the 4.4rem footer gap */
-body a.back_to_top { bottom: 7.8rem; }   /* 4.8 + 2.6 circle + 0.4 gap */
+body a.move_to_end { right: 1.6rem; }
+body a.back_to_top { right: 4.6rem; }   /* 1.6 + 2.6 circle + 0.4 gap */
 /* The round button itself */
 body a.back_to_top > i.fa,
 body a.move_to_end > i.fa {
@@ -2624,12 +2625,12 @@ body a.move_to_end:hover > i.fa {
     box-shadow: var(--pill-edge), 0 0 12px rgba(124, 92, 255, 0.6);
 }
 /* The capsule, around both slots.  pointer-events: none so a click on the capsule's
-   empty edge, or on the placeholder, doesn't count as a click on "down". */
+   rim, or on the placeholder, doesn't count as a click on "down". */
 body a.move_to_end::before {
     content: "";
     position: absolute;
     z-index: -1;
-    inset: -3.4rem -0.4rem -0.4rem;   /* reaches up past the gap and the top slot */
+    inset: -0.4rem -0.4rem -0.4rem -3.4rem;   /* reaches left past the gap and the up slot */
     border-radius: var(--pill);
     /* Lighter than the page and with a brighter rim: the plain glass tint matched the
        dark background near the footer, so the capsule disappeared. */
@@ -2639,12 +2640,12 @@ body a.move_to_end::before {
     box-shadow: inset 0 0 0 1px rgba(200, 190, 255, 0.24), 0 8px 22px -8px rgba(0, 0, 0, 0.75);
     pointer-events: none;
 }
-/* The dimmed placeholder "up" in the top slot (Font Awesome 4 angle-up, like the real one) */
+/* The dimmed placeholder "up" in the left slot (Font Awesome 4 angle-up, like the real one) */
 body a.move_to_end::after {
     content: "\f106";
     position: absolute;
-    left: 0;
-    bottom: calc(100% + 0.4rem);
+    top: 0;
+    right: calc(100% + 0.4rem);
     width: 2.6rem;
     height: 2.6rem;
     line-height: 2.6rem;
@@ -2656,42 +2657,10 @@ body a.move_to_end::after {
     opacity: 0.6;
     pointer-events: none;
 }
-/* Auto-hide: on computers with a mouse the capsule fades out and comes back when the
-   pointer reaches either button (or a keyboard user tabs to one).  Only the circles are
-   hover targets: the capsule and the placeholder belong to the "down" link, so making
-   them hoverable would also make a click on them count as "down".  It lingers 2s
-   before hiding so it doesn't flicker when the pointer brushes past.  Touch screens
-   can't hover, so they always show it.  The fade is on the parts inside each link,
-   not the links: jQuery writes its own opacity onto the links while it fades them. */
-@media (hover: hover) and (pointer: fine) {
-    body a.back_to_top > i.fa,
-    body a.move_to_end > i.fa,
-    body a.move_to_end::before,
-    body a.move_to_end::after {
-        opacity: 0;
-        transition: opacity 0.4s ease 2s, color 0.2s, background 0.2s, box-shadow 0.2s;
-    }
-    body a.move_to_end:is(:hover, :focus-visible) > i.fa,
-    body a.move_to_end:is(:hover, :focus-visible)::before,
-    /* [style] isn't decoration: Safari only re-checks a rule when "up" is shown by the
-       script (which writes its style attribute) if the rule mentions that attribute.
-       Without it, "up" stayed hidden over the dimmed placeholder after clicking down. */
-    body a.move_to_end:is(:hover, :focus-visible) + a.back_to_top[style] > i.fa,
-    body a.back_to_top:is(:hover, :focus-visible) > i.fa,
-    body a.move_to_end:has(+ a.back_to_top:is(:hover, :focus-visible)) > i.fa,
-    body a.move_to_end:has(+ a.back_to_top:is(:hover, :focus-visible))::before {
-        opacity: 1;
-        transition-delay: 0s;
-    }
-    body a.move_to_end:is(:hover, :focus-visible)::after,
-    body a.move_to_end:has(+ a.back_to_top:is(:hover, :focus-visible))::after {
-        opacity: 0.6;
-        transition-delay: 0s;
-    }
-}
-/* When the background task tray is open, Unraid moves the pair to the bottom-left */
-.op-tray:not(:empty) ~ a.back_to_top,
-.op-tray:not(:empty) ~ a.move_to_end { left: 1.6rem; }
+/* When the background task tray is open, Unraid moves the pair to the bottom-left
+   (and sets right: auto); keep the same order, up then down. */
+.op-tray:not(:empty) ~ a.back_to_top { left: 1.6rem; }
+.op-tray:not(:empty) ~ a.move_to_end { left: 4.6rem; }
 /* Plain chevrons (Font Awesome 4: angle-up / angle-down): the button is already round */
 body a.back_to_top > i.fa::before { content: "\f106"; }
 body a.move_to_end > i.fa::before { content: "\f107"; }
