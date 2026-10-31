@@ -2533,3 +2533,36 @@ body .usage-bar > span:is(.greenbar, .orangebar, .redbar) {
     color: #ffffff;
     text-shadow: 0 1px 1px var(--aether-bar-ink), 0 0 3px var(--aether-bar-ink);
 }
+
+/* ===== Docker install / update output page =====
+   After "Apply" on a container, Unraid pastes the whole of dynamix.docker.manager/log.htm
+   into the page body, including its own <style> block with hardcoded orange buttons.
+   That block lands after this theme and ties with it, so the buttons came out stock orange.
+   The theme normally recolours buttons through Unraid's --button-* variables, which those
+   hardcoded rules ignore, so here the same variables are applied directly, only on pages
+   that contain the log body (#logBody). */
+body:has(#logBody) :is(input[type="button"], input[type="reset"], input[type="submit"], button, a.button):not(.unapi *):not([disabled]) {
+    color: var(--button-text-color);
+    background: var(--button-background);
+    background-size: var(--button-background-size);
+}
+body:has(#logBody) :is(input[type="button"], input[type="reset"], input[type="submit"], button, a.button):not(.unapi *):not([disabled]):hover {
+    color: var(--hover-button-text-color);
+    background: var(--hover-button-background);
+}
+/* The "Command execution" box is a <fieldset> with the browser's grey groove border;
+   it gets the same dark well as code blocks */
+body fieldset.CMD:not(.unapi *) {
+    border: 0;
+    border-radius: var(--r-md);
+    padding: var(--sp-3) var(--sp-4);
+    background: rgba(8, 5, 26, 0.45);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+}
+body fieldset.CMD:not(.unapi *) > legend {
+    padding: 0 var(--sp-2);
+    color: var(--aether-text-dim);
+    font-family: var(--aether-font);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}

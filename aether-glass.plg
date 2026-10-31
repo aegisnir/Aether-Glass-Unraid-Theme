@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.30a">
+<!ENTITY version   "2026.10.31">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "d37d1a54f431e4b15636db6b8eb3b1c1bad1ff245eeb710ee1a25a882ddd19f6">
+<!ENTITY sha_css     "60aa95b16b7d449c3368ed4535172c7128ef248d6955a546b64fbcd2acaddcee">
 <!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -25,6 +25,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31
+- Docker install and update output page: buttons and the "Command execution" box now match the theme instead of stock orange and grey.
+
 ### 2026.10.30a
 - New icon: a small glass window with the theme's gradient title bar.
 
