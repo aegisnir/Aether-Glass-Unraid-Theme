@@ -2573,13 +2573,17 @@ body fieldset.CMD:not(.unapi *) > legend {
 /* Scroll-to-top / scroll-to-end buttons: a glass capsule holding two round buttons.
    Stock Unraid draws two red circle-arrow glyphs 24px off the bottom, where the frosted
    footer clipped them.  Unraid shows each one on its own: "down" whenever the page can
-   scroll, "up" only once you've scrolled.  So the capsule is drawn by "down" (its
-   ::before) and grows upward to hold "up" only while "up" is visible (jQuery writes
-   display: inline into its style attribute then; block is matched too, just in case).
+   scroll, "up" only once you've scrolled.  The capsule always has both slots, drawn by
+   "down" (its ::before), with a dimmed placeholder "up" in the top slot (its ::after).
+   The real "up" sits exactly on top of the placeholder and covers it while it's shown,
+   so at the top of the page the up button simply looks disabled.
+   (A version that resized the capsule with :has() on "up"'s style attribute failed in
+   Safari: it doesn't recheck :has() when a script changes that attribute, so the
+   capsule only caught up after a hover.)
    Layering: each link keeps Unraid's z-index, so it's its own stack.  The capsule sits
    at z-index -1 inside "down", behind the circle, which is the <i> (not the link itself:
    a background on the link would paint under the capsule).  "Up" comes later in the page,
-   so its circle paints over the part of the capsule that reaches up behind it.
+   so it paints over everything "down" draws.
    Sizes: circles 2.6rem, 0.4rem of capsule around them and between them.  (jQuery fades
    set display inline, so centring is done with line-height, not flexbox.) */
 body a.back_to_top,
@@ -2619,12 +2623,13 @@ body a.move_to_end:hover > i.fa {
     background: var(--hover-button-background);
     box-shadow: var(--pill-edge), 0 0 12px rgba(124, 92, 255, 0.6);
 }
-/* The capsule: around "down" alone, stretched up around both when "up" shows */
+/* The capsule, around both slots.  pointer-events: none so a click on the capsule's
+   empty edge, or on the placeholder, doesn't count as a click on "down". */
 body a.move_to_end::before {
     content: "";
     position: absolute;
     z-index: -1;
-    inset: -0.4rem;
+    inset: -3.4rem -0.4rem -0.4rem;   /* reaches up past the gap and the top slot */
     border-radius: var(--pill);
     /* Lighter than the page and with a brighter rim: the plain glass tint matched the
        dark background near the footer, so the capsule disappeared. */
@@ -2632,9 +2637,24 @@ body a.move_to_end::before {
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     box-shadow: inset 0 0 0 1px rgba(200, 190, 255, 0.24), 0 8px 22px -8px rgba(0, 0, 0, 0.75);
+    pointer-events: none;
 }
-body a.move_to_end:has(+ a.back_to_top:is([style*="display: inline"], [style*="display: block"]))::before {
-    top: -3.4rem;   /* reaches up past the gap and the "up" circle */
+/* The dimmed placeholder "up" in the top slot (Font Awesome 4 angle-up, like the real one) */
+body a.move_to_end::after {
+    content: "\f106";
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.4rem);
+    width: 2.6rem;
+    height: 2.6rem;
+    line-height: 2.6rem;
+    border-radius: 50%;
+    font-family: FontAwesome;
+    color: var(--aether-text-faint);
+    background: rgba(40, 28, 82, 0.3);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+    opacity: 0.6;
+    pointer-events: none;
 }
 /* When the background task tray is open, Unraid moves the pair to the bottom-left */
 .op-tray:not(:empty) ~ a.back_to_top,
