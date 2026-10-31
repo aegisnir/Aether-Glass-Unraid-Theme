@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.31">
+<!ENTITY version   "2026.10.31a">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
@@ -22,9 +22,13 @@
         pluginURL="&repo;/main/aether-glass.plg"
         support="https://github.com/aegisnir/Aether-Glass-Unraid-Theme/issues"
         icon="aether-glass.png"
+        launch="Settings/AetherGlass"
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31a
+- The icon on the Plugins page now opens the Aether Glass settings page.
+
 ### 2026.10.31
 - Docker install and update output page: buttons and the "Command execution" box now match the theme instead of stock orange and grey.
 
