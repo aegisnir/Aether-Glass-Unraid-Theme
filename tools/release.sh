@@ -1,25 +1,68 @@
 #!/bin/bash
 #
-# Prepares a release: writes the SHA256 of each file in source/ into aether-glass.plg.
-# Unraid checks every downloaded file against these, so a file that changed on GitHub
-# after the release (by accident or on purpose) is refused instead of installed.
+# Prepares a release: writes the version, the update channel and the SHA256 of each file
+# in source/ into aether-glass.plg.  Unraid checks every downloaded file against these
+# hashes, so a file that changed on GitHub after the release (by accident or on purpose)
+# is refused instead of installed.
+#
+# Two channels, picked from the git branch you're on:
+#   main  the default for everyone (Community Apps and the README's install link).
+#         Files download from the version's tag, so a release needs that tag.
+#         Versions look like 2026.11.02 (or 2026.11.02a for a second one that day).
+#   dev   opt-in testing builds.  Servers that installed the dev .plg check the dev
+#         branch for updates and download files straight from it (no tag needed).
+#         Versions get "-dev" on the end automatically, so the Plugins page shows
+#         which channel a server is on.
 #
 # Usage, from the repo folder:
 #   tools/release.sh            update the SHA256 lines for the version already in the .plg
 #   tools/release.sh 2026.11.02 also set a new version first
 #
-# Then commit, tag the commit with the version (git tag 2026.11.02), and push the
-# commit and the tag.  The .plg downloads files from the tag, so the tag must exist.
+# Main: then commit, tag the commit with the version (git tag 2026.11.02), and push the
+# commit and the tag.  Dev: commit and push; no tag.
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PLG=aether-glass.plg
+REPO_RAW='\&repo;'
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+case "$branch" in
+    main) channel=main ;;
+    dev)  channel=dev ;;
+    *)    echo "releases are made from main or dev, not '$branch'"; exit 1 ;;
+esac
 
 if [ $# -ge 1 ]; then
-    [[ "$1" =~ ^[0-9]{4}\.[0-9]{2}\.[0-9]{2}[a-z]?$ ]] || { echo "version must look like 2026.11.02"; exit 1; }
-    sed -i.bak "s|<!ENTITY version   \"[^\"]*\">|<!ENTITY version   \"$1\">|" "$PLG"
+    version="${1%-dev}"
+    [[ "$version" =~ ^[0-9]{4}\.[0-9]{2}\.[0-9]{2}[a-z]?$ ]] || { echo "version must look like 2026.11.02"; exit 1; }
+    [ "$channel" = dev ] && version="$version-dev"
+    sed -i.bak "s|<!ENTITY version   \"[^\"]*\">|<!ENTITY version   \"$version\">|" "$PLG"
     rm -f "$PLG.bak"
 fi
+
+# The version already in the .plg must suit this branch (a dev merge can leave "-dev" on main)
+current="$(sed -n 's|<!ENTITY version   "\([^"]*\)">|\1|p' "$PLG")"
+if [ "$channel" = main ] && [[ "$current" == *-dev ]]; then
+    echo "main can't ship a -dev version ($current): pass a new version, e.g. tools/release.sh 2026.11.02"; exit 1
+fi
+if [ "$channel" = dev ] && [[ "$current" != *-dev ]]; then
+    echo "dev builds need a -dev version ($current): pass one, e.g. tools/release.sh 2026.11.02"; exit 1
+fi
+
+# Point the update check and the file downloads at this channel
+if [ "$channel" = main ]; then
+    src="$REPO_RAW/\&version;/source"
+else
+    src="$REPO_RAW/dev/source"
+fi
+sed -i.bak \
+    -e "s|<!ENTITY src       \"[^\"]*\">|<!ENTITY src       \"$src\">|" \
+    -e "s|pluginURL=\"[^\"]*\"|pluginURL=\"$REPO_RAW/$channel/aether-glass.plg\"|" \
+    "$PLG"
+rm -f "$PLG.bak"
+grep -q "pluginURL=\"&repo;/$channel/aether-glass.plg\"" "$PLG" || { echo "failed to set the update channel"; exit 1; }
+echo "channel  $channel"
 
 # entity name -> file in source/
 set_sha() {

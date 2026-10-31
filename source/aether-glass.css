@@ -2566,3 +2566,121 @@ body fieldset.CMD:not(.unapi *) > legend {
     font-weight: 600;
     letter-spacing: 0.02em;
 }
+
+
+/* ===== Main page polish ===== */
+
+/* Scroll-to-top / scroll-to-end buttons: a glass capsule holding two round buttons.
+   Stock Unraid draws two red circle-arrow glyphs 24px off the bottom, where the frosted
+   footer clipped them.  Unraid shows each one on its own: "down" whenever the page can
+   scroll, "up" only once you've scrolled.  So the capsule is drawn by "down" (its
+   ::before) and grows upward to hold "up" only while "up" is visible (jQuery writes
+   display: block into its style attribute then).
+   Layering: each link keeps Unraid's z-index, so it's its own stack.  The capsule sits
+   at z-index -1 inside "down", behind the circle, which is the <i> (not the link itself:
+   a background on the link would paint under the capsule).  "Up" comes later in the page,
+   so its circle paints over the part of the capsule that reaches up behind it.
+   Sizes: circles 2.6rem, 0.4rem of capsule around them and between them.  (jQuery fades
+   set display inline, so centring is done with line-height, not flexbox.) */
+body a.back_to_top,
+body a.move_to_end {
+    right: 1.6rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    line-height: 2.6rem;
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--aether-text);
+    background: none;
+    box-shadow: none;
+}
+body a.move_to_end { bottom: 4.8rem; }   /* 0.4rem of capsule above the 4.4rem footer gap */
+body a.back_to_top { bottom: 7.8rem; }   /* 4.8 + 2.6 circle + 0.4 gap */
+/* The round button itself */
+body a.back_to_top > i.fa,
+body a.move_to_end > i.fa {
+    display: block;
+    width: 100%;
+    height: 100%;
+    line-height: inherit;
+    border-radius: 50%;
+    background: var(--pill-sheen), rgba(40, 28, 82, 0.55);
+    box-shadow: var(--pill-edge);
+    transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+body a.back_to_top:hover > i.fa,
+body a.move_to_end:hover > i.fa {
+    color: #ffffff;
+    background: var(--hover-button-background);
+    box-shadow: var(--pill-edge), 0 0 12px rgba(124, 92, 255, 0.6);
+}
+/* The capsule: around "down" alone, stretched up around both when "up" shows */
+body a.move_to_end::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -0.4rem;
+    border-radius: var(--pill);
+    background: var(--glass-tint-strong);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: inset 0 0 0 1px var(--glass-edge), 0 8px 22px -8px rgba(0, 0, 0, 0.75);
+}
+body a.move_to_end:has(+ a.back_to_top[style*="display: block"])::before {
+    top: -3.4rem;   /* reaches up past the gap and the "up" circle */
+}
+/* When the background task tray is open, Unraid moves the pair to the bottom-left */
+.op-tray:not(:empty) ~ a.back_to_top,
+.op-tray:not(:empty) ~ a.move_to_end { left: 1.6rem; }
+/* Plain chevrons (Font Awesome 4: angle-up / angle-down): the button is already round */
+body a.back_to_top > i.fa::before { content: "\f106"; }
+body a.move_to_end > i.fa::before { content: "\f107"; }
+
+/* Device dropdowns and slot counts on Main: the general select pill (2.4rem plus padding)
+   was too tall for a 3.2rem table row and sat off-centre.  Inside the device tables they
+   get a fixed, slimmer height, no vertical padding (so the text and arrow centre), and
+   middle alignment within the row. */
+html body table.disk_status select:not(.unapi *) {
+    height: 2.2rem;
+    min-height: 2.2rem;
+    line-height: 2.2rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    vertical-align: middle;
+    font-size: 1.2rem;
+}
+
+/* Disk usage bars: make the empty track visible (it was so faint that a nearly empty
+   bar, like the boot flash, looked like a lone sliver), and give any non-empty fill a
+   minimum width of its own height so a small value is a round dot, not a thin bar. */
+body table.disk_status .usage-disk:not(.sys):not(.mm) {
+    background-color: rgba(170, 155, 255, 0.12);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+}
+body table.disk_status .usage-disk:not(.sys):not(.mm) > span:first-child:not([style*="width:0%"]):not([style*="width: 0%"]) {
+    min-width: 1.8rem;
+}
+
+/* Header array bar when the array is stopped.  Unraid prints "offline" in an unclassed
+   fill at full width, which the theme painted with the full brand gradient, so a stopped
+   array looked like a healthy one.  It becomes an empty track with rose text instead. */
+html body #menu .usage-bar > span:not([class]) {
+    background: none;
+    box-shadow: none;
+    color: #f43f6e;
+    text-align: center;
+    font-weight: 600;
+    text-shadow: 0 0 6px rgba(244, 63, 110, 0.35);
+}
+
+/* Section breaks inside the device tables.  Unraid leaves blank rows between parity and
+   data disks (array stopped) and between pools; on glass they read as accidental empty
+   space.  They become a slim, darker recessed band so the break looks deliberate. */
+html body table.unraid.disk_status thead td.divider,
+html body table.unraid.disk_status tbody tr.tr_last > td[colspan="10"]:only-child:empty {
+    height: 1rem;
+    line-height: 1rem;
+    padding: 0;
+    background: rgba(4, 2, 14, 0.55);
+    box-shadow: inset 0 1px 0 var(--hairline), inset 0 -1px 0 var(--hairline);
+}

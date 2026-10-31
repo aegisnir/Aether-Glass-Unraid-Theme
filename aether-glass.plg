@@ -26,6 +26,14 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31b
+- Main page: scroll-to-top and scroll-to-end are two round buttons in a glass capsule, clear of the footer.
+- Main page: device and slot dropdowns are slimmer and centred in their rows.
+- Main page: disk usage bars show their empty track, and a nearly empty bar is a round dot instead of a sliver.
+- Header: the array bar no longer shows "offline" in full brand colours when the array is stopped.
+- Main page: the blank rows between parity and data disks, and between pools, are now a slim dark divider.
+- New dev channel for testing builds (see README).  Main stays the default.
+
 ### 2026.10.31a
 - The icon on the Plugins page now opens the Aether Glass settings page.
 
