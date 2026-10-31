@@ -2673,7 +2673,10 @@ body a.move_to_end::after {
     }
     body a.move_to_end:is(:hover, :focus-visible) > i.fa,
     body a.move_to_end:is(:hover, :focus-visible)::before,
-    body a.move_to_end:is(:hover, :focus-visible) + a.back_to_top > i.fa,
+    /* [style] isn't decoration: Safari only re-checks a rule when "up" is shown by the
+       script (which writes its style attribute) if the rule mentions that attribute.
+       Without it, "up" stayed hidden over the dimmed placeholder after clicking down. */
+    body a.move_to_end:is(:hover, :focus-visible) + a.back_to_top[style] > i.fa,
     body a.back_to_top:is(:hover, :focus-visible) > i.fa,
     body a.move_to_end:has(+ a.back_to_top:is(:hover, :focus-visible)) > i.fa,
     body a.move_to_end:has(+ a.back_to_top:is(:hover, :focus-visible))::before {
