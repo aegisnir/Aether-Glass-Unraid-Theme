@@ -2702,14 +2702,85 @@ html body #menu .usage-bar > span:not([class]) {
     text-shadow: 0 0 6px rgba(244, 63, 110, 0.35);
 }
 
-/* Section breaks inside the device tables.  Unraid leaves blank rows between parity and
-   data disks (array stopped) and between pools; on glass they read as accidental empty
-   space.  They become a slim, darker recessed band so the break looks deliberate. */
-html body table.unraid.disk_status thead td.divider,
-html body table.unraid.disk_status tbody tr.tr_last > td[colspan="10"]:only-child:empty {
-    height: 1rem;
-    line-height: 1rem;
+/* Device tables on Main (array, pools, boot, unassigned): each section is its own
+   rounded glass card.  Unraid builds the pool list as one table with an empty divider
+   row between pools (and, with the array stopped, an empty row between parity and
+   data disks).  On one glass sheet those breaks could only be painted on top, so they
+   looked like a hard stripe.  Here the glass moves from the table onto the cells: the
+   divider rows stay clear so the page shows through, and the cells next to each break
+   get rounded corners, so every group ends and starts like a card.
+   Rounded cell corners need separate (not collapsed) borders, so the row lines Unraid
+   draws as row borders are redrawn as a hairline inside each cell. */
+html body table.unraid.disk_status:not(.unapi *) {
+    border-collapse: separate;
+    border-spacing: 0;
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    clip-path: none;
+}
+html body table.unraid.disk_status > :is(thead, tbody) > tr > td {
+    background-image: linear-gradient(var(--glass-tint), var(--glass-tint));
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: inset 0 -1px 0 var(--table-border-color);
+}
+/* Unraid also paints row backgrounds (zebra stripes, the totals/slots rows), and a row
+   background is square, so it would fill the rounded corners.  Rows go clear and the
+   stripe moves onto the cells. */
+html body table.unraid.disk_status > :is(thead, tbody) > tr {
+    background: none;
+    border: 0;
+}
+html body table.unraid.disk_status > tbody > tr:nth-child(even) > td {
+    background-image:
+        linear-gradient(var(--table-background-color), var(--table-background-color)),
+        linear-gradient(var(--glass-tint), var(--glass-tint));
+}
+/* Header row keeps its own tint on top of the glass */
+html body table.unraid.disk_status > thead:first-child > tr > td {
+    background-image:
+        linear-gradient(var(--table-header-background-color), var(--table-header-background-color)),
+        linear-gradient(var(--glass-tint), var(--glass-tint));
+}
+/* Row hover: Unraid sets a background colour, which would sit under the glass layer */
+html body table.unraid.disk_status > tbody > tr:not(.tr_last):hover > td {
+    background-image:
+        linear-gradient(var(--hover-table-row-background-color), var(--hover-table-row-background-color)),
+        linear-gradient(var(--glass-tint), var(--glass-tint));
+}
+/* The breaks: clear, no glass, no line */
+html body table.unraid.disk_status > thead > tr > td.divider,
+html body table.unraid.disk_status > tbody > tr.tr_last > td[colspan="10"]:only-child:empty {
+    height: 1.6rem;
+    line-height: 1.6rem;
     padding: 0;
-    background: rgba(4, 2, 14, 0.55);
-    box-shadow: inset 0 1px 0 var(--hairline), inset 0 -1px 0 var(--hairline);
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+}
+/* Card tops: the column header row, and the first row after each break */
+html body table.unraid.disk_status > thead:first-child > tr:first-child > td:first-child,
+html body table.unraid.disk_status > thead:not(:first-child) + tbody > tr:first-child > td:first-child,
+html body table.unraid.disk_status > tbody > tr.tr_last:has(> td[colspan="10"]:only-child:empty) + tr > td:first-child {
+    border-top-left-radius: var(--glass-radius);
+}
+html body table.unraid.disk_status > thead:first-child > tr:first-child > td:last-child,
+html body table.unraid.disk_status > thead:not(:first-child) + tbody > tr:first-child > td:last-child,
+html body table.unraid.disk_status > tbody > tr.tr_last:has(> td[colspan="10"]:only-child:empty) + tr > td:last-child {
+    border-top-right-radius: var(--glass-radius);
+}
+/* Card bottoms: the last row before each break, and the table's last row (no line under it) */
+html body table.unraid.disk_status > tbody > tr:last-child > td:first-child,
+html body table.unraid.disk_status > tbody > tr:has(+ tr.tr_last > td[colspan="10"]:only-child:empty) > td:first-child {
+    border-bottom-left-radius: var(--glass-radius);
+}
+html body table.unraid.disk_status > tbody > tr:last-child > td:last-child,
+html body table.unraid.disk_status > tbody > tr:has(+ tr.tr_last > td[colspan="10"]:only-child:empty) > td:last-child {
+    border-bottom-right-radius: var(--glass-radius);
+}
+html body table.unraid.disk_status > tbody > tr:last-child > td,
+html body table.unraid.disk_status > tbody > tr:has(+ tr.tr_last > td[colspan="10"]:only-child:empty) > td {
+    box-shadow: none;
 }

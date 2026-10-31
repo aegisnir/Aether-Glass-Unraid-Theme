@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.31h-dev">
+<!ENTITY version   "2026.10.31i-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "63f394825c84d924974516455f01032ec124fe1d3df51f36266f3a2efa941a68">
+<!ENTITY sha_css     "2283c9e3d6c6e117f00373f80f0bda7d5128066bc22a0e15d83fb97c5025b30f">
 <!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -26,6 +26,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31i
+- Main page: each section of the device tables (every pool, and parity vs data disks while stopped) is its own rounded glass card, with a clean gap between them.
+
 ### 2026.10.31h
 - Scroll buttons: side by side in one capsule, always visible (auto-hide removed; Safari didn't update it reliably).
 
