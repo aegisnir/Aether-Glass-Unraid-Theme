@@ -16,9 +16,8 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     [ "$local_sha" = "$zero" ] && continue   # deleting a branch, nothing to check
     plg="$(git show "$local_sha:$PLG" 2>/dev/null)" || continue
     if grep -q 'ENTITY version *"[^"]*-dev"' <<<"$plg" \
-       || grep -q 'pluginURL="&repo;/dev/' <<<"$plg" \
-       || grep -q 'ENTITY src *"&repo;/dev/' <<<"$plg"; then
-        echo "Push to main stopped: $PLG is still a dev build (-dev version or dev-branch links)." >&2
+       || grep -q 'pluginURL="&repo;/dev/' <<<"$plg"; then
+        echo "Push to main stopped: $PLG is still a dev build (-dev version or dev update link)." >&2
         echo "Run tools/release.sh <version> on main, commit, tag, then push." >&2
         exit 1
     fi

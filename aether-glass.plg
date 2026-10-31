@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.31c-dev">
+<!ENTITY version   "2026.10.31d-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
-<!ENTITY src       "&repo;/dev/source">
+<!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "defff1b61520b2eae6a7335464eb3cfa885bf32b26b2bc5892051d61a23df1e2">
+<!ENTITY sha_css     "5e9ee5c51085d2ca1cb91cec041417b8de1dda48e81577cf99368937dbe30ec1">
 <!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -26,6 +26,10 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31d
+- Scroll buttons: the capsule now grows to hold both buttons once you've scrolled down.
+- Dev builds now download from their own tag, so they install right after release.
+
 ### 2026.10.31c
 - Scroll buttons: the capsule is visible against the page, and hovering a button no longer underlines its arrow.
 

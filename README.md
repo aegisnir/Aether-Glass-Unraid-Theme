@@ -117,7 +117,7 @@ grep aether-glass /var/log/syslog
 
 ## For maintainers: releasing
 
-Two channels, chosen by the branch you're on.  `tools/release.sh` sets the update link and file source in the `.plg` to match, and adds `-dev` to dev versions.
+Two channels, chosen by the branch you're on.  `tools/release.sh` sets the update link in the `.plg` to match and adds `-dev` to dev versions.  Both channels download files from the version's tag: a new tag is an address GitHub hasn't cached, so a build installs as soon as it's pushed.
 
 One-time setup per clone, so the push guard below runs (GitHub Desktop runs it too):
 
@@ -129,17 +129,17 @@ git config core.hooksPath tools/hooks
 1. **Edit** files in `source/`.
 2. **Run** `tools/release.sh 2026.11.02`.  The `.plg` becomes `2026.11.02-dev`, updating from the `dev` branch.
 3. **Add** a line under `<CHANGES>` in the `.plg`.
-4. **Commit** and **push** `dev`.  No tag: dev builds download straight from the branch.
+4. **Commit**, **tag** it `2026.11.02-dev` before pushing, then **push** `dev` and the tag.
 
 **Release** (to everyone)
 1. **Merge** `dev` into `main`.
-2. **Run** `tools/release.sh 2026.11.02` on `main`.  It refuses to keep a `-dev` version and points the `.plg` back at `main` and the tag.
+2. **Run** `tools/release.sh 2026.11.02` on `main`.  It refuses to keep a `-dev` version and points the update link back at `main`.
 3. **Commit**, then **tag** that commit with the same version **before pushing**: `git tag 2026.11.02`.  The `.plg` downloads its files from that tag, so a release pushed without it fails to install.
 4. **Push** the commit and the tag: `git push && git push --tags`.
 5. **Check** the tag is on GitHub and each file in the `.plg` downloads with a matching SHA256.
 6. **Merge** `main` back into `dev`, then run `tools/release.sh` on `dev` so it's a dev build again.
 
-The push guard (`tools/hooks/pre-push`) stops a push to `main` while its `.plg` still has a `-dev` version or links to the `dev` branch.  That's the one mistake that would move every user onto the testing channel.
+The push guard (`tools/hooks/pre-push`) stops a push to `main` while its `.plg` still has a `-dev` version or the `dev` update link.  That's the one mistake that would move every user onto the testing channel.
 
 Changes that don't touch `source/` or the `.plg` (README, screenshots, tools) need no new version and no tag.
 

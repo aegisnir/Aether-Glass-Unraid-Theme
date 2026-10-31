@@ -10,16 +10,18 @@
 #         Files download from the version's tag, so a release needs that tag.
 #         Versions look like 2026.11.02 (or 2026.11.02a for a second one that day).
 #   dev   opt-in testing builds.  Servers that installed the dev .plg check the dev
-#         branch for updates and download files straight from it (no tag needed).
-#         Versions get "-dev" on the end automatically, so the Plugins page shows
-#         which channel a server is on.
+#         branch for updates.  Versions get "-dev" on the end automatically, so the
+#         Plugins page shows which channel a server is on.
+# Both channels download files from the version's tag.  A tag is a fresh address
+# GitHub hasn't cached, so a build installs right after it's pushed; a branch address
+# can serve the previous files for ~5 minutes and fail the SHA256 check.
 #
 # Usage, from the repo folder:
 #   tools/release.sh            update the SHA256 lines for the version already in the .plg
 #   tools/release.sh 2026.11.02 also set a new version first
 #
-# Main: then commit, tag the commit with the version (git tag 2026.11.02), and push the
-# commit and the tag.  Dev: commit and push; no tag.
+# Then commit, tag the commit with the version (2026.11.02, or 2026.11.02-dev on dev),
+# and push the commit and the tag.
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -50,12 +52,8 @@ if [ "$channel" = dev ] && [[ "$current" != *-dev ]]; then
     echo "dev builds need a -dev version ($current): pass one, e.g. tools/release.sh 2026.11.02"; exit 1
 fi
 
-# Point the update check and the file downloads at this channel
-if [ "$channel" = main ]; then
-    src="$REPO_RAW/\&version;/source"
-else
-    src="$REPO_RAW/dev/source"
-fi
+# Point the update check at this channel, and the file downloads at the version's tag
+src="$REPO_RAW/\&version;/source"
 sed -i.bak \
     -e "s|<!ENTITY src       \"[^\"]*\">|<!ENTITY src       \"$src\">|" \
     -e "s|pluginURL=\"[^\"]*\"|pluginURL=\"$REPO_RAW/$channel/aether-glass.plg\"|" \

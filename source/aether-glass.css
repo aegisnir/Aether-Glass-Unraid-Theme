@@ -2575,7 +2575,7 @@ body fieldset.CMD:not(.unapi *) > legend {
    footer clipped them.  Unraid shows each one on its own: "down" whenever the page can
    scroll, "up" only once you've scrolled.  So the capsule is drawn by "down" (its
    ::before) and grows upward to hold "up" only while "up" is visible (jQuery writes
-   display: block into its style attribute then).
+   display: inline into its style attribute then; block is matched too, just in case).
    Layering: each link keeps Unraid's z-index, so it's its own stack.  The capsule sits
    at z-index -1 inside "down", behind the circle, which is the <i> (not the link itself:
    a background on the link would paint under the capsule).  "Up" comes later in the page,
@@ -2633,7 +2633,7 @@ body a.move_to_end::before {
     backdrop-filter: var(--glass-filter);
     box-shadow: inset 0 0 0 1px rgba(200, 190, 255, 0.24), 0 8px 22px -8px rgba(0, 0, 0, 0.75);
 }
-body a.move_to_end:has(+ a.back_to_top[style*="display: block"])::before {
+body a.move_to_end:has(+ a.back_to_top:is([style*="display: inline"], [style*="display: block"]))::before {
     top: -3.4rem;   /* reaches up past the gap and the "up" circle */
 }
 /* When the background task tray is open, Unraid moves the pair to the bottom-left */
