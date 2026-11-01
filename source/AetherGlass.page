@@ -4,102 +4,495 @@ Icon="aether-glass.png"
 Markdown="false"
 ---
 <?php
-/* Aether Glass Settings page: shows the theme's status and offers its buttons.
- * Each button posts to Unraid's own /update.php, which runs apply.sh with fixed
+/* Aether Glass Settings page.
+ * Sections use Unraid's own title bars, so they match every other page in whichever theme
+ * is active.  Inside them, the page draws its own larger controls (status readouts, a big
+ * switch, the preset panel) in the theme's colours, with Unraid's blue as the fallback.
+ * Every button posts to Unraid's own /update.php, which runs apply.sh with fixed
  * arguments.  update.php only runs scripts inside the webGUI folder and quotes the
  * arguments, and apply.sh rejects anything that isn't one of its known options and values.
- * No JavaScript: the theme is CSS only, and so is this page.
+ * No JavaScript: the theme is CSS only, and so is this page.  The preset panel and the
+ * choice buttons react to clicks with CSS alone (radio buttons underneath).
  */
 $apply  = '/usr/local/emhttp/plugins/aether-glass/apply.sh';
-$status = shell_exec(escapeshellarg($apply).' --status 2>&1');
+$status = shell_exec(escapeshellarg($apply).' --status 2>&1') ?? '';
 
-// Current effect levels, read from the status text (apply.sh is the only thing that
-// writes effects.cfg, and it only writes known values)
-preg_match('/^Effects:\s+(\w+) \(motion (\w+), glass (\w+), glow (\w+)\)/m', $status ?? '', $fx);
+// apply.sh --status prints "Name:   value" lines; pick out the ones this page shows
+function ag_status($status, $name) {
+  return preg_match('/^'.preg_quote($name, '/').':\s*(.*)$/m', $status, $m) ? trim($m[1]) : '';
+}
+$theme_ver = ag_status($status, 'Theme version') ?: 'unknown';
+$unraid    = ag_status($status, 'Unraid version') ?: 'unknown';
+$approved  = ag_status($status, 'Approved version');
+$kill_on   = ag_status($status, 'Kill switch') === 'ON';
+$display   = ag_status($status, 'Display theme');
+$themed    = [
+  _('Normal pages') => ag_status($status, 'themes/black.css') === 'themed',
+  _('Login page')   => ag_status($status, 'default-cases.css') === 'themed',
+  _('Log windows')  => ag_status($status, 'logging.htm') === 'themed',
+];
+$is_approved = $approved !== '' && $approved === $unraid;
+$is_on       = !$kill_on && $is_approved && $themed[_('Normal pages')];
+
+// Effects: "Effects:  fast (motion hover, glass panels, glow static)"
+preg_match('/^Effects:\s+(\w+) \(motion (\w+), glass (\w+), glow (\w+)\)/m', $status, $fx);
 [$preset, $motion, $glass, $glow] = [$fx[1] ?? 'balanced', $fx[2] ?? 'hover', $fx[3] ?? 'all', $fx[4] ?? 'all'];
 
-// One dropdown; marks the current value as selected
-function ag_select($name, $current, $options) {
-  $html = "<select name=\"".htmlspecialchars($name)."\">";
-  foreach ($options as $value => $label) {
-    $sel = ($value === $current) ? ' selected' : '';
-    $html .= "<option value=\"".htmlspecialchars($value)."\"$sel>".htmlspecialchars($label)."</option>";
+// Hidden fields every form needs
+function ag_form_head($apply, $var, $arg0) {
+  return '<input type="hidden" name="csrf_token" value="'.htmlspecialchars($var['csrf_token'] ?? '').'">'
+       . '<input type="hidden" name="#command" value="'.htmlspecialchars($apply).'">'
+       . '<input type="hidden" name="#arg[0]" value="'.htmlspecialchars($arg0).'">';
+}
+?>
+<?php
+// ---- Effects ----------------------------------------------------------------------------
+// Three effects, lowest level first (four levels for the shimmer and glass, three for glows).
+// The level number is how many sections of that effect's bar are filled.  Visuals = all three
+// bars added up (3 to 11 sections).  Speed is NOT the mirror image: each level has its own cost, measured by
+// benchmarking all 27 combinations twice on the Dashboard (Safari, 120 Hz).  Holographic on
+// every title: scrolling 48 -> 32 fps and about 12x the stutters; on hover it costs nothing
+// measurable.  Frosted glass: about 15-20 fps less while idle, almost all of it from the big
+// panels (Panels and Everything cost nearly the same).  Glows: no measurable cost.  9 = full speed.
+// Page titles and Menus were added later and not benchmarked; their cost is inferred: a few
+// always-moving titles against ~37 for Every title, and only the menu bar's blur always on
+// screen against every panel for Panels.
+// Keys match apply.sh (motion = the holographic effect).
+$ag_fx = [
+  'motion' => [_('Holographic'), [
+      'still'      => [_('Still'),        _('Titles hold a still frame of the holographic shimmer.')],
+      'hover'      => [_('On hover'),     _('The shimmer moves on the tile you point at.')],
+      'titles'     => [_('Page titles'),  _('The section titles on each page shimmer all the time; Dashboard tiles still on hover.')],
+      'everywhere' => [_('Every title'),  _('The shimmer moves on every title at once.')]]],
+  'glass'  => [_('Frosted glass'), [
+      'off'        => [_('Off'),          _('Solid panels, no blur.')],
+      'menus'      => [_('Menus'),        _('Glass only on the menu bar, dropdowns, dialogs and tooltips; solid panels.')],
+      'panels'     => [_('Panels'),       _('Blur on panels; small buttons get a plain fill.')],
+      'all'        => [_('Everything'),   _('Blur behind every panel, button and menu.')]]],
+  'glow'   => [_('Glows'), [
+      'off'        => [_('Off'),          _('No glows.')],
+      'static'     => [_('Still things'), _('Glows on things that sit still; none on live bars and numbers.')],
+      'all'        => [_('Everywhere'),   _('Soft glows on every coloured bar, ring and status.')]]],
+];
+$ag_now = ['motion' => $motion, 'glass' => $glass, 'glow' => $glow];
+$themed_count = count(array_filter($themed));
+// Named mixes (the presets apply.sh knows); any other mix is Custom
+$ag_names = ['everywhere|all|all' => _('Vivid'), 'hover|all|all' => _('Balanced'),
+             'hover|menus|static' => _('Light'), 'still|off|off' => _('Minimal')];
+
+// One effect: label, the line describing the picked level, and a 3-section bar of radio buttons
+function ag_level($key, $fx, $now) {
+  [$label, $levels] = $fx;
+  $html = '<div class="ag-fxrow"><div class="ag-fxname"><b>'.$label.'</b>';
+  foreach ($levels as $val => [$name, $desc]) $html .= '<span class="ag-desc" data-for="ag-'.$key.'-'.$val.'">'.$desc.'</span>';
+  $icon = ['motion' => 'fa-magic', 'glass' => 'fa-snowflake-o', 'glow' => 'fa-sun-o'][$key];
+  // a small icon on the left and a large one on the right mean less / more, like Apple's sliders
+  $html .= '</div><div class="ag-sl"><i class="fa '.$icon.' ag-less" aria-hidden="true"></i>'
+         . '<div class="ag-lvl"><span class="ag-track"><span class="ag-fill"></span><span class="ag-knob"></span></span>';
+  // Stop k sits at k / (levels - 1) along the full-width bar: a tick under the line marks it,
+  // and its word sits under the tick (first word left-aligned, last right-aligned).  Each
+  // click area covers the stretch of bar nearest its stop.
+  $last = count($levels) - 1; $k = 0;
+  foreach ($levels as $val => [$name, $desc]) {
+    $at = round($k / $last * 100, 3);
+    $from = round(max(0, ($k - 0.5) / $last) * 100, 3); $to = round(min(1, ($k + 0.5) / $last) * 100, 3);
+    $align = $k === 0 ? 'start' : ($k === $last ? 'end' : 'mid');
+    $html .= '<i class="ag-tick" style="left: '.$at.'%"></i>';
+    $saved = ($val === $now) ? ' class="ag-saved" checked' : '';
+    $html .= '<input type="radio" id="ag-'.$key.'-'.$val.'" name="#arg['.(['motion'=>1,'glass'=>2,'glow'=>3][$key]).']" value="'.$key.'='.$val.'"'.$saved.'>'
+           . '<label for="ag-'.$key.'-'.$val.'" class="ag-'.$align.'" style="left: '.$from.'%; width: '.round($to - $from, 3).'%"><span class="ag-cap">'
+           . ($val === $now ? '<span class="ag-applied" title="'._('Applied').'">&check;</span>' : '').$name.'</span></label>';
+    $k++;
   }
-  return $html."</select>";
+  return $html.'</div><i class="fa '.$icon.' ag-more" aria-hidden="true"></i></div></div>';
+}
+
+// CSS that follows the picks (no script): fill each bar up to the picked level, show that
+// level's description, and work out the Visuals / Speed bars and the mix's name.
+function ag_fx_css($fx, $names) {
+  $css = '';
+  foreach ($fx as $key => [$label, $levels]) {
+    $vals = array_keys($levels);
+    foreach ($vals as $n => $val) {
+      $css .= ".ag-fx:has(#ag-$key-$val:checked) .ag-desc[data-for=\"ag-$key-$val\"] { display: block; }\n";
+      $x = round($n / (count($vals) - 1) * 100, 3);   // lowest level = empty bar, knob at the start
+      $css .= ".ag-lvl:has(#ag-$key-$val:checked) .ag-fill { width: $x%; }\n";
+      $knob = "clamp(0rem, calc($x% - 0.9rem), calc(100% - 1.8rem))";   // centred on the stop, kept inside the bar
+      $css .= ".ag-lvl:has(#ag-$key-$val:checked) .ag-knob { left: $knob; }\n";
+      // pointing at a level: the knob glides there, showing where a click lands
+      // (doubled class so it outranks the "picked level" rule above, whatever the order)
+      $css .= ".ag-lvl.ag-lvl:has(label[for=\"ag-$key-$val\"]:hover) .ag-knob { left: $knob; }\n";
+    }
+  }
+  $cost = ['motion' => ['still' => 0, 'hover' => 0, 'titles' => 1, 'everywhere' => 4],
+           'glass'  => ['off' => 0, 'menus' => 1, 'panels' => 2, 'all' => 3],
+           'glow'   => ['off' => 0, 'static' => 0, 'all' => 0]];
+  [$m, $g, $w] = array_values(array_map('array_keys', array_column($fx, 1)));
+  foreach ($m as $a => $mv) foreach ($g as $b => $gv) foreach ($w as $c => $wv) {
+    $sum = $a + $b + $c + 3;                       // 3 to 11 filled sections
+    $speed = 9 - $cost['motion'][$mv] - $cost['glass'][$gv] - $cost['glow'][$wv];   // 2 to 9 (Vivid 2, Balanced 6, Light 7, Minimal 9)
+    $sel = ".ag-fx:has(#ag-motion-$mv:checked):has(#ag-glass-$gv:checked):has(#ag-glow-$wv:checked)";
+    $v = round($sum / 11 * 100); $sp = round($speed / 9 * 100);
+    $css .= "$sel .ag-ring.vis { --p: $v; --n: $v; }\n$sel .ag-ring.spd { --p: $sp; --n: $sp; }\n";
+    $name = $names["$mv|$gv|$wv"] ?? null;
+    $css .= ".ag-fx:not(:has(.ag-lvl input:checked:not(.ag-saved))):has(#ag-motion-$mv:checked):has(#ag-glass-$gv:checked):has(#ag-glow-$wv:checked)"
+          . " .ag-mix [data-mix=\"".($name ? "$mv|$gv|$wv" : 'custom')."\"] { display: inline; }\n";
+  }
+  // Any change not applied yet reads Custom, even if it happens to match a preset: the name
+  // shows what is applied, so an edit to Vivid never looks like it turned into Minimal.
+  $css .= ".ag-fx:has(.ag-lvl input:checked:not(.ag-saved)) .ag-mix [data-mix=\"custom\"] { display: inline; }\n";
+  return $css;
 }
 ?>
 <style>
-#aether-glass-status { font-family: ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; line-height: 1.6; }
-.aether-glass-actions form { display: inline-block; margin-right: 1rem; }
-.aether-glass-effects form { margin: 0 0 1rem; }
-.aether-glass-effects label { display: inline-block; min-width: 9rem; }
-.aether-glass-effects dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1rem; margin: 0.5rem 0 1rem; }
-.aether-glass-effects dt { font-weight: bold; }
-.aether-glass-effects dd { margin: 0; }
+/* Colours come from Aether Glass's variables where it is active, with Unraid's own blue as
+   the fallback on other themes.  Sizes follow the page's font size (rem). */
+.ag { --ag-accent: var(--aether-violet, #486dba); --ag-ok: var(--aether-ok, #4caf50); --ag-warn: var(--aether-attention, #ff8c2f);
+  --ag-line: rgba(200, 190, 255, 0.14); --ag-dim: rgba(230, 235, 247, 0.66);
+  /* Same gap from the edge as the section title pills (the theme's --inset), so text lines up under the titles */
+  padding: 0.8rem var(--inset, 1.2rem) 2rem; font-size: 1.35rem; line-height: 1.55; }
+.ag p { margin: 0 0 1.2rem; color: var(--ag-dim); max-width: 110rem; }
+.ag-ok { color: var(--ag-ok); } .ag-warn { color: var(--ag-warn); }
+.ag form { margin: 0; }
+.ag-btn { margin-top: 1.2rem; display: flex; align-items: center; gap: 1.6rem; flex-wrap: wrap; }
+.ag-note { color: var(--ag-dim); }   /* sits beside the button, so showing it never moves the page */
+.ag-cancel { display: none; }
+.ag form:has(input[type="radio"]:checked:not(.ag-saved)) .ag-cancel { display: inline-block; }
+
+.ag input[type="submit"] { width: auto; min-width: 0; }
+
+/* ---- Status: one row of large readouts with thin dividers, like a Dashboard tile ---- */
+.ag-stats { display: flex; flex-wrap: wrap; align-items: stretch; }
+.ag-stat { padding: 0.3rem 2.2rem 0.3rem 0; margin-right: 2.2rem; border-right: 1px solid var(--ag-line); min-width: 9rem; }
+.ag-stat:last-child { border-right: 0; }
+.ag-k { display: block; font-size: 1.15rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ag-dim); margin-bottom: 0.4rem; }
+.ag-v { display: block; font-size: 1.9rem; font-weight: 600; line-height: 1.2; white-space: nowrap; }
+.ag-v small { display: block; font-size: 1.25rem; font-weight: 400; margin-top: 0.2rem; }
+
+/* The big switch: a submit button drawn as a toggle.  Clicking it turns the theme off or on. */
+.ag .ag-switch, .ag .ag-switch:hover, .ag .ag-switch:focus { background: none; box-shadow: none; border: 0; padding: 0; margin: 0; min-width: 0; height: auto; color: inherit; animation: none; }
+.ag-switch { all: unset; display: inline-flex; align-items: center; gap: 0.8rem; cursor: pointer; font-size: 1.9rem; font-weight: 600; }
+.ag-switch .ag-track { position: relative; width: 4.6rem; height: 2.6rem; border-radius: 999px; background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5); transition: background 0.25s; }
+.ag-switch .ag-track::before { content: ""; position: absolute; top: 0.3rem; left: 0.3rem; width: 2rem; height: 2rem; border-radius: 50%;
+  background: linear-gradient(180deg, #fff, #e4e0f5); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.ag-switch.on .ag-track { background: var(--ag-accent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 14px -2px var(--ag-accent); }
+.ag-switch.on .ag-track::before { transform: translateX(2rem); }
+.ag-switch:focus-visible .ag-track { outline: 2px solid var(--ag-accent); outline-offset: 3px; }
+
+/* ---- Effects: one 3-section bar per effect ---- */
+.ag-fx .ag { padding-bottom: 1rem; }
+.ag-fxrow { display: grid; grid-template-columns: 26rem 36rem; gap: 0 3rem; align-items: center; padding: 1.1rem 0; border-bottom: 1px solid var(--ag-line); max-width: 62rem; }
+.ag-fxrow:last-of-type { border-bottom: 0; }
+@media (max-width: 760px) { .ag-fxrow { grid-template-columns: 1fr; gap: 0.8rem; } }
+.ag-fxname b { display: block; font-size: 1.5rem; }
+.ag-desc { display: none; color: var(--ag-dim); margin-top: 0.2rem; }
+.ag-lvl { position: relative; height: 4.4rem; }   /* bar, ticks, words */
+.ag-lvl input { position: absolute; opacity: 0; pointer-events: none; }
+.ag-lvl label { position: absolute; top: -0.6rem; bottom: 0; cursor: pointer; z-index: 2; }   /* reaches up over the bar */
+.ag-cap { position: absolute; top: 2.6rem; font-size: 1.2rem; color: #b4bad6; white-space: nowrap; }
+.ag-mid .ag-cap { left: 50%; transform: translateX(-50%); }
+.ag-start .ag-cap { left: 0; transform: translateX(-50%); }    /* centred on the bar's start, so it runs out past the end */
+.ag-end .ag-cap { right: 0; transform: translateX(50%); }      /* centred on the bar's end */
+/* a short tick under the line at each stop, like a ruler */
+.ag-tick { position: absolute; top: 1.3rem; width: 2px; height: 0.6rem; margin-left: -1px; border-radius: 1px; background: rgba(200, 190, 255, 0.35); }
+.ag-tick:first-of-type { margin-left: 0; }
+.ag-tick:last-of-type { margin-left: -2px; }
+.ag-sl { display: grid; grid-template-columns: 2rem minmax(0, 1fr) 2.6rem; align-items: start; gap: 0 1rem; }
+.ag-sl > .fa { color: #b4bad6; text-align: center; line-height: 1rem; }
+.ag-less { font-size: 1.1rem; }
+.ag-more { font-size: 1.8rem; }
+/* one bar: a dim track with a cyan-to-violet fill that grows to the picked level */
+.ag-track { position: absolute; left: 0; right: 0; top: 0; height: 1rem; border-radius: 999px; pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--aether-cyan, #486dba) 20%, #150d2c), color-mix(in srgb, var(--ag-accent) 20%, #150d2c)); }
+.ag-fill { position: absolute; inset: 0 auto 0 0; border-radius: inherit; transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); container-type: inline-size; width: 0;
+  background: linear-gradient(90deg, var(--aether-cyan, #486dba), var(--ag-accent)); }
+/* The knob, Apple-style: hidden until you point at the bar, then it fades in at the end of
+   the fill and glides to whichever level you point at.  Same knob as the theme's toggles. */
+.ag-knob { position: absolute; top: -0.4rem; left: 0; width: 1.8rem; height: 1.8rem; border-radius: 50%;
+  pointer-events: none; z-index: 3; background: linear-gradient(180deg, #fff, #e4e0f5);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(0, 0, 0, 0.15);
+  opacity: 0; transform: scale(0.6);
+  /* a slight overshoot, so a click snaps the knob into its stop like a detent */
+  transition: opacity 0.2s, transform 0.2s, left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.ag-lvl:hover .ag-knob { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .ag-knob { transition: opacity 0.2s; } .ag-fill { transition: none; } }
+.ag-lvl input:checked + label .ag-cap { color: #fff; font-weight: 600; }
+.ag-lvl input:focus-visible + label .ag-cap { outline: 2px solid var(--ag-accent); outline-offset: 3px; border-radius: 4px; }
+.ag-applied { color: var(--ag-ok); font-weight: 700; margin-right: 0.3rem; }
+
+/* ---- Layout: the effect bars on the left, the result (name + two rings) on the right ---- */
+.ag-fxgrid { display: grid; grid-template-columns: minmax(0, 62rem) auto; column-gap: 7rem; align-items: start; }
+@media (max-width: 1100px) { .ag-fxgrid { grid-template-columns: 1fr; } }
+.ag-result { padding: 1.1rem 0 0; }
+.ag-mix b { display: block; font-size: 1.15rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ag-dim); font-weight: 600; }
+.ag-mix [data-mix] { display: none; font-size: 2.6rem; font-weight: 700;
+  background: linear-gradient(90deg, #a9e3ff, #cdb9ff, #ffc2e2); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ag-mix small { display: block; color: var(--ag-dim); }
+
+/* Visuals and Speed are readouts, not controls, so they are rings like the Dashboard's:
+   a cyan-to-violet sweep on a dim track tinted from the same colours.  The number in the
+   middle is a CSS counter fed by the same value, so no script is needed. */
+.ag-rings { display: flex; gap: 3.2rem; margin-top: 1.8rem; }
+.ag-gauge { display: grid; justify-items: center; gap: 0.8rem; }
+.ag-ring { position: relative; width: 11rem; height: 11rem; display: grid; place-items: center; }
+.ag-ring { --t: 1.1rem; --r: calc(5.5rem - var(--t) / 2); --a: calc(var(--p) * 3.6deg); }   /* thickness, radius to the middle of the band, fill angle */
+.ag-ring::before { content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(circle at calc(50% + var(--r) * sin(var(--a))) calc(50% - var(--r) * cos(var(--a))),
+      var(--ag-accent) calc(var(--t) / 2 - 0.5px), transparent calc(var(--t) / 2)),
+    radial-gradient(circle at 50% calc(var(--t) / 2), var(--aether-cyan, #486dba) calc(var(--t) / 2 - 0.5px), transparent calc(var(--t) / 2)),
+    conic-gradient(var(--aether-cyan, #486dba) 0%, var(--ag-accent) calc(var(--p) * 1%),
+      color-mix(in srgb, var(--ag-accent) 20%, #150d2c) calc(var(--p) * 1%) 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--t)), #000 calc(100% - var(--t) + 1px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - var(--t)), #000 calc(100% - var(--t) + 1px)); }
+/* Each ring animates its own value, so changing a level sweeps the ring and counts the
+   number up or down.  (Animating a value inherited from the whole section made Safari
+   restart it from 0 on every click.)  Registered so the browser can animate a number. */
+@property --p { syntax: "<integer>"; inherits: true; initial-value: 0; }
+/* The number reads --n, a plain copy that changes instantly: Safari shows 0 for a counter
+   whose value is mid-animation, so only the ring (--p) animates. */
+.ag-ring { transition: --p 0.5s cubic-bezier(0.4, 0, 0.2, 1); counter-reset: ag-n var(--n); }
+@media (prefers-reduced-motion: reduce) { .ag-ring { transition: none; } }
+.ag-ring::after { content: counter(ag-n) "%"; font-size: 2.2rem; font-weight: 700; }
+.ag .ag-fine { margin: 1.4rem 0 0; font-size: 1.15rem; line-height: 1.5; color: var(--ag-dim); max-width: 25rem; }   /* the width of the two rings */
+.ag-gauge > b { font-size: 1.15rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ag-dim); font-weight: 600; }
+
+/* Apply turns green while something is picked that isn't applied yet */
+.ag form:has(input[type="radio"]:checked:not(.ag-saved)) input[type="submit"] {
+  color: #04130d; background: linear-gradient(180deg, #4ade9c 0, #10c98f 55%, #0aa676 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgba(16, 201, 143, 0.6); }
+.ag code { font-size: 1.15rem; }
+/* Benchmark: a plain HTML disclosure (no script) holding the steps and the code to copy */
+.ag-bench summary { cursor: pointer; color: #c4b5fd; font-weight: 600; margin-bottom: 1rem; }
+.ag-bench ol { margin: 0 0 1.2rem; padding-left: 2rem; color: var(--ag-dim); max-width: 90rem; }
+.ag-bench li { margin-bottom: 0.6rem; }
+.ag .ag-code { display: block; width: 100%; max-width: 90rem; font: 1.15rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre; overflow: auto; resize: vertical; }
+/* preset dropdown: small, on one line; Apply goes green when a different preset is picked */
+.ag-preset { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; margin-top: 1.8rem; padding-top: 1.4rem; border-top: 1px solid var(--ag-line); max-width: 62rem; }
+.ag-preset label { color: var(--ag-dim); }
+.ag .ag-preset select { width: auto; min-width: 16rem; max-width: 24rem; margin: 0; }
+.ag form.ag-preset:has(option:checked:not(.ag-saved)) input[type="submit"] {
+  color: #04130d; background: linear-gradient(180deg, #4ade9c 0, #10c98f 55%, #0aa676 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgba(16, 201, 143, 0.6); }
+<?=ag_fx_css($ag_fx, $ag_names)?>
 </style>
 
-<p>An unofficial deep-violet frosted-glass theme for the webGUI.  It changes how pages look and nothing else.
-Main pages need <b>Settings -> Display Settings -> Dynamix color theme = Black</b>; the login page is themed on any setting.</p>
-
-<p><b>Update pause:</b> the theme only loads on the Unraid version you approved.  After installing, and after every
-Unraid update, it stays off until you look over the stock pages and click <b>Approve</b>.</p>
-
-<div id="aether-glass-status"><?=htmlspecialchars($status ?? 'apply.sh did not answer')?></div>
-
-<div class="aether-glass-actions">
-  <form method="POST" action="/update.php" target="progressFrame">
-    <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
-    <input type="hidden" name="#command" value="<?=$apply?>">
-    <input type="hidden" name="#arg[0]" value="--approve">
-    <input type="submit" value="Approve this version and turn on">
-  </form>
-  <form method="POST" action="/update.php" target="progressFrame">
-    <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
-    <input type="hidden" name="#command" value="<?=$apply?>">
-    <input type="hidden" name="#arg[0]" value="--disable">
-    <input type="submit" value="Turn off (stays off after reboot)">
-  </form>
-  <form method="POST" action="/update.php" target="progressFrame">
-    <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
-    <input type="hidden" name="#command" value="<?=$apply?>">
-    <input type="hidden" name="#arg[0]" value="--enable">
-    <input type="submit" value="Turn back on">
-  </form>
+<div class="ag">
+<p>An unofficial deep-violet frosted-glass theme for the webGUI.  It changes how pages look and nothing else, and it is CSS only.
+Main pages need <b>Settings &rarr; Display Settings &rarr; Dynamix color theme = Black</b>; the login page is themed on any setting.</p>
 </div>
 
-<h3>Effects</h3>
-<div class="aether-glass-effects">
-<p>Trade looks for speed on slower computers.  Every level still follows each visitor's own computer: if it asks for
-less motion or less transparency (macOS and Windows accessibility settings), that visitor gets it anyway.</p>
-
-<dl>
-  <dt>Best looks</dt><dd>Lava moves on every title, frosted glass everywhere, all glows.</dd>
-  <dt>Balanced</dt><dd>Lava moves on the tile you point at.  Recommended, and the default.</dd>
-  <dt>Fast</dt><dd>Also: small buttons get a plain fill instead of blur, and no glows on bars and live numbers.</dd>
-  <dt>Fastest</dt><dd>Nothing moves, no frosted glass (solid panels), no glows.</dd>
-</dl>
-
-<form method="POST" action="/update.php" target="progressFrame">
-  <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
-  <input type="hidden" name="#command" value="<?=$apply?>">
-  <input type="hidden" name="#arg[0]" value="--effects">
-  <label>Preset</label>
-  <?=ag_select('#arg[1]', "preset=$preset", ['preset=best' => 'Best looks', 'preset=balanced' => 'Balanced', 'preset=fast' => 'Fast', 'preset=fastest' => 'Fastest'] + ($preset === 'custom' ? ['preset=custom' => 'Custom (fine-tuned below)'] : []))?>
-  <input type="submit" value="Apply preset">
-</form>
-
-<form method="POST" action="/update.php" target="progressFrame">
-  <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
-  <input type="hidden" name="#command" value="<?=$apply?>">
-  <input type="hidden" name="#arg[0]" value="--effects">
-  <p><b>Fine-tune</b> (overrides the preset):</p>
-  <label>Motion</label><?=ag_select('#arg[1]', "motion=$motion", ['motion=everywhere' => 'Every title', 'motion=hover' => 'Title you point at', 'motion=still' => 'Still'])?><br>
-  <label>Frosted glass</label><?=ag_select('#arg[2]', "glass=$glass", ['glass=all' => 'Everything', 'glass=panels' => 'Panels only', 'glass=off' => 'Off (solid panels)'])?><br>
-  <label>Glows</label><?=ag_select('#arg[3]', "glow=$glow", ['glow=all' => 'All', 'glow=static' => 'Not on live bars and numbers', 'glow=off' => 'Off'])?><br>
-  <input type="submit" value="Apply these settings">
-</form>
+<div class="title nocontrol"><span class="left"><i class="title fa fa-info-circle"></i> _(Status)_</span></div>
+<div class="ag">
+  <div class="ag-stats">
+    <div class="ag-stat"><span class="ag-k">_(Theme)_</span>
+      <form method="POST" action="/update.php" target="progressFrame">
+        <?=ag_form_head($apply, $var, $kill_on ? '--enable' : '--disable')?>
+        <button type="submit" class="ag-switch<?=$kill_on ? '' : ' on'?>" title="<?=$kill_on ? _('Turn the theme back on') : _('Turn the theme off (stays off after reboot)')?>">
+          <span class="ag-track"></span><?=$kill_on ? _('Off') : _('On')?>
+        </button>
+      </form>
+      <?php if (!$kill_on && !$is_on): ?><span class="ag-v"><small class="ag-warn">_(waiting for approval)_</small></span><?php endif; ?>
+    </div>
+    <div class="ag-stat"><span class="ag-k">_(Unraid)_</span>
+      <span class="ag-v"><?=htmlspecialchars($unraid)?>
+        <?php if ($is_approved): ?><small class="ag-ok">_(approved)_</small>
+        <?php else: ?><small class="ag-warn"><?=$approved ? sprintf(_('approved for %s only'), htmlspecialchars($approved)) : _('not approved yet')?></small><?php endif; ?></span>
+      <?php if (!$is_approved): ?>
+      <form class="ag-btn" method="POST" action="/update.php" target="progressFrame">
+        <?=ag_form_head($apply, $var, '--approve')?><input type="submit" value="_(Approve and turn on)_">
+      </form>
+      <?php endif; ?>
+    </div>
+    <div class="ag-stat"><span class="ag-k">_(Display theme)_</span>
+      <span class="ag-v <?=$display === 'Black' ? 'ag-ok' : 'ag-warn'?>"><?=$display === 'Black' ? _('Black') : _('Not Black')?>
+        <?php if ($display !== 'Black'): ?><small>_(main pages stay stock)_</small><?php endif; ?></span></div>
+    <div class="ag-stat"><span class="ag-k">_(Pages themed)_</span>
+      <span class="ag-v <?=$themed_count === 3 ? 'ag-ok' : 'ag-warn'?>"><?=$themed_count?> _(of)_ 3
+        <small style="color:var(--ag-dim)"><?=implode(' &middot; ', array_keys($themed))?></small></span></div>
+    <div class="ag-stat"><span class="ag-k">_(Version)_</span><span class="ag-v"><?=htmlspecialchars($theme_ver)?></span></div>
+  </div>
 </div>
 
-<p>Reload the page after a change.  If it still looks the same, reload while holding Shift.
-If the webGUI is unreachable, create an empty file named <code>DISABLED</code> in
-<code>config/plugins/aether-glass/</code> on the flash drive and reboot: the theme will not load.</p>
+<div class="ag-fx">
+<div class="title nocontrol"><span class="left"><i class="title fa fa-magic"></i> _(Effects)_</span></div>
+<div class="ag">
+  <p>_(Trade visual effects for speed on slower computers.  These settings apply to everyone who opens this server's webGUI.)_</p>
+  <p>_(Accessibility settings still win: if a visitor's Mac or PC has Reduce motion or Reduce transparency turned on, that visitor sees less of those effects than chosen here.  Nothing changes for anyone else.)_</p>
+  <p><span class="ag-applied">&check;</span>_(marks the level that is applied now.)_</p>
+  <form method="POST" action="/update.php" target="progressFrame">
+    <?=ag_form_head($apply, $var, '--effects')?>
+    <div class="ag-fxgrid">
+      <div>
+        <?php foreach ($ag_fx as $key => $fx) echo ag_level($key, $fx, $ag_now[$key]); ?>
+        <div class="ag-btn"><input type="submit" value="_(Apply)_"><input type="reset" class="ag-cancel" value="_(Cancel)_"></div>
+      </div>
+      <div class="ag-result">
+        <div class="ag-mix"><b>_(Your mix)_</b><span data-mix="everywhere|all|all">_(Vivid)_</span><span data-mix="hover|all|all">_(Balanced)_</span><span data-mix="hover|panels|static">_(Light)_</span><span data-mix="still|off|off">_(Minimal)_</span><span data-mix="custom">_(Custom)_</span><small>_(Default: Balanced)_</small></div>
+        <div class="ag-rings">
+          <div class="ag-gauge"><div class="ag-ring vis"></div><b>_(Visuals)_</b></div>
+          <div class="ag-gauge"><div class="ag-ring spd"></div><b>_(Speed)_</b></div>
+        </div>
+        <p class="ag-fine">_(Speed figures measured on an Apple M5 MacBook Pro, macOS 27.2, Safari 27.2.  Results vary with hardware, operating system, browser and screen.)_</p>
+      </div>
+    </div>
+  </form>
+  <form class="ag-preset" method="POST" action="/update.php" target="progressFrame">
+    <?=ag_form_head($apply, $var, '--effects')?>
+    <label for="ag-preset-pick">_(Or pick a preset)_</label>
+    <select id="ag-preset-pick" name="#arg[1]">
+      <?php if ($preset === 'custom'): ?><option value="preset=custom" class="ag-saved" selected>_(Custom)_</option><?php endif; ?>
+      <option value="preset=best"<?=$preset === 'best' ? ' class="ag-saved" selected' : ''?>>_(Vivid)_</option><option value="preset=balanced"<?=$preset === 'balanced' ? ' class="ag-saved" selected' : ''?>>_(Balanced (default))_</option><option value="preset=fast"<?=$preset === 'fast' ? ' class="ag-saved" selected' : ''?>>_(Light)_</option><option value="preset=fastest"<?=$preset === 'fastest' ? ' class="ag-saved" selected' : ''?>>_(Minimal)_</option>
+    </select>
+    <input type="submit" value="_(Apply preset)_">
+  </form>
+</div>
+</div><!-- /ag-fx -->
+
+<div class="title nocontrol"><span class="left"><i class="title fa fa-tachometer"></i> _(Benchmark your computer)_</span></div>
+<div class="ag">
+  <p>_(Optional.  The Speed ring uses figures measured on one computer.  To see the real cost on yours, run this short test in your browser.  It tries the four presets on the Dashboard and gives each a score: 1 point for every frame per second, minus 1 point for every stutter.  It recommends the richest preset that scores 50 or more, which is about a smooth 60 frames a second with only a few stutters.  Nothing changes until you apply it yourself.)_</p>
+  <p>_(The test is code you run yourself, not part of the plugin, so Aether Glass stays pure CSS.  It runs only in your browser, changes nothing permanently (reload the page to undo it), and sends nothing anywhere.  Tested in Safari; Chrome and Edge use the same code.)_</p>
+  <details class="ag-bench">
+    <summary>_(Show the steps and the code)_</summary>
+    <ol>
+      <li>_(Open the Dashboard and wait a few seconds.)_</li>
+      <li>_(Open the browser console.)_<br>
+        <b>Safari:</b> _(turn on Safari, Settings, Advanced, "Show features for web developers" once, then Develop, Show JavaScript Console (Option-Command-C).)_<br>
+        <b>Chrome / Edge:</b> _(Option-Command-J on a Mac, Ctrl+Shift+J on Windows.)_</li>
+      <li>_(Click in the box below, select all (Command-A or Ctrl+A), copy, paste into the console and press Return.  Chrome and Edge ask you to type "allow pasting" the first time.)_</li>
+      <li>_(A prompt in the middle of the screen asks you to close the console and counts down from 5, so the test measures the whole window.  Close it with Option-Command-I on a Mac or F12 on Windows, or the console's close button.  The test then takes about 1.5 minutes.  Please don't touch the mouse or keyboard while it runs, so your own scrolling doesn't throw the results off.)_</li>
+      <li>_(When it's done, a results card in the middle of the screen shows every preset's score, with the recommended one in green.)_</li>
+    </ol>
+    <textarea class="ag-code" readonly rows="14" spellcheck="false">// Aether Glass benchmark: tests the four Effects presets on this page and recommends one.
+// Paste into the browser console on the Dashboard.  It takes about 1.5 minutes.  Please don't touch
+// the mouse or keyboard while it runs: moving or scrolling yourself would throw the results off.
+// It only runs in your browser, changes nothing permanently, and sends nothing anywhere.
+(async () =&gt; {
+  // A see-through cover over the page for the length of the test, so a resting mouse can't
+  // hover a tile and start its shimmer (that would skew two of the presets).
+  const shield = Object.assign(document.createElement("div"), { style:
+    "position:fixed;inset:0;z-index:2147483646;cursor:wait" });
+  const banner = Object.assign(document.createElement("div"), { style:
+    "position:fixed;bottom:40px;left:20px;z-index:2147483647;padding:8px 16px;border-radius:99px;" +
+    "background:#000;color:#fff;font:700 15px system-ui;box-shadow:0 0 0 2px #10c98f;cursor:default" });
+  document.documentElement.append(shield, banner);
+  let card;   // the "close the console" prompt, removed again if the test stops early
+  try {
+    const wait = ms =&gt; new Promise(r =&gt; setTimeout(r, ms));
+    // A page can't close the browser's console itself, so ask, with that browser's keys, and
+    // count down.  An open console takes part of the window and would lower the scores.
+    // Option-Command-I (Mac, Safari and Chrome) and F12 (Windows) toggle the developer panel closed
+    const keys = /Mac/.test(navigator.platform) ? "Option-Command-I" : "F12";
+    card = Object.assign(document.createElement("div"), { style:
+      "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2147483647;width:min(640px,90vw);padding:44px 48px;border-radius:28px;" +
+      "background:rgba(24,14,4,.97);color:#ffd27a;font:700 26px/1.4 system-ui;text-align:center;" +
+      "box-shadow:0 0 0 3px #f59e0b,0 0 60px rgba(245,158,11,.45),0 30px 80px rgba(0,0,0,.7)" });   // amber, so it can't be missed
+    document.documentElement.append(card);
+    for (let n = 5; n &gt; 0; n--) {
+      card.innerHTML = `⚠️ Please close the console now&lt;br&gt;&lt;span style="font-size:22px;color:#fff"&gt;${keys}, or its × button&lt;/span&gt;` +
+        `&lt;span style="display:block;margin-top:18px;font-size:20px;font-weight:600;color:#fde7b6"&gt;The test starts in&lt;/span&gt;` +
+        `&lt;span style="display:block;font-size:96px;line-height:1.1;color:#f59e0b"&gt;${n}&lt;/span&gt;`;
+      await wait(1000);
+    }
+    card.remove();
+    const frames = (ms, scroll) =&gt; new Promise(done =&gt; {
+      const gaps = []; const t0 = performance.now(); let last = t0;
+      const max = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+      const tick = t =&gt; { gaps.push(t - last); last = t; const p = (t - t0) / ms;
+        if (scroll) scrollTo(0, max * (p &lt; .5 ? p * 2 : 2 - p * 2)); p &lt; 1 ? requestAnimationFrame(tick) : done(gaps); };
+      requestAnimationFrame(tick);
+    });
+    const fps = a =&gt; a.length / (a.reduce((x, y) =&gt; x + y, 0) / 1000);
+    // The theme's Effects rules, found by the names in their conditions
+    const rules = [];
+    for (const sh of document.styleSheets) { let rs; try { rs = sh.cssRules; } catch (e) { continue; }
+      for (const r of rs) if (r instanceof CSSMediaRule &amp;&amp; /aether-(motion|glass|glow)-|prefers-reduced-(motion|transparency)/.test(r.media.mediaText))
+        rules.push({ r, orig: r.media.mediaText }); }
+    if (!rules.some(x =&gt; x.orig.includes("aether-motion-everywhere"))) throw new Error("Aether Glass isn't active on this page (or is an older version)");
+    // Switch the rules to one mix of levels, in this tab only
+    const set = (m, g, w) =&gt; { for (const { r, orig } of rules) { const has = n =&gt; orig.includes(n);
+      const on = has("prefers-reduced-motion") ? m === "still" : has("prefers-reduced-transparency") ? g === "off"
+        : has("aether-motion-everywhere") ? m === "everywhere" : has("aether-motion-titles") ? m === "titles"
+        : has("aether-glass-panels") ? g === "panels" : has("aether-glass-menus") ? g === "menus"
+        : (has("aether-glow-static") &amp;&amp; w === "static") || (has("aether-glow-off") &amp;&amp; w === "off");
+      r.media.mediaText = on ? "all" : "not all"; } };
+    const presets = { Vivid: ["everywhere", "all", "all"], Balanced: ["hover", "all", "all"],
+                      Light: ["hover", "menus", "static"], Minimal: ["still", "off", "off"] };
+    const res = {};
+    for (const round of [1, 2]) {
+      const order = Object.keys(presets);   // shuffled (Fisher-Yates), so no preset always runs first
+      for (let i = order.length - 1; i &gt; 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+      for (const name of order) {
+        banner.textContent = `Testing ${name} (round ${round} of 2)…  Please don't touch the mouse or keyboard.`;
+        set(...presets[name]); await wait(1000);
+        const idle = await frames(3000, false), scroll = await frames(4000, true);
+        (res[name] ||= []).push({ idle: fps(idle), scroll: fps(scroll), slow: [...idle, ...scroll].filter(x =&gt; x &gt; 50).length });
+        scrollTo(0, 0); await wait(400);
+      }
+    }
+    for (const x of rules) x.r.media.mediaText = x.orig;   // back to how the page loaded
+    shield.remove();
+    // Score: 1 point per frame per second while idle, with no ceiling, so 144 Hz and faster
+    // screens show their real differences (the self-scrolling part caps near 50 fps on every
+    // preset, so it only counts toward stutters), minus 1 point for every
+    // stutter (a frame that took longer than 50 ms, idle or scrolling).  The richest preset that
+    // scores 50 or more is recommended: about a smooth 60 frames a second with only a few stutters.
+    const avg = (r, k) =&gt; r.reduce((s, x) =&gt; s + x[k], 0) / r.length;
+    const stats = {}, table = {};
+    for (const name of Object.keys(presets)) { const r = res[name];
+      const idle = avg(r, "idle"), stutters = Math.round(avg(r, "slow"));
+      stats[name] = { score: Math.round(idle - stutters) };
+      table[name] = { score: stats[name].score, "idle fps": +idle.toFixed(1), "scroll fps": +avg(r, "scroll").toFixed(1), stutters };
+    }
+    console.table(table);
+    const pick = ["Vivid", "Balanced", "Light"].find(n =&gt; stats[n].score &gt;= 50) || "Minimal";
+    const note = stats.Minimal.score &lt; 50 ? "  Even Minimal scores under 50 here, so this computer may find the theme heavy." : "";
+    // Results card in the middle of the screen: violet, with the recommendation in green
+    banner.remove();
+    const top = Math.max(1, ...Object.values(table).map(t =&gt; t.score));   // bars scale to the best score in this run
+    const row = n =&gt; { const t = table[n], best = n === pick, w = Math.max(0, t.score / top * 100);
+      return `&lt;tr style="${best ? "color:#4ade9c;font-weight:800" : ""}"&gt;` +
+        `&lt;td style="background:transparent;border:0;padding:8px 14px 8px 0;text-align:left"&gt;${best ? "✓ " : ""}${n}&lt;/td&gt;` +
+        `&lt;td style="background:transparent;border:0;padding:8px 14px;min-width:170px"&gt;&lt;div style="height:10px;border-radius:99px;background:rgba(124,92,255,.25)"&gt;` +
+        `&lt;div style="height:100%;width:${w}%;border-radius:99px;background:${best ? "#10c98f" : "linear-gradient(90deg,#00e5ff,#7c5cff)"}"&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;` +
+        `&lt;td style="background:transparent;border:0;padding:8px 14px;text-align:right;font-size:22px"&gt;${t.score}&lt;/td&gt;` +
+        `&lt;td style="background:transparent;border:0;padding:8px 14px;text-align:right;color:${best ? "#4ade9c" : "#b4bad6"}"&gt;${Math.round(t["idle fps"])} fps&lt;/td&gt;` +
+        `&lt;td style="background:transparent;border:0;padding:8px 0 8px 14px;text-align:right;color:${best ? "#4ade9c" : "#b4bad6"}"&gt;${t.stutters} stutters&lt;/td&gt;&lt;/tr&gt;`; };
+    const results = Object.assign(document.createElement("div"), { style:
+      "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2147483647;width:min(720px,92vw);padding:36px 40px;border-radius:28px;" +
+      "background:rgba(20,12,46,.97);color:#e6ebf7;font:600 17px/1.4 system-ui;text-align:center;" +
+      "box-shadow:0 0 0 3px #7c5cff,0 0 60px rgba(124,92,255,.45),0 30px 80px rgba(0,0,0,.7)" });
+    results.innerHTML =
+      `&lt;div style="font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:#cdb9ff"&gt;Aether Glass benchmark&lt;/div&gt;` +
+      `&lt;div style="margin:10px 0 4px;font-size:30px;font-weight:800;color:#4ade9c"&gt;Recommended: ${pick}&lt;/div&gt;` +
+      `&lt;div style="font-size:15px;font-weight:500;color:#b4bad6"&gt;Set it in Settings → Aether Glass → Effects.&lt;/div&gt;` +
+      (note ? `&lt;div style="margin-top:10px;font-size:15px;font-weight:500;color:#ffd27a"&gt;${note.trim()}&lt;/div&gt;` : "") +
+      `&lt;table style="margin:22px auto 10px;border-collapse:separate;border-spacing:0;border-radius:18px;overflow:hidden;` +
+      `padding:8px 20px;background:rgba(8,5,26,.6);box-shadow:inset 0 0 0 1px rgba(200,190,255,.14);font-size:17px"&gt;${["Vivid", "Balanced", "Light", "Minimal"].map(row).join("")}&lt;/table&gt;` +
+      `&lt;div style="font-size:13px;font-weight:500;color:#8b95b5"&gt;Score = frames per second minus 1 per stutter.  50 or more is recommended.&lt;/div&gt;` +
+      // Two buttons: one goes straight to the Aether Glass settings page to apply the pick,
+      // the quieter one just closes the card and stays on the Dashboard
+      `&lt;div style="margin-top:22px;display:flex;gap:12px;justify-content:center"&gt;` +
+      `&lt;button data-go style="padding:10px 28px;border:0;border-radius:99px;font:700 16px system-ui;color:#fff;cursor:pointer;` +
+      `background:linear-gradient(180deg,#9a82ff,#7354f0 55%,#5534c9)"&gt;Open settings&lt;/button&gt;` +
+      `&lt;button data-close style="padding:10px 22px;border:0;border-radius:99px;font:600 16px system-ui;color:#cdb9ff;cursor:pointer;` +
+      `background:transparent;box-shadow:inset 0 0 0 1px rgba(205,185,255,.35)"&gt;Close&lt;/button&gt;&lt;/div&gt;`;
+    results.querySelector("[data-go]").onclick = () =&gt; { location.href = "/Settings/AetherGlass"; };
+    results.querySelector("[data-close]").onclick = () =&gt; results.remove();
+    document.documentElement.append(results);
+    console.log(`%cRecommended preset for this computer: ${pick}`, "font-weight:bold;font-size:15px;color:#10c98f");
+    console.log(Object.entries(table).map(([n, t]) =&gt; `${n}: ${t.score} points (${Math.round(t["idle fps"])} fps, ${t.stutters} stutters)`).join("\n"));
+  } catch (err) { shield.remove(); card?.remove(); banner.textContent = "Benchmark stopped: " + err.message; console.error(err); }
+})();</textarea>
+  </details>
+</div>
+
+<div class="title nocontrol"><span class="left"><i class="title fa fa-life-ring"></i> _(If something goes wrong)_</span></div>
+<div class="ag">
+  <p><b>Changes not showing?</b>  Reload the page; if it still looks the same, reload while holding Shift.</p>
+  <p><b>webGUI won't load?</b>  Create an empty file named <code>DISABLED</code> in <code>config/plugins/aether-glass/</code>
+  on the flash drive and reboot: the theme will not load.</p>
+</div>

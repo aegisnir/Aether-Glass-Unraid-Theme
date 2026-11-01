@@ -141,14 +141,16 @@ restore() {
 
 # ---- Effects ----------------------------------------------------------------------------
 # Three effects, each with levels (the CSS explains what each level changes):
-#   motion  everywhere | hover | still
-#   glass   all | panels | off
+#   motion  everywhere | titles | hover | still   (the holographic shimmer on titles)
+#   glass   all | panels | menus | off
 #   glow    all | static | off
 # Presets set all three at once.  "balanced" is the default.
 # The choice is saved in effects.cfg as three fixed lines.  The theme CSS keeps every
 # level's rules behind media conditions that never match on their own; effects_filter
-# switches the chosen ones on in the copy being installed.  The CSS file itself is
-# never changed, and the browser still only receives CSS.
+# switches the chosen ones on in the copy being installed, by putting "all, " in front of the
+# condition: "(aether-glass-menus)" becomes "all, (aether-glass-menus)", which always matches
+# but keeps the name, so the optional benchmark on the Settings page can still find it.  The
+# CSS file itself is never changed, and the browser still only receives CSS.
 
 DEFAULT_MOTION=hover DEFAULT_GLASS=all DEFAULT_GLOW=all
 
@@ -157,7 +159,7 @@ preset_levels() {
     case "$1" in
         best)     echo "everywhere all all" ;;
         balanced) echo "hover all all" ;;
-        fast)     echo "hover panels static" ;;
+        fast)     echo "hover menus static" ;;
         fastest)  echo "still off off" ;;
     esac
 }
@@ -173,8 +175,8 @@ levels_preset() {
 
 valid_level() {
     case "$1=$2" in
-        motion=everywhere|motion=hover|motion=still) return 0 ;;
-        glass=all|glass=panels|glass=off) return 0 ;;
+        motion=everywhere|motion=titles|motion=hover|motion=still) return 0 ;;
+        glass=all|glass=panels|glass=menus|glass=off) return 0 ;;
         glow=all|glow=static|glow=off) return 0 ;;
     esac
     return 1
@@ -201,16 +203,18 @@ effects_filter() {
     local args=()
     read_effects
     case "$MOTION" in
-        everywhere) args+=(-e 's/(aether-motion-everywhere)/all/g') ;;
-        still)      args+=(-e 's/(prefers-reduced-motion: reduce)/all/g') ;;
+        everywhere) args+=(-e 's/(aether-motion-everywhere)/all, &/g') ;;
+        titles)     args+=(-e 's/(aether-motion-titles)/all, &/g') ;;
+        still)      args+=(-e 's/(prefers-reduced-motion: reduce)/all, &/g') ;;
     esac
     case "$GLASS" in
-        panels) args+=(-e 's/(aether-glass-panels)/all/g') ;;
-        off)    args+=(-e 's/(prefers-reduced-transparency: reduce)/all/g') ;;
+        panels) args+=(-e 's/(aether-glass-panels)/all, &/g') ;;
+        menus)  args+=(-e 's/(aether-glass-menus)/all, &/g') ;;
+        off)    args+=(-e 's/(prefers-reduced-transparency: reduce)/all, &/g') ;;
     esac
     case "$GLOW" in
-        static) args+=(-e 's/(aether-glow-static)/all/g') ;;
-        off)    args+=(-e 's/(aether-glow-off)/all/g') ;;
+        static) args+=(-e 's/(aether-glow-static)/all, &/g') ;;
+        off)    args+=(-e 's/(aether-glow-off)/all, &/g') ;;
     esac
     if [ ${#args[@]} -eq 0 ]; then cat; else sed "${args[@]}"; fi
 }

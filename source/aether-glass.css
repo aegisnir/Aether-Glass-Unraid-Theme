@@ -417,7 +417,7 @@ body [class*=" case-"] {
    filled with a soft cyan / violet / pink gradient that drifts slowly and continuously, so
    it is always gently coloured rather than white with the odd flash.  The fill is clipped
    to the glyphs; reduced-motion users get the same sheen held still. */
-@keyframes aether-holo {
+@keyframes aether-sheen {
     from { background-position: 0% 50%; }
     to   { background-position: 200% 50%; }
 }
@@ -433,7 +433,7 @@ body .sidenav :is(.rightTitle, .popupAuthorTitle) {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: aether-holo 14s linear infinite;
+    animation: aether-sheen 14s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
     body .tile-header-main,
@@ -2193,7 +2193,7 @@ body .tabs button[role="tab"]:active {
     color: transparent;
     font-weight: 600;
     box-shadow: none;
-    animation: aether-holo 14s linear infinite;
+    animation: aether-sheen 14s linear infinite;
 }
 .sweet-alert.nchan h1::before,
 .sweet-alert.nchan h2::before,
@@ -3053,7 +3053,7 @@ html body .boot-title {
     text-transform: none;     /* sentence case, matching the rest of the theme */
     letter-spacing: 0.01em;
     overflow-wrap: anywhere;
-    background: var(--aether-gradient);   /* lava-lamp blobs replace this further down */
+    background: var(--aether-gradient);   /* the holographic blobs replace this further down */
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -3506,7 +3506,7 @@ body #sb-title-inner {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: aether-holo 14s linear infinite;
+    animation: aether-sheen 14s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
     body #sb-title-inner { animation: none; }
@@ -3933,8 +3933,8 @@ body td:has(> canvas#cpuchart)::after {
 }
 
 
-/* Lava-lamp shimmer for headings: six soft colour blobs float inside the letters over a
-   base colour, like globs in a lava lamp, each on its own wandering path.
+/* Holographic shimmer for headings: six soft colour blobs float inside the letters over a
+   base colour, like globs in a holographic lamp, each on its own wandering path.
    How: each blob is a radial gradient centred at two registered (@property) percentages,
    and one animation per heading moves all twelve along six different paths.  The whole
    stack is clipped to the text (background-clip: text, set by the rules above).
@@ -3947,30 +3947,31 @@ body td:has(> canvas#cpuchart)::after {
      - that still left the Dashboard at ~25 fps: each step repainted a chunk of
        the frosted panel around the heading, not just the heading.  Giving every heading its
        own layer (will-change: transform) plus paint containment (contain: paint) keeps each
-       step's repaint inside the heading's own box: ~50 fps, about the same as no lava at all.
+       step's repaint inside the heading's own box: ~50 fps, about the same as no holographic at all.
        Neither alone was enough (45 and 39 fps).  Checked: tile dropdowns still open fully.
+       Only on tile and section titles: on a frosted dialog's title it looked ghostly.
    Reduced-motion users get the blobs held still. */
 
-@property --aether-lava-x1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-y1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-x2 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-y2 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-x3 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-y3 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-x4 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-y4 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-x5 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-y5 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-x6 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@property --aether-lava-y6 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
-@keyframes aether-lava {
-    0% { --aether-lava-x1: 67%; --aether-lava-y1: 18%; --aether-lava-x2: 7%; --aether-lava-y2: 91%; --aether-lava-x3: -3%; --aether-lava-y3: 36%; --aether-lava-x4: 33%; --aether-lava-y4: 75%; --aether-lava-x5: 77%; --aether-lava-y5: 56%; --aether-lava-x6: 3%; --aether-lava-y6: 10%; }
-    17% { --aether-lava-x1: 86%; --aether-lava-y1: -8%; --aether-lava-x2: 92%; --aether-lava-y2: -3%; --aether-lava-x3: -4%; --aether-lava-y3: 14%; --aether-lava-x4: 9%; --aether-lava-y4: 120%; --aether-lava-x5: 48%; --aether-lava-y5: 26%; --aether-lava-x6: 92%; --aether-lava-y6: 22%; }
-    33% { --aether-lava-x1: 3%; --aether-lava-y1: 117%; --aether-lava-x2: 46%; --aether-lava-y2: 3%; --aether-lava-x3: 59%; --aether-lava-y3: 87%; --aether-lava-x4: 1%; --aether-lava-y4: -5%; --aether-lava-x5: 47%; --aether-lava-y5: 0%; --aether-lava-x6: 72%; --aether-lava-y6: 18%; }
-    50% { --aether-lava-x1: 9%; --aether-lava-y1: 73%; --aether-lava-x2: 93%; --aether-lava-y2: -5%; --aether-lava-x3: 21%; --aether-lava-y3: 118%; --aether-lava-x4: 37%; --aether-lava-y4: 107%; --aether-lava-x5: 61%; --aether-lava-y5: 114%; --aether-lava-x6: 110%; --aether-lava-y6: 87%; }
-    67% { --aether-lava-x1: -1%; --aether-lava-y1: 109%; --aether-lava-x2: 16%; --aether-lava-y2: 37%; --aether-lava-x3: 15%; --aether-lava-y3: 58%; --aether-lava-x4: 94%; --aether-lava-y4: 60%; --aether-lava-x5: 111%; --aether-lava-y5: 67%; --aether-lava-x6: -5%; --aether-lava-y6: -1%; }
-    83% { --aether-lava-x1: 39%; --aether-lava-y1: -11%; --aether-lava-x2: 0%; --aether-lava-y2: 81%; --aether-lava-x3: 31%; --aether-lava-y3: 6%; --aether-lava-x4: 104%; --aether-lava-y4: 96%; --aether-lava-x5: 99%; --aether-lava-y5: 53%; --aether-lava-x6: 65%; --aether-lava-y6: 67%; }
-    100% { --aether-lava-x1: 67%; --aether-lava-y1: 18%; --aether-lava-x2: 7%; --aether-lava-y2: 91%; --aether-lava-x3: -3%; --aether-lava-y3: 36%; --aether-lava-x4: 33%; --aether-lava-y4: 75%; --aether-lava-x5: 77%; --aether-lava-y5: 56%; --aether-lava-x6: 3%; --aether-lava-y6: 10%; }
+@property --aether-holo-x1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-y1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-x2 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-y2 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-x3 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-y3 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-x4 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-y4 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-x5 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-y5 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-x6 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-holo-y6 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-holo {
+    0% { --aether-holo-x1: 67%; --aether-holo-y1: 18%; --aether-holo-x2: 7%; --aether-holo-y2: 91%; --aether-holo-x3: -3%; --aether-holo-y3: 36%; --aether-holo-x4: 33%; --aether-holo-y4: 75%; --aether-holo-x5: 77%; --aether-holo-y5: 56%; --aether-holo-x6: 3%; --aether-holo-y6: 10%; }
+    17% { --aether-holo-x1: 86%; --aether-holo-y1: -8%; --aether-holo-x2: 92%; --aether-holo-y2: -3%; --aether-holo-x3: -4%; --aether-holo-y3: 14%; --aether-holo-x4: 9%; --aether-holo-y4: 120%; --aether-holo-x5: 48%; --aether-holo-y5: 26%; --aether-holo-x6: 92%; --aether-holo-y6: 22%; }
+    33% { --aether-holo-x1: 3%; --aether-holo-y1: 117%; --aether-holo-x2: 46%; --aether-holo-y2: 3%; --aether-holo-x3: 59%; --aether-holo-y3: 87%; --aether-holo-x4: 1%; --aether-holo-y4: -5%; --aether-holo-x5: 47%; --aether-holo-y5: 0%; --aether-holo-x6: 72%; --aether-holo-y6: 18%; }
+    50% { --aether-holo-x1: 9%; --aether-holo-y1: 73%; --aether-holo-x2: 93%; --aether-holo-y2: -5%; --aether-holo-x3: 21%; --aether-holo-y3: 118%; --aether-holo-x4: 37%; --aether-holo-y4: 107%; --aether-holo-x5: 61%; --aether-holo-y5: 114%; --aether-holo-x6: 110%; --aether-holo-y6: 87%; }
+    67% { --aether-holo-x1: -1%; --aether-holo-y1: 109%; --aether-holo-x2: 16%; --aether-holo-y2: 37%; --aether-holo-x3: 15%; --aether-holo-y3: 58%; --aether-holo-x4: 94%; --aether-holo-y4: 60%; --aether-holo-x5: 111%; --aether-holo-y5: 67%; --aether-holo-x6: -5%; --aether-holo-y6: -1%; }
+    83% { --aether-holo-x1: 39%; --aether-holo-y1: -11%; --aether-holo-x2: 0%; --aether-holo-y2: 81%; --aether-holo-x3: 31%; --aether-holo-y3: 6%; --aether-holo-x4: 104%; --aether-holo-y4: 96%; --aether-holo-x5: 99%; --aether-holo-y5: 53%; --aether-holo-x6: 65%; --aether-holo-y6: 67%; }
+    100% { --aether-holo-x1: 67%; --aether-holo-y1: 18%; --aether-holo-x2: 7%; --aether-holo-y2: 91%; --aether-holo-x3: -3%; --aether-holo-y3: 36%; --aether-holo-x4: 33%; --aether-holo-y4: 75%; --aether-holo-x5: 77%; --aether-holo-y5: 56%; --aether-holo-x6: 3%; --aether-holo-y6: 10%; }
 }
 html body .tile-header-main,
 html body .tile-header-left i[class^="icon-"],
@@ -3981,21 +3982,30 @@ html body .sidenav :is(.rightTitle, .popupAuthorTitle),
 html body .sweet-alert.nchan :is(h1, h2, h3),
 html body #sb-title-inner,
 html body .boot-title {
-    background-color: var(--aether-lava-base);
+    background-color: var(--aether-holo-base);
     background-image:
-        radial-gradient(1.9em 1em at var(--aether-lava-x1) var(--aether-lava-y1), var(--aether-lava-c1), transparent),
-        radial-gradient(2.2em 1.1em at var(--aether-lava-x2) var(--aether-lava-y2), var(--aether-lava-c2), transparent),
-        radial-gradient(1.7em 0.9em at var(--aether-lava-x3) var(--aether-lava-y3), var(--aether-lava-c3), transparent),
-        radial-gradient(1.5em 0.8em at var(--aether-lava-x4) var(--aether-lava-y4), var(--aether-lava-c4), transparent),
-        radial-gradient(1.6em 0.9em at var(--aether-lava-x5) var(--aether-lava-y5), var(--aether-lava-c5), transparent),
-        radial-gradient(1.6em 0.9em at var(--aether-lava-x6) var(--aether-lava-y6), var(--aether-lava-c6), transparent);
+        radial-gradient(1.9em 1em at var(--aether-holo-x1) var(--aether-holo-y1), var(--aether-holo-c1), transparent),
+        radial-gradient(2.2em 1.1em at var(--aether-holo-x2) var(--aether-holo-y2), var(--aether-holo-c2), transparent),
+        radial-gradient(1.7em 0.9em at var(--aether-holo-x3) var(--aether-holo-y3), var(--aether-holo-c3), transparent),
+        radial-gradient(1.5em 0.8em at var(--aether-holo-x4) var(--aether-holo-y4), var(--aether-holo-c4), transparent),
+        radial-gradient(1.6em 0.9em at var(--aether-holo-x5) var(--aether-holo-y5), var(--aether-holo-c5), transparent),
+        radial-gradient(1.6em 0.9em at var(--aether-holo-x6) var(--aether-holo-y6), var(--aether-holo-c6), transparent);
     background-size: auto;
     background-position: 0 0;
     background-repeat: no-repeat;
-    animation: aether-lava 34s infinite;
+    animation: aether-holo 34s infinite;
     animation-timing-function: steps(85);   /* ~15 updates a second, see above */
+}
+/* Own layer + paint containment (see above), only on the titles that come in dozens.
+   Not on dialog, popup or boot-page titles: there is one at a time, and Safari drew a
+   separate layer on top of a frosted dialog faint and ghostly. */
+html body .tile-header-main,
+html body .tile-header-left i[class^="icon-"],
+html body .tile-header-left i[class*=" icon-"],
+html body div.title .left,
+html body div.title .left i {
     will-change: transform;                 /* own layer, so a step repaints only this heading */
-    contain: paint;                         /* and nothing outside its box: see above */
+    contain: paint;                         /* and nothing outside its box */
 }
 html body .tile-header-main,
 html body .tile-header-left i[class^="icon-"],
@@ -4005,10 +4015,10 @@ html body div.title .left i,
 html body .sidenav :is(.rightTitle, .popupAuthorTitle),
 html body .sweet-alert.nchan :is(h1, h2, h3),
 html body #sb-title-inner {
-    --aether-lava-base: #cdb9ff; --aether-lava-c1: #8fe0ff; --aether-lava-c2: #ff9fd2; --aether-lava-c3: #b59bff; --aether-lava-c4: #a8f5dc; --aether-lava-c5: #ffe2a8; --aether-lava-c6: #9ff5c0;
+    --aether-holo-base: #cdb9ff; --aether-holo-c1: #8fe0ff; --aether-holo-c2: #ff9fd2; --aether-holo-c3: #b59bff; --aether-holo-c4: #a8f5dc; --aether-holo-c5: #ffe2a8; --aether-holo-c6: #9ff5c0;
 }
 html body .boot-title {
-    --aether-lava-base: #7c5cff; --aether-lava-c1: #00e5ff; --aether-lava-c2: #ff3d9a; --aether-lava-c3: #c86bff; --aether-lava-c4: #ffd0f0; --aether-lava-c5: #ffc46b; --aether-lava-c6: #5ff0a8;
+    --aether-holo-base: #7c5cff; --aether-holo-c1: #00e5ff; --aether-holo-c2: #ff3d9a; --aether-holo-c3: #c86bff; --aether-holo-c4: #ffd0f0; --aether-holo-c5: #ffc46b; --aether-holo-c6: #5ff0a8;
 }
 @media (prefers-reduced-motion: reduce) {
     html body .tile-header-main,
@@ -4021,15 +4031,15 @@ html body .boot-title {
     html body #sb-title-inner,
     html body .boot-title {
         animation: none;
-        --aether-lava-x1: 67%; --aether-lava-y1: 18%; --aether-lava-x2: 7%; --aether-lava-y2: 91%; --aether-lava-x3: -3%; --aether-lava-y3: 36%; --aether-lava-x4: 33%; --aether-lava-y4: 75%; --aether-lava-x5: 77%; --aether-lava-y5: 56%; --aether-lava-x6: 3%; --aether-lava-y6: 10%;
+        --aether-holo-x1: 67%; --aether-holo-y1: 18%; --aether-holo-x2: 7%; --aether-holo-y2: 91%; --aether-holo-x3: -3%; --aether-holo-y3: 36%; --aether-holo-x4: 33%; --aether-holo-y4: 75%; --aether-holo-x5: 77%; --aether-holo-y5: 56%; --aether-holo-x6: 3%; --aether-holo-y6: 10%;
     }
 }
 
-/* Lava moves only where you're pointing.  Tile and section titles hold a still frame of
-   the lava, and come alive while the pointer is over their tile (a Dashboard tile is a
+/* Holographic moves only where you're pointing.  Tile and section titles hold a still frame of
+   the holographic, and come alive while the pointer is over their tile (a Dashboard tile is a
    <tbody>) or their title bar.  Pausing keeps the blobs where they were, so nothing jumps
    when the pointer leaves or comes back.  Why: ~37 titles animating at once was the
-   theme's one real cost on the Dashboard (stock Unraid ~118 fps; lava everywhere as low as
+   theme's one real cost on the Dashboard (stock Unraid ~118 fps; holographic everywhere as low as
    ~60 in Safari at 120 Hz).  Popups, the log window and the boot page show one title at a
    time, so they keep moving. */
 html body .tile-header-main,
@@ -4057,7 +4067,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01l-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01m-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
@@ -4567,8 +4577,8 @@ body .usage-disk.aether-bar-gain > span:first-child {
 /*
  * ---- Effects settings (Settings -> Aether Glass -> Effects) ----
  * Three effects, each with levels, so slower computers can trade looks for speed:
- *   Motion         everywhere | hover (default) | still
- *   Frosted glass  all (default) | panels | off
+ *   Motion         everywhere | titles | hover (default) | still   (the holographic shimmer)
+ *   Frosted glass  all (default) | panels | menus | off
  *   Glows          all (default) | static | off
  * The blocks below sit behind media conditions that never match on their own, like
  * "(aether-motion-everywhere)".  apply.sh turns the chosen ones on by rewriting that
@@ -4579,7 +4589,7 @@ body .usage-disk.aether-bar-gain > span:first-child {
  * gets it, whatever the server is set to.  Still CSS only: nothing here runs a script.
  */
 
-/* Motion: everywhere.  Every title's lava moves, not just the one under the pointer. */
+/* Motion: everywhere.  Every title's holographic moves, not just the one under the pointer. */
 @media (aether-motion-everywhere) {
     html body .tile-header-main,
     html body .tile-header-left i[class^="icon-"],
@@ -4587,6 +4597,38 @@ body .usage-disk.aether-bar-gain > span:first-child {
     html body div.title .left,
     html body div.title .left i {
         animation-play-state: running;
+    }
+}
+
+/* Motion: page titles.  The section title bars on each page (a few per page) shimmer all the
+   time; Dashboard tile titles still only move while you point at their tile. */
+@media (aether-motion-titles) {
+    html body div.title .left,
+    html body div.title .left i {
+        animation-play-state: running;
+    }
+}
+
+/* Frosted glass: menus and popups only.  Glass stays where it is rare or short-lived (the menu
+   bar, dropdowns, dialogs, tooltips, notifications); the big panels that fill the page (tiles,
+   tables, title bars) become solid, which is where nearly all the blur cost was measured. */
+@media (aether-glass-menus) {
+    body div.title,
+    body table:not(.unapi *):not(.dashboard),
+    body table.dashboard > tbody,
+    html body:has(> .boot-title) {
+        --glass-filter: none;
+        --glass-tint: var(--aether-raised);
+        --glass-tint-strong: var(--aether-surface);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+    body table.dashboard .control,
+    body .tile-ctrl > .fa.hand,
+    body a.move_to_end::before,
+    html body table.unraid.disk_status > :is(thead, tbody) > tr > td {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
     }
 }
 
