@@ -4014,6 +4014,25 @@ html body .boot-title {
     }
 }
 
+/* Lava moves only where you're pointing.  Tile and section titles hold a still frame of
+   the lava, and come alive while the pointer is over their tile (a Dashboard tile is a
+   <tbody>) or their title bar.  Pausing keeps the blobs where they were, so nothing jumps
+   when the pointer leaves or comes back.  Why: ~37 titles animating at once was the
+   theme's one real cost on the Dashboard (stock Unraid ~118 fps; lava everywhere as low as
+   ~60 in Safari at 120 Hz).  Popups, the log window and the boot page show one title at a
+   time, so they keep moving. */
+html body .tile-header-main,
+html body .tile-header-left i[class^="icon-"],
+html body .tile-header-left i[class*=" icon-"],
+html body div.title .left,
+html body div.title .left i {
+    animation-play-state: paused;
+}
+html body tbody:hover :is(.tile-header-main, .tile-header-left i[class^="icon-"], .tile-header-left i[class*=" icon-"]),
+html body div.title:hover :is(.left, .left i) {
+    animation-play-state: running;
+}
+
 /* Spinner in the log-window title: while a plugin job runs, Unraid puts a spinning icon
    after "In Progress".  The icon is a font glyph, so the shimmer's see-through text fill hid
    it like the letters around it (and Chrome drew a stray sliver of it in the window corner).
@@ -4027,7 +4046,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01j-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01k-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
