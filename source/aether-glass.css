@@ -886,6 +886,16 @@ body .tabs button[role="tab"]:active {
     background: rgba(20, 13, 44, 0.62);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(200, 190, 255, 0.2);
 }
+/* Concentric corners: the title capsule sits the same distance (--aether-modal-gap) from the
+   window's top and sides, and its corner radius is the window's radius minus that gap, so the
+   two curves run parallel instead of a full pill inside a gentler curve. */
+.sweet-alert.nchan > h2 {
+    --aether-modal-gap: 8px;
+    margin: var(--aether-modal-gap) var(--aether-modal-gap) var(--sp-4);
+}
+.sweet-alert.nchan > h2::before {
+    border-radius: calc(var(--r-xl) - 8px);
+}
 @media (prefers-reduced-motion: reduce) {
     .sweet-alert.nchan h1,
     .sweet-alert.nchan h2,
@@ -1863,6 +1873,12 @@ body .dockerHubHolder {
 body .ca_holder:hover,
 body .dockerHubHolder:hover {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(200, 190, 255, 0.2), 0 10px 28px -10px rgba(124, 92, 255, 0.6);
+}
+/* The "favourite repository" heart on app cards: CA draws it in a dark flat red (#bb0000).
+   It gets the theme's rose instead, with a soft rose glow. */
+body .favCardBackground {
+    color: #f43f6e;
+    filter: drop-shadow(0 0 4px rgba(244, 63, 110, 0.55));
 }
 /* The Apps search box: a pill like every other field, sitting level with its row */
 body #searchBox {
@@ -2900,4 +2916,19 @@ body .sweet-alert[data-has-cancel-button="true"]:has(.sa-icon.sa-warning.pulseWa
     color: #ffffff;
     background: var(--pill-sheen), linear-gradient(180deg, #fb7193 0, #f43f6e 55%, #d42a5a 100%);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 14px rgba(244, 63, 110, 0.45) !important;
+}
+
+/* Plugin install/update window: the button lights up violet once the job ends.  While it
+   runs, Unraid's title holds <span id="pluginProgressTitle">In Progress <i spinner></i></span>;
+   when it ends, that span's text is replaced ("Finished" or "Error"), which removes the
+   spinner <i>.  That's the only change CSS can see (the Close -> Done/Error label swap is
+   text, which CSS can't read).  Success and failure look the same to CSS, so the colour is
+   the neutral theme violet: "it's over, click me", not "it worked". */
+body .sweet-alert.nchan:has(#pluginProgressTitle):not(:has(#pluginProgressTitle i)) button.confirm:not([disabled]):not(.unapi *) {
+    color: #ffffff !important;
+    background: var(--hover-button-background) !important;   /* Unraid's own rule for this button uses !important */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        0 0 16px -2px rgba(124, 92, 255, 0.7) !important;
 }
