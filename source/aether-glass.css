@@ -886,15 +886,20 @@ body .tabs button[role="tab"]:active {
     background: rgba(20, 13, 44, 0.62);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(200, 190, 255, 0.2);
 }
-/* Concentric corners: the title capsule sits the same distance (--aether-modal-gap) from the
-   window's top and sides, and its corner radius is the window's radius minus that gap, so the
-   two curves run parallel instead of a full pill inside a gentler curve. */
-.sweet-alert.nchan > h2 {
-    --aether-modal-gap: 8px;
-    margin: var(--aether-modal-gap) var(--aether-modal-gap) var(--sp-4);
+/* Concentric corners on the log window: the title stays a pill, and the window's corner
+   radius is the pill's radius plus the gap around it, so the two curves run parallel.
+   The maths (measured on Unraid 7.3.4):
+     - the window has 20px of padding; a -12px margin pulls the pill out to an 8px gap
+     - the pill is 56px tall (36px line + 10px padding top and bottom), so its radius is 28px
+     - window radius = 28px + 8px gap = 36px (only on these log windows; other pop-ups keep 28px) */
+.sweet-alert.nchan {
+    border-radius: 36px !important;
 }
-.sweet-alert.nchan > h2::before {
-    border-radius: calc(var(--r-xl) - 8px);
+.sweet-alert.nchan > h2 {
+    margin: -12px -12px var(--sp-4);
+    line-height: 36px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 @media (prefers-reduced-motion: reduce) {
     .sweet-alert.nchan h1,
@@ -932,7 +937,7 @@ ul[id^="awesomplete_list_"]::before {
 }
 ul[id^="awesomplete_list_"] > li {
     padding: var(--sp-2) var(--sp-3);
-    border-radius: var(--r-sm);
+    border-radius: calc(var(--r-md) - 1px - var(--sp-2));   /* concentric: list radius minus its border and padding */
     color: var(--aether-text);
     background: transparent;
     cursor: pointer;
@@ -981,7 +986,7 @@ body .awesomplete > ul::before {
 }
 body .awesomplete > ul > li {
     padding: var(--sp-2) var(--sp-3);
-    border-radius: var(--r-sm);
+    border-radius: calc(var(--r-md) - 1px - var(--sp-2));   /* concentric: list radius minus its border and padding */
     color: var(--aether-text);
     background: transparent;
     cursor: pointer;
@@ -1212,7 +1217,7 @@ body .switch-button-label.on {
         padding: 6px 14px;
         line-height: 1.5;
         text-align: left;
-        border-radius: 10px;
+        border-radius: 8px;   /* concentric: picker 16px minus 6px padding and 2px margin */
         color: var(--aether-text);
         background: transparent;
         outline: none;
@@ -1786,8 +1791,8 @@ body .dropdown-menu {
         0 16px 40px -12px rgba(0, 0, 0, 0.8);
 }
 body .dropdown-menu a {
+    border-radius: calc(var(--r-md) - var(--sp-1));   /* concentric: menu radius minus its padding */
     color: var(--aether-text);
-    border-radius: var(--r-xs);
     padding: 3px 20px 3px 8px;
 }
 body .dropdown-menu li > a:hover,
