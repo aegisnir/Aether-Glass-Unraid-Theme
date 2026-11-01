@@ -437,7 +437,7 @@ body .sidenav :is(.rightTitle, .popupAuthorTitle) {
    Unraid's script writes onto each element (green / orange / red by load), so they are
    left alone.  Only the decorative defaults change:
      - the donut centre was a fixed grey disc; now it matches the card, so it reads as a ring
-     - CPU load bars filled with light grey; now violet (a status colour Unraid sets still wins) */
+     - CPU load bars: see "Bar types" at the end of this file */
 html:root {
     --dashstats-pie-after-bg-color: #150d2c;
 }
@@ -1802,9 +1802,7 @@ body span.outer.solid {
 body span.outer.solid:hover {
     background-color: rgba(255, 255, 255, 0.06);
 }
-body .usage-disk.mm > span:first-child {
-    background-color: var(--aether-violet);
-}
+/* (Thin .mm bars: see "Bar types" at the end of this file.) */
 /* The processor history graph is a <canvas> the script paints orange.  CSS can't
    recolour a canvas, but it can shift its hue: orange turns violet while the grey
    grid lines (which have no hue) stay as they are. */
@@ -4460,4 +4458,71 @@ body #removeall input[type="button"]:hover {
     color: #ffffff;
     background: var(--pill-sheen), linear-gradient(180deg, #fb7193 0, #f43f6e 55%, #d42a5a 100%);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 14px rgba(244, 63, 110, 0.45);
+}
+
+/*
+ * ---- Bar types ----
+ * Every bar says what it measures, by colour:
+ *   capacity  spectrum fill: the tip goes amber, then rose, as it fills.  Red means
+ *             running out.  CPU, RAM, disks, the header array bar, Docker and VM CPU.
+ *   neutral   grey: a reference value with no good or bad (a "before" number).
+ *   gain      cyan to violet: performance, longer is better, never red.
+ * Every track is a dim copy of its own fill colour: the fill mixed 20% into #150d2c,
+ * the same rule the dashboard rings use for their unfilled part.
+ *
+ * Capacity is the default.  A plugin opts a bar into the other two by adding a class
+ * to Unraid's own bar element (harmless in stock themes, which don't know it):
+ *   <div class='usage-disk mm aether-bar-neutral'>   or   aether-bar-gain
+ */
+html:root {
+    --aether-track-base: #150d2c;
+    --aether-meter-track: linear-gradient(90deg,
+        color-mix(in srgb, #12a57c 20%, var(--aether-track-base)) 0%,
+        color-mix(in srgb, #3cc48e 20%, var(--aether-track-base)) 25%,
+        color-mix(in srgb, #8fd27a 20%, var(--aether-track-base)) 45%,
+        color-mix(in srgb, #d4c457 20%, var(--aether-track-base)) 60%,
+        color-mix(in srgb, #f0a23a 20%, var(--aether-track-base)) 72%,
+        color-mix(in srgb, #f2733f 20%, var(--aether-track-base)) 84%,
+        color-mix(in srgb, #ec4470 20%, var(--aether-track-base)) 92%,
+        color-mix(in srgb, #e0388f 20%, var(--aether-track-base)) 100%);
+    --aether-neutral-fill: #8b95b5;
+    --aether-neutral-track: color-mix(in srgb, var(--aether-neutral-fill) 20%, var(--aether-track-base));
+    --aether-gain-fill: linear-gradient(90deg, var(--aether-cyan), var(--aether-violet));
+    --aether-gain-track: linear-gradient(90deg,
+        color-mix(in srgb, var(--aether-cyan) 20%, var(--aether-track-base)),
+        color-mix(in srgb, var(--aether-violet) 20%, var(--aether-track-base)));
+}
+
+/* Capacity tracks: the dim spectrum.  "none" bars are deliberately invisible, and the
+   header bar of a stopped array is styled elsewhere, so both are left alone. */
+body .usage-disk:not(.none),
+body table.disk_status .usage-disk:not(.sys):not(.mm),
+body .usage-bar {
+    background: var(--aether-meter-track);
+}
+
+/* Thin bars (Docker and VM CPU per container / VM) were plain violet; they measure
+   usage, so they get the spectrum fill like every other capacity bar. */
+body .usage-disk.mm > span:first-child {
+    background: var(--aether-meter-sheen), var(--aether-meter);
+    background-size: 100% 100%, 100cqw 100%;
+    background-repeat: no-repeat;
+}
+
+/* Neutral and gain: opt-in, on any Unraid bar */
+body .usage-disk.aether-bar-neutral {
+    background: var(--aether-neutral-track);
+}
+body .usage-disk.aether-bar-neutral > span:first-child {
+    background: var(--aether-meter-sheen), var(--aether-neutral-fill);
+    box-shadow: none;
+}
+body .usage-disk.aether-bar-gain {
+    background: var(--aether-gain-track);
+}
+body .usage-disk.aether-bar-gain > span:first-child {
+    background: var(--aether-meter-sheen), var(--aether-gain-fill);
+    background-size: 100% 100%, 100cqw 100%;   /* fade spans the full track, so a short bar is mostly cyan */
+    background-repeat: no-repeat;
+    box-shadow: none;
 }
