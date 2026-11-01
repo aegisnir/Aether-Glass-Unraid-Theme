@@ -4006,7 +4006,11 @@ html body .boot-title {
    How, with CSS only: Unraid writes each bar's width into its style attribute
    ("width: 33%").  The rules below read that number into --aether-trail.  The variable is
    registered (@property) as a number, so the browser can animate it, and it eases toward
-   each new reading over 1.6s while the bar itself jumps.  The trail is a pseudo-element
+   each new reading over 1.2s.  Unraid slides the bar to each new reading over 0.4s
+   (jQuery rewrites the width about 24 times on the way), so the trail retargets on every
+   step; a transition-delay would restart on each step and stall it, so there is none.
+   Limit: CSS keeps no memory of the previous reading, so the trail can't "snap up and fall
+   slowly" like a real peak meter; a one-second spike leaves a shorter trail than its peak.  The trail is a pseudo-element
    sized in cqw (1cqw = 1% of the track, which is already a size container above), so its
    width is the lagging number as a percentage of the whole track. */
 @property --aether-trail {
@@ -4015,7 +4019,7 @@ html body .boot-title {
     initial-value: 0;
 }
 body .usage-disk.sys > span:first-child {
-    transition: --aether-trail 1.6s cubic-bezier(0.5, 0, 0.3, 1) 0.25s;
+    transition: --aether-trail 1.2s cubic-bezier(0.3, 0, 0.3, 1);
 }
 body .usage-disk.sys > span:first-child::after {
     content: "";
@@ -4024,10 +4028,12 @@ body .usage-disk.sys > span:first-child::after {
     bottom: 0;
     left: 0;
     width: calc(var(--aether-trail) * 1cqw);
+    min-width: 12px;   /* never thinner than the bar's own round dot */
     z-index: -1;   /* behind the bar, above the track (the track isolates its layers) */
     border-radius: var(--pill);
     background: inherit;
-    opacity: 0.3;
+    /* fades out below 3%, so an idle core shows no stray sliver */
+    opacity: calc(clamp(0, (var(--aether-trail) - 1) / 2, 1) * 0.3);
     pointer-events: none;
 }
 body .usage-disk.sys > span:first-child:is([style*="width: 0%"], [style*="width: 0."], [style*="width:0%"], [style*="width:0."]) { --aether-trail: 0; }
@@ -4136,7 +4142,7 @@ body .usage-disk.sys > span:first-child:is([style*="width: 100%"], [style*="widt
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01a-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);

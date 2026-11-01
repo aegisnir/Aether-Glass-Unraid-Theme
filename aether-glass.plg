@@ -28,7 +28,7 @@
 <CHANGES>
 ### 2026.11.01
 - Footer: the theme's version shows next to Unraid's copyright.
-- CPU bars: when the load drops, a faded trail stays at the old level and slides down to catch up, like a music visualiser.
+- CPU bars: when the load drops, a faded trail stays at the old level and slides down to catch up, like a music visualiser.  It follows Unraid's own bar animation without stalling, and idle cores show no stray sliver.
 - Log windows (plugin installs, container updates) no longer pick up the amber or rose glow of the confirm box that opened them.
 - Headings shimmer like a lava lamp: six soft colour blobs (cyan, pink, orchid, blush, amber, mint) float inside the letters on their own timers.  Vivid on the reboot and shutdown title, pastel on tile headers, page titles, log-window titles and the login page.
 
