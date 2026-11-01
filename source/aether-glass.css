@@ -2903,20 +2903,42 @@ body canvas#cpuchart {
        blend and doesn't pick up the gradient) while the bright line stays white. */
     filter: grayscale(1) contrast(4);
 }
-/* Our own soft grey grid, painted on the row BEHIND the chart cell, outside the blend:
-   horizontal lines at 0/25/50/75/100% (the chart's 4 sections) and vertical lines every
-   24px.  Static, so it doesn't scroll with the line the way the old canvas grid did. */
-body tr:has(> td > canvas#cpuchart) {
+/* The chart sits in a rounded well seated inside the tile: an even 8px gap to the tile's
+   sides and bottom, and corners of 20px - 8px = 12px so they run parallel to the tile's.
+   (A fully see-through chart isn't possible in Safari: inside a frosted tile, the blend that
+   removes the canvas's black only sees the tile's flat tint, so the well stays a bit darker,
+   like the log box in the update windows.)
+   The tile's bottom padding drops to the 8px gap while the chart row is showing. */
+body table.dashboard > tbody:has(> tr#cpu_chart:not([style*="none"])) {
+    padding-bottom: 8px;
+}
+body td:has(> canvas#cpuchart) {
+    padding: 0 8px;
+}
+body canvas#cpuchart {
+    border-radius: 12px;
+}
+/* Our own soft grey grid (lines at 0/25/50/75/100% and every 24px), drawn over the chart
+   after the colouring so it stays grey, with a hairline edge around the well.  Static, so it
+   doesn't scroll with the line the way the canvas's own grid did. */
+body td:has(> canvas#cpuchart)::before {
+    content: "";
+    position: absolute;
+    inset: 0 8px;
+    z-index: 2;
+    border-radius: 12px;
     background-image:
         linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
     background-size: 100% 25%, 24px 100%;
-    background-position: 0 0, 0 0;
+    box-shadow: inset 0 0 0 1px rgba(200, 190, 255, 0.12);
+    pointer-events: none;
 }
 body td:has(> canvas#cpuchart)::after {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: 0 8px;
+    border-radius: 12px;
     background: linear-gradient(to top,
         #12a57c 0%, #3cc48e 25%, #8fd27a 45%, #d4c457 60%,
         #f0a23a 72%, #f2733f 84%, #ec4470 92%, #e0388f 100%);
@@ -3087,6 +3109,17 @@ body table.disk_status .usage-disk:not(.sys):not(.mm) {
 }
 body table.disk_status .usage-disk:not(.sys):not(.mm) > span:first-child:not([style*="width:0%"]):not([style*="width: 0%"]) {
     min-width: 1.8rem;
+}
+
+/* Dashboard bars (CPU cores, GPU stats and other 12px "sys" bars): same idea, a small value
+   is a round dot instead of a sliver narrower than it is tall.  Only fills that have a width
+   written and are at least 1%, so empty bars stay empty. */
+body .usage-disk.sys:not(.none) > span:first-child:is([style*="width"]):not([style*="width:0%"], [style*="width: 0%"], [style*="width: 0px"], [style*="width:0."], [style*="width: 0."]) {
+    min-width: 12px;
+}
+/* Under 1% (e.g. "width: 0.4%") the number next to it reads 0%, so the bar shows empty too */
+body .usage-disk.sys:not(.none) > span:first-child:is([style*="width:0."], [style*="width: 0."]) {
+    visibility: hidden;
 }
 
 /* Header array bar when the array is stopped.  Unraid prints "offline" in an unclassed
