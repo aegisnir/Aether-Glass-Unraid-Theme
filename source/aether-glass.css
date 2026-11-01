@@ -3908,9 +3908,10 @@ body td:has(> canvas#cpuchart)::after {
 
 /* Lava-lamp shimmer for headings: six soft colour blobs float inside the letters over a
    base colour, like globs in a lava lamp, each on its own wandering path.
-   How: each blob is a soft radial gradient drawn once as its own small background layer
-   (background-size), and one animation slides the six layers along six different paths
-   (background-position).  Sliding an already-drawn layer is cheap; an earlier version
+   How: each blob is a soft radial gradient drawn once in the centre of its own background
+   layer, twice the heading's size (background-size 200%), and one animation slides the six
+   layers along six different paths (background-position).  At twice the size, 0% to 100%
+   carries a blob's centre right across the heading, whatever its width.  Sliding an already-drawn layer is cheap; an earlier version
    re-drew every gradient on every frame (12 animated values per heading) and dropped the
    Dashboard to ~16 fps in Safari.  The base colour is the background-color, which is
    clipped to the text along with the layers (background-clip: text, set by the rules above).
@@ -3936,15 +3937,20 @@ html body #sb-title-inner,
 html body .boot-title {
     background-color: var(--aether-lava-base);
     background-image:
-        radial-gradient(closest-side, var(--aether-lava-c1), transparent),
-        radial-gradient(closest-side, var(--aether-lava-c2), transparent),
-        radial-gradient(closest-side, var(--aether-lava-c3), transparent),
-        radial-gradient(closest-side, var(--aether-lava-c4), transparent),
-        radial-gradient(closest-side, var(--aether-lava-c5), transparent),
-        radial-gradient(closest-side, var(--aether-lava-c6), transparent);
-    background-size: 3.8em 2em, 4.4em 2.2em, 3.4em 1.8em, 3em 1.6em, 3.2em 1.8em, 3.2em 1.8em;
+        radial-gradient(1.9em 1em at 50% 50%, var(--aether-lava-c1), transparent),
+        radial-gradient(2.2em 1.1em at 50% 50%, var(--aether-lava-c2), transparent),
+        radial-gradient(1.7em 0.9em at 50% 50%, var(--aether-lava-c3), transparent),
+        radial-gradient(1.5em 0.8em at 50% 50%, var(--aether-lava-c4), transparent),
+        radial-gradient(1.6em 0.9em at 50% 50%, var(--aether-lava-c5), transparent),
+        radial-gradient(1.6em 0.9em at 50% 50%, var(--aether-lava-c6), transparent);
+    background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%;
     background-repeat: no-repeat;
-    animation: aether-lava 34s ease-in-out infinite;
+    animation: aether-lava 34s infinite;
+    /* Moves in small steps (about 15 a second) instead of every screen refresh: the blobs
+       drift slowly, so it still reads as smooth, and Safari repaints the text a quarter
+       as often.  Measured on the Dashboard in Safari: 16 fps with smooth redrawn blobs,
+       28 fps with sliding layers, ~56 fps when stepped. */
+    animation-timing-function: steps(85);
 }
 html body .tile-header-main,
 html body .tile-header-left i[class^="icon-"],
@@ -3978,7 +3984,7 @@ html body .boot-title {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01d-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01e-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
