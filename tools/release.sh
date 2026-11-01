@@ -62,6 +62,16 @@ rm -f "$PLG.bak"
 grep -q "pluginURL=\"&repo;/$channel/aether-glass.plg\"" "$PLG" || { echo "failed to set the update channel"; exit 1; }
 echo "channel  $channel"
 
+# Write the version into the footer label: the one CSS line marked AETHER-GLASS-VERSION.
+# Done before hashing, so the hash covers it.  The version is checked against a strict
+# pattern first, so nothing but digits, dots, a letter and "-dev" can reach the CSS.
+[[ "$current" =~ ^[0-9]{4}\.[0-9]{2}\.[0-9]{2}[a-z]?(-dev)?$ ]] || { echo "unexpected version '$current' in the .plg"; exit 1; }
+CSS=source/aether-glass.css
+sed -i.bak "s|content: \"Aether Glass [^\"]*\"; /\* AETHER-GLASS-VERSION \*/|content: \"Aether Glass $current\"; /* AETHER-GLASS-VERSION */|" "$CSS"
+rm -f "$CSS.bak"
+grep -qF "content: \"Aether Glass $current\"; /* AETHER-GLASS-VERSION */" "$CSS" || { echo "failed to write the footer version"; exit 1; }
+echo "footer   Aether Glass $current"
+
 # entity name -> file in source/
 set_sha() {
     local entity="$1" file="source/$2" sum
