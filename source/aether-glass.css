@@ -3978,7 +3978,7 @@ html body .boot-title {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01c-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01d-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
