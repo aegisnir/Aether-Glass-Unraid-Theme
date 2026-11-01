@@ -3933,6 +3933,11 @@ body td:has(> canvas#cpuchart)::after {
        repaint text-clipped backgrounds when only their position changes, so it froze;
      - so: one animation per heading, stepped about 15 times a second.  The blobs drift
        slowly, so steps still read as smooth, and Safari repaints a quarter as often.
+     - that still left the Dashboard at ~25 fps: each step repainted a chunk of
+       the frosted panel around the heading, not just the heading.  Giving every heading its
+       own layer (will-change: transform) plus paint containment (contain: paint) keeps each
+       step's repaint inside the heading's own box: ~50 fps, about the same as no lava at all.
+       Neither alone was enough (45 and 39 fps).  Checked: tile dropdowns still open fully.
    Reduced-motion users get the blobs held still. */
 
 @property --aether-lava-x1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
@@ -3978,6 +3983,8 @@ html body .boot-title {
     background-repeat: no-repeat;
     animation: aether-lava 34s infinite;
     animation-timing-function: steps(85);   /* ~15 updates a second, see above */
+    will-change: transform;                 /* own layer, so a step repaints only this heading */
+    contain: paint;                         /* and nothing outside its box: see above */
 }
 html body .tile-header-main,
 html body .tile-header-left i[class^="icon-"],
@@ -4020,7 +4027,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01i-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01j-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
