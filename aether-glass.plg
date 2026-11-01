@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.31v-dev">
+<!ENTITY version   "2026.10.31w-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "751b8b979b7155ccd83cfb69ca1d5d45cef851aaa5cd5c689dd9ad0ce7c14a18">
+<!ENTITY sha_css     "bdbe119aa5e963589f82f7b3562199fe041a5058d810c4e4379ecda570c31e0b">
 <!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -26,6 +26,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31w
+- RAM pie: detail rings sort themselves live by size, biggest outermost.
+
 ### 2026.10.31v
 - RAM pie: fixed the detail rings showing as solid orange in Safari.  Up to four rings now (System, then the first two types, then a fourth that counts everything after), still adaptive in thickness.
 

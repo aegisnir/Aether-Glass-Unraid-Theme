@@ -605,10 +605,14 @@ body div.pie#sys0 {
     --_n: calc(var(--_p1) + var(--_p2) + var(--_p3) + var(--_p4));
     --_t: clamp(1.75, (18 - (var(--_n) - 1) * 1.5) / max(var(--_n), 1), 7);   /* ring thickness */
     --_d: calc(34 - var(--_n) * var(--_t) - (var(--_n) - 1) * 1.5);              /* centre radius */
-    --_r1: calc(34 - var(--_t) / 2 - 0 * (var(--_t) + 1.5));   /* ring 1 centre radius */
-    --_r2: calc(34 - var(--_t) / 2 - 1 * (var(--_t) + 1.5));   /* ring 2 centre radius */
-    --_r3: calc(34 - var(--_t) / 2 - 2 * (var(--_t) + 1.5));   /* ring 3 centre radius */
-    --_r4: calc(34 - var(--_t) / 2 - 3 * (var(--_t) + 1.5));   /* ring 4 centre radius */
+    --_rank1: calc(clamp(0, (var(--_len2) - var(--_len1)) * 2 + 0, 1) + clamp(0, (var(--_len3) - var(--_len1)) * 2 + 0, 1) + clamp(0, (var(--_len4) - var(--_len1)) * 2 + 0, 1));
+    --_r1: calc(34 - var(--_t) / 2 - var(--_rank1) * (var(--_t) + 1.5));   /* ring 1 centre radius */
+    --_rank2: calc(clamp(0, (var(--_len1) - var(--_len2)) * 2 + 1, 1) + clamp(0, (var(--_len3) - var(--_len2)) * 2 + 0, 1) + clamp(0, (var(--_len4) - var(--_len2)) * 2 + 0, 1));
+    --_r2: calc(34 - var(--_t) / 2 - var(--_rank2) * (var(--_t) + 1.5));   /* ring 2 centre radius */
+    --_rank3: calc(clamp(0, (var(--_len1) - var(--_len3)) * 2 + 1, 1) + clamp(0, (var(--_len2) - var(--_len3)) * 2 + 1, 1) + clamp(0, (var(--_len4) - var(--_len3)) * 2 + 0, 1));
+    --_r3: calc(34 - var(--_t) / 2 - var(--_rank3) * (var(--_t) + 1.5));   /* ring 3 centre radius */
+    --_rank4: calc(clamp(0, (var(--_len1) - var(--_len4)) * 2 + 1, 1) + clamp(0, (var(--_len2) - var(--_len4)) * 2 + 1, 1) + clamp(0, (var(--_len3) - var(--_len4)) * 2 + 1, 1));
+    --_r4: calc(34 - var(--_t) / 2 - var(--_rank4) * (var(--_t) + 1.5));   /* ring 4 centre radius */
     background: radial-gradient(circle, #150d2c calc(var(--_d) * 1px - 0.5px), transparent calc(var(--_d) * 1px)) !important;
 }
 body div.pie#sys0 > span:first-child { font-size: min(19px, calc(var(--_d) * 0.85px)) !important; }
