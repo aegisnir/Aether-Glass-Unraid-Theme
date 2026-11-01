@@ -3026,7 +3026,7 @@ html body .boot-title {
     text-transform: none;     /* sentence case, matching the rest of the theme */
     letter-spacing: 0.01em;
     overflow-wrap: anywhere;
-    background: var(--aether-gradient);
+    background: var(--aether-gradient);   /* lava-lamp blobs replace this further down */
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -3906,6 +3906,99 @@ body td:has(> canvas#cpuchart)::after {
 }
 
 
+/* Lava-lamp shimmer for headings: six soft colour blobs float inside the letters over a
+   base colour, like globs in a lava lamp.  Each blob drifts across and up/down on its own
+   timer (5.5s to 21s, none matching), so they merge and split without a visible loop.
+   How: each blob is a radial gradient placed at two registered (@property) percentages;
+   registered properties can be animated, so the browser moves the blobs smoothly.  The
+   whole stack is clipped to the text (background-clip: text, set by the rules above).
+   Reduced-motion users get the blobs held still, spread across the text. */
+
+@property --aether-lava-x1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-x1 { from { --aether-lava-x1: -10%; } to { --aether-lava-x1: 70%; } }
+@property --aether-lava-y1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-y1 { from { --aether-lava-y1: 0%; } to { --aether-lava-y1: 100%; } }
+@property --aether-lava-x2 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-x2 { from { --aether-lava-x2: 110%; } to { --aether-lava-x2: 20%; } }
+@property --aether-lava-y2 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-y2 { from { --aether-lava-y2: 100%; } to { --aether-lava-y2: 10%; } }
+@property --aether-lava-x3 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-x3 { from { --aether-lava-x3: 30%; } to { --aether-lava-x3: 100%; } }
+@property --aether-lava-y3 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-y3 { from { --aether-lava-y3: 20%; } to { --aether-lava-y3: 90%; } }
+@property --aether-lava-x4 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-x4 { from { --aether-lava-x4: 80%; } to { --aether-lava-x4: 0%; } }
+@property --aether-lava-y4 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-y4 { from { --aether-lava-y4: 80%; } to { --aether-lava-y4: 0%; } }
+@property --aether-lava-x5 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-x5 { from { --aether-lava-x5: 50%; } to { --aether-lava-x5: -5%; } }
+@property --aether-lava-y5 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-y5 { from { --aether-lava-y5: 10%; } to { --aether-lava-y5: 95%; } }
+@property --aether-lava-x6 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-x6 { from { --aether-lava-x6: 5%; } to { --aether-lava-x6: 95%; } }
+@property --aether-lava-y6 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-lava-y6 { from { --aether-lava-y6: 90%; } to { --aether-lava-y6: 15%; } }
+
+html body .tile-header-main,
+html body .tile-header-left i[class^="icon-"],
+html body .tile-header-left i[class*=" icon-"],
+html body div.title .left,
+html body div.title .left i,
+html body .sidenav :is(.rightTitle, .popupAuthorTitle),
+html body .sweet-alert.nchan :is(h1, h2, h3),
+html body #sb-title-inner,
+html body .boot-title {
+    background-image:
+        radial-gradient(1.9em 1em at var(--aether-lava-x1) var(--aether-lava-y1), var(--aether-lava-c1), transparent),
+        radial-gradient(2.2em 1.1em at var(--aether-lava-x2) var(--aether-lava-y2), var(--aether-lava-c2), transparent),
+        radial-gradient(1.7em 0.9em at var(--aether-lava-x3) var(--aether-lava-y3), var(--aether-lava-c3), transparent),
+        radial-gradient(1.5em 0.8em at var(--aether-lava-x4) var(--aether-lava-y4), var(--aether-lava-c4), transparent),
+        radial-gradient(1.6em 0.9em at var(--aether-lava-x5) var(--aether-lava-y5), var(--aether-lava-c5), transparent),
+        radial-gradient(1.6em 0.9em at var(--aether-lava-x6) var(--aether-lava-y6), var(--aether-lava-c6), transparent),
+        linear-gradient(var(--aether-lava-base), var(--aether-lava-base));
+    background-size: auto;
+    background-position: 0 0;
+    animation:
+        aether-lava-x1 13s ease-in-out infinite alternate, aether-lava-y1 7s ease-in-out infinite alternate,
+        aether-lava-x2 17s ease-in-out infinite alternate, aether-lava-y2 9s ease-in-out infinite alternate,
+        aether-lava-x3 11s ease-in-out infinite alternate, aether-lava-y3 5.5s ease-in-out infinite alternate,
+        aether-lava-x4 19s ease-in-out infinite alternate, aether-lava-y4 8s ease-in-out infinite alternate,
+        aether-lava-x5 15s ease-in-out infinite alternate, aether-lava-y5 6.5s ease-in-out infinite alternate,
+        aether-lava-x6 21s ease-in-out infinite alternate, aether-lava-y6 7.5s ease-in-out infinite alternate;
+}
+html body .tile-header-main,
+html body .tile-header-left i[class^="icon-"],
+html body .tile-header-left i[class*=" icon-"],
+html body div.title .left,
+html body div.title .left i,
+html body .sidenav :is(.rightTitle, .popupAuthorTitle),
+html body .sweet-alert.nchan :is(h1, h2, h3),
+html body #sb-title-inner {
+    --aether-lava-base: #cdb9ff; --aether-lava-c1: #8fe0ff; --aether-lava-c2: #ff9fd2; --aether-lava-c3: #b59bff; --aether-lava-c4: #a8f5dc; --aether-lava-c5: #ffe2a8; --aether-lava-c6: #9ff5c0;
+}
+html body .boot-title {
+    --aether-lava-base: #7c5cff; --aether-lava-c1: #00e5ff; --aether-lava-c2: #ff3d9a; --aether-lava-c3: #c86bff; --aether-lava-c4: #ffd0f0; --aether-lava-c5: #ffc46b; --aether-lava-c6: #5ff0a8;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body .tile-header-main,
+    html body .tile-header-left i[class^="icon-"],
+    html body .tile-header-left i[class*=" icon-"],
+    html body div.title .left,
+    html body div.title .left i,
+    html body .sidenav :is(.rightTitle, .popupAuthorTitle),
+    html body .sweet-alert.nchan :is(h1, h2, h3),
+    html body #sb-title-inner,
+    html body .boot-title {
+        animation: none;
+        --aether-lava-x1: 30%; --aether-lava-y1: 50%;
+        --aether-lava-x2: 65%; --aether-lava-y2: 55%;
+        --aether-lava-x3: 65%; --aether-lava-y3: 55%;
+        --aether-lava-x4: 40%; --aether-lava-y4: 40%;
+        --aether-lava-x5: 22%; --aether-lava-y5: 52%;
+        --aether-lava-x6: 50%; --aether-lava-y6: 52%;
+    }
+}
+
 /* Live bars (CPU load): a faded "trail" behind each bar, like a music visualiser's.
    When the load drops, the bar snaps down at once and a faint copy of it stays at the old
    level, then slides down to catch up.  When the load rises, the trail is hidden under the
@@ -4043,7 +4136,7 @@ body .usage-disk.sys > span:first-child:is([style*="width: 100%"], [style*="widt
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01a-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
