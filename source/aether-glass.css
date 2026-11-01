@@ -903,6 +903,16 @@ body .tabs button[role="tab"]:active {
     padding-top: 10px;
     padding-bottom: 10px;
 }
+/* The log box lines up with the title pill: Unraid stretches the <p> that holds the log edge
+   to edge with a -20px margin (to cancel the window's 20px padding); this pulls it back in to
+   the same gap as the pill, and rounds its corners to the pill's 28px so the two read as a set. */
+body .sweet-alert.nchan > p {
+    margin-left: calc(var(--aether-title-gap) - 20px);
+    margin-right: calc(var(--aether-title-gap) - 20px);
+}
+body .sweet-alert.nchan > p > pre:is(#swaltext, #swalbody) {
+    border-radius: 28px;
+}
 @media (prefers-reduced-motion: reduce) {
     .sweet-alert.nchan h1,
     .sweet-alert.nchan h2,
