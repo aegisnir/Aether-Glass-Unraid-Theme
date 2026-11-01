@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.01a-dev">
+<!ENTITY version   "2026.11.01b-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "2ec53ba1c83568273e4112c52a1083e26a50b542d21c581affebd3cc09955326">
+<!ENTITY sha_css     "3d28b192ae002895f4a36c7c8f025879a7be72ea7d6419b4cf1470370e049bd4">
 <!ENTITY sha_login   "f13bfa3e5f4d0302ed912d0e59ef54c9758c8979e9cabf75db3c233c3bf0575b">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -28,7 +28,6 @@
 <CHANGES>
 ### 2026.11.01
 - Footer: the theme's version shows next to Unraid's copyright.
-- CPU bars: when the load drops, a faded trail stays at the old level and slides down to catch up, like a music visualiser.  It follows Unraid's own bar animation without stalling, and idle cores show no stray sliver.
 - Log windows (plugin installs, container updates) no longer pick up the amber or rose glow of the confirm box that opened them.
 - Headings shimmer like a lava lamp: six soft colour blobs (cyan, pink, orchid, blush, amber, mint) float inside the letters on their own timers.  Vivid on the reboot and shutdown title, pastel on tile headers, page titles, log-window titles and the login page.
 
