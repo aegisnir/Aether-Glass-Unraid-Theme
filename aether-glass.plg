@@ -2,17 +2,17 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.01k-dev">
+<!ENTITY version   "2026.11.01l-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "45aa7b625e67dd7ad322e1e2e971d9d6f3a30748ee3a9175b8643c9bf77cbc0f">
+<!ENTITY sha_css     "b2babf1b823e58f029cb5853c8fe53c188faf35877229b35308b3799bb402a64">
 <!ENTITY sha_login   "dd9f86073a6c9b50527ebd324b8f533ce5246e863bc62a4b5e453ec79f66f38e">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
-<!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
-<!ENTITY sha_page    "077fa82565d5862318379402bf41a6fac30e07c28fc2bdb7fdcce814ed7a755f">
+<!ENTITY sha_apply   "cfe1427f231f8b35e2abf46c23fe15ad9a4c164d537962344c06b6a3e82db4f9">
+<!ENTITY sha_page    "a2c5add3987ebcc9269ba5d1caef4e0a6a90425417808c32b8abe707ac4f4bae">
 <!ENTITY sha_icon    "ec8be7110f1cc9d0fe440edfb2d4d3de394dc482519ba26eccbd7a7e2e2d6159">
 ]>
 
@@ -225,7 +225,7 @@ rm -f "&emhttp;/images/aether-glass.png"
 rmdir "&emhttp;/images" 2>/dev/null
 rmdir "&emhttp;" 2>/dev/null
 
-for f in aether-glass.css aether-glass-login.css aether-glass-logging.css apply.sh AetherGlass.page aether-glass.png approved-version DISABLED; do
+for f in aether-glass.css aether-glass-login.css aether-glass-logging.css apply.sh AetherGlass.page aether-glass.png approved-version DISABLED effects.cfg; do
     rm -f "&cfg;/$f"
 done
 rmdir "&cfg;" 2>/dev/null

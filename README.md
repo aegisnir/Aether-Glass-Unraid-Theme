@@ -60,6 +60,19 @@ https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme/dev/aether-
 | Turn off | switches the kill switch on and goes back to stock, also after reboots |
 | Turn back on | switches the kill switch off and applies the theme again, if this version is approved |
 
+### Effects
+
+On a slower computer, trade looks for speed.  Pick a preset, or fine-tune each effect:
+
+| Preset | Motion (lava shimmer on titles) | Frosted glass | Glows |
+|---|---|---|---|
+| Best looks | every title | everything | all |
+| **Balanced** (default) | the tile you point at | everything | all |
+| Fast | the tile you point at | panels only (small buttons get a plain fill) | not on live bars and numbers |
+| Fastest | still | off (solid panels) | off |
+
+The choice is saved in `/boot/config/plugins/aether-glass/effects.cfg` and applies to everyone who opens this server's webGUI.  Each visitor's own computer still wins: if macOS or Windows is set to reduce motion or transparency, that visitor gets less of it whatever the preset.  Still CSS only: the effects are switched in the stylesheet, no script runs in the browser.
+
 ## Safety features
 
 - **Pauses after Unraid updates.**  The theme only loads on the Unraid version you approved.  After an update it stays off, a notification says so, and you check the stock pages before approving the new version.  A webGUI change in a new release can't leave you with a broken-looking UI you didn't choose.
@@ -107,7 +120,8 @@ Unraid unpacks its webGUI into memory at every boot and reinstalls plugins from 
 
 1. Checks that this Unraid version is approved and the kill switch is off.
 2. Saves untouched copies of three webGUI files in `/tmp`.
-3. Appends the theme to `themes/black.css` (normal pages) and `default-cases.css` (the login page, which loads no other stylesheet), and inserts a `<style>` block into `logging.htm` (the pop-up log window).  Each addition sits between `AETHER-GLASS-START` and `AETHER-GLASS-END` markers.
+3. Switches on the Effects levels you picked (in the copy it installs; the theme file itself is not changed).
+4. Appends the theme to `themes/black.css` (normal pages) and `default-cases.css` (the login page, which loads no other stylesheet), and inserts a `<style>` block into `logging.htm` (the pop-up log window).  Each addition sits between `AETHER-GLASS-START` and `AETHER-GLASS-END` markers.
 
 Results go to the system log under the tag `aether-glass`:
 

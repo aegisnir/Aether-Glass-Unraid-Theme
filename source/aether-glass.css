@@ -176,8 +176,20 @@ html:root {
 
 /* ===== Background: violet aurora for the glass to blur, plus the faint circuit grid ===== */
 
+/* The aurora sits on its own pinned layer (position: fixed) instead of a fixed page
+   background (background-attachment: fixed).  Same look, but a pinned layer is drawn once
+   and reused by the graphics card, while a fixed page background gets repainted whenever
+   anything above it changes, and every frosted panel then re-blurs it.  Cheap on a fast
+   computer, noticeable on a slow one. */
 body {
     background-color: var(--aether-bg);
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background-image:
         linear-gradient(rgba(124, 92, 255, 0.035) 1px, transparent 1px),
         linear-gradient(90deg, rgba(124, 92, 255, 0.035) 1px, transparent 1px),
@@ -186,7 +198,6 @@ body {
         radial-gradient(45vw 40vh at 85% 85%, rgba(0, 229, 255, 0.055), transparent 70%),
         radial-gradient(70vw 60vh at 40% 100%, rgba(79, 70, 229, 0.19), transparent 70%);
     background-size: 24px 24px, 24px 24px, auto, auto, auto, auto;
-    background-attachment: fixed;
 }
 
 
@@ -4046,7 +4057,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01k-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01l-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
@@ -4551,4 +4562,91 @@ body .usage-disk.aether-bar-gain > span:first-child {
     background-size: 100% 100%, 100cqw 100%;   /* fade spans the full track, so a short bar is mostly cyan */
     background-repeat: no-repeat;
     box-shadow: none;
+}
+
+/*
+ * ---- Effects settings (Settings -> Aether Glass -> Effects) ----
+ * Three effects, each with levels, so slower computers can trade looks for speed:
+ *   Motion         everywhere | hover (default) | still
+ *   Frosted glass  all (default) | panels | off
+ *   Glows          all (default) | static | off
+ * The blocks below sit behind media conditions that never match on their own, like
+ * "(aether-motion-everywhere)".  apply.sh turns the chosen ones on by rewriting that
+ * condition to "all" in the copy it installs.  Two levels reuse the accessibility
+ * fallbacks instead: motion "still" switches on every "(prefers-reduced-motion: reduce)"
+ * block, and glass "off" every "(prefers-reduced-transparency: reduce)" block.  Those keep
+ * working on their own too: a visitor whose computer asks for less motion or transparency
+ * gets it, whatever the server is set to.  Still CSS only: nothing here runs a script.
+ */
+
+/* Motion: everywhere.  Every title's lava moves, not just the one under the pointer. */
+@media (aether-motion-everywhere) {
+    html body .tile-header-main,
+    html body .tile-header-left i[class^="icon-"],
+    html body .tile-header-left i[class*=" icon-"],
+    html body div.title .left,
+    html body div.title .left i {
+        animation-play-state: running;
+    }
+}
+
+/* Frosted glass: panels only.  Small things (tile buttons, the drag handle) get a plain
+   see-through fill instead of their own blur.  At that size the difference is hard to see,
+   and each one was a separate blur to redraw.  Tiles, title bars, menus, popups and
+   dialogs keep real glass. */
+@media (aether-glass-panels) {
+    body table.dashboard .control,
+    body .tile-ctrl > .fa.hand,
+    body a.move_to_end::before {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+
+/* Frosted glass: off.  No blur anywhere; panels become solid violet-tinted fills (the
+   tint swap is in the reduced-transparency block further up).  Things that relied on blur
+   alone to hide what's behind them get a solid colour instead. */
+@media (prefers-reduced-transparency: reduce) {
+    html body *,
+    html body *::before,
+    html body *::after {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html body #menu::before { background: rgba(14, 9, 32, 0.94); }
+    html body #footer { background: rgba(10, 6, 30, 0.96); }
+    html:root [data-sonner-toast] { background: rgba(20, 12, 46, 0.96); }
+}
+
+/* Glows: static only.  No glow on things Unraid redraws every few seconds (usage bars,
+   dashboard rings, live status text), since each glow is a small blur that is redrawn with
+   them.  Glows on things that sit still stay. */
+@media (aether-glow-static), (aether-glow-off) {
+    body .greenbar,
+    body .orangebar,
+    body .redbar {
+        box-shadow: none;
+    }
+    body div.pie > span:first-child::before {
+        filter: none;
+    }
+    body :is(table.dashboard, table.disk_status) :is(.green-text, .passed, .green, .orange-text, .warning, .red-text, .failed) {
+        text-shadow: none;
+    }
+}
+
+/* Glows: off.  Also the glows on static status text and icons.  Hover glows on buttons
+   stay: they only appear while pointing, and they show what is clickable. */
+@media (aether-glow-off) {
+    body :is(.green-text, .passed, .green, .orange-text, .warning, .red-text, .failed) {
+        text-shadow: none;
+    }
+    body .favCardBackground,
+    body .sweet-alert[data-has-cancel-button] .sa-icon.sa-warning,   /* as specific as the glow rules they undo */
+    body .sweet-alert .sa-icon.sa-error {
+        filter: none;
+    }
+    body img.spotlightIcon {
+        filter: hue-rotate(255deg) saturate(1.15);   /* keeps the colour shift, drops the glow */
+    }
 }

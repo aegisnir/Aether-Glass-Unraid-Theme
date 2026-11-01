@@ -4,17 +4,38 @@ Icon="aether-glass.png"
 Markdown="false"
 ---
 <?php
-/* Aether Glass Settings page: shows the theme's status and offers three buttons.
- * Each button posts to Unraid's own /update.php, which runs apply.sh with one fixed
- * argument.  update.php only runs scripts inside the webGUI folder and quotes the
- * arguments, and apply.sh rejects anything that isn't one of its known options.
+/* Aether Glass Settings page: shows the theme's status and offers its buttons.
+ * Each button posts to Unraid's own /update.php, which runs apply.sh with fixed
+ * arguments.  update.php only runs scripts inside the webGUI folder and quotes the
+ * arguments, and apply.sh rejects anything that isn't one of its known options and values.
+ * No JavaScript: the theme is CSS only, and so is this page.
  */
 $apply  = '/usr/local/emhttp/plugins/aether-glass/apply.sh';
 $status = shell_exec(escapeshellarg($apply).' --status 2>&1');
+
+// Current effect levels, read from the status text (apply.sh is the only thing that
+// writes effects.cfg, and it only writes known values)
+preg_match('/^Effects:\s+(\w+) \(motion (\w+), glass (\w+), glow (\w+)\)/m', $status ?? '', $fx);
+[$preset, $motion, $glass, $glow] = [$fx[1] ?? 'balanced', $fx[2] ?? 'hover', $fx[3] ?? 'all', $fx[4] ?? 'all'];
+
+// One dropdown; marks the current value as selected
+function ag_select($name, $current, $options) {
+  $html = "<select name=\"".htmlspecialchars($name)."\">";
+  foreach ($options as $value => $label) {
+    $sel = ($value === $current) ? ' selected' : '';
+    $html .= "<option value=\"".htmlspecialchars($value)."\"$sel>".htmlspecialchars($label)."</option>";
+  }
+  return $html."</select>";
+}
 ?>
 <style>
 #aether-glass-status { font-family: ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; line-height: 1.6; }
 .aether-glass-actions form { display: inline-block; margin-right: 1rem; }
+.aether-glass-effects form { margin: 0 0 1rem; }
+.aether-glass-effects label { display: inline-block; min-width: 9rem; }
+.aether-glass-effects dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1rem; margin: 0.5rem 0 1rem; }
+.aether-glass-effects dt { font-weight: bold; }
+.aether-glass-effects dd { margin: 0; }
 </style>
 
 <p>An unofficial deep-violet frosted-glass theme for the webGUI.  It changes how pages look and nothing else.
@@ -44,6 +65,39 @@ Unraid update, it stays off until you look over the stock pages and click <b>App
     <input type="hidden" name="#arg[0]" value="--enable">
     <input type="submit" value="Turn back on">
   </form>
+</div>
+
+<h3>Effects</h3>
+<div class="aether-glass-effects">
+<p>Trade looks for speed on slower computers.  Every level still follows each visitor's own computer: if it asks for
+less motion or less transparency (macOS and Windows accessibility settings), that visitor gets it anyway.</p>
+
+<dl>
+  <dt>Best looks</dt><dd>Lava moves on every title, frosted glass everywhere, all glows.</dd>
+  <dt>Balanced</dt><dd>Lava moves on the tile you point at.  Recommended, and the default.</dd>
+  <dt>Fast</dt><dd>Also: small buttons get a plain fill instead of blur, and no glows on bars and live numbers.</dd>
+  <dt>Fastest</dt><dd>Nothing moves, no frosted glass (solid panels), no glows.</dd>
+</dl>
+
+<form method="POST" action="/update.php" target="progressFrame">
+  <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
+  <input type="hidden" name="#command" value="<?=$apply?>">
+  <input type="hidden" name="#arg[0]" value="--effects">
+  <label>Preset</label>
+  <?=ag_select('#arg[1]', "preset=$preset", ['preset=best' => 'Best looks', 'preset=balanced' => 'Balanced', 'preset=fast' => 'Fast', 'preset=fastest' => 'Fastest'] + ($preset === 'custom' ? ['preset=custom' => 'Custom (fine-tuned below)'] : []))?>
+  <input type="submit" value="Apply preset">
+</form>
+
+<form method="POST" action="/update.php" target="progressFrame">
+  <input type="hidden" name="csrf_token" value="<?=$var['csrf_token']?>">
+  <input type="hidden" name="#command" value="<?=$apply?>">
+  <input type="hidden" name="#arg[0]" value="--effects">
+  <p><b>Fine-tune</b> (overrides the preset):</p>
+  <label>Motion</label><?=ag_select('#arg[1]', "motion=$motion", ['motion=everywhere' => 'Every title', 'motion=hover' => 'Title you point at', 'motion=still' => 'Still'])?><br>
+  <label>Frosted glass</label><?=ag_select('#arg[2]', "glass=$glass", ['glass=all' => 'Everything', 'glass=panels' => 'Panels only', 'glass=off' => 'Off (solid panels)'])?><br>
+  <label>Glows</label><?=ag_select('#arg[3]', "glow=$glow", ['glow=all' => 'All', 'glow=static' => 'Not on live bars and numbers', 'glow=off' => 'Off'])?><br>
+  <input type="submit" value="Apply these settings">
+</form>
 </div>
 
 <p>Reload the page after a change.  If it still looks the same, reload while holding Shift.

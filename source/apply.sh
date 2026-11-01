@@ -35,6 +35,10 @@
 #   apply.sh --enable     kill switch off (still needs this version approved)
 #   apply.sh --remove     back to stock right now (until the next boot)
 #   apply.sh --status     show what is on and why
+#   apply.sh --effects preset=balanced
+#   apply.sh --effects motion=hover glass=all glow=all
+#                         pick how much motion, frosted glass and glow to use (see
+#                         "Effects" below); saved on the flash drive, applied right away
 #
 # Results go to the syslog under the tag "aether-glass".
 
@@ -64,6 +68,7 @@ LOCK="${AG_LOCK:-/var/lock/$PLUGIN.lock}"
 NOTIFY=/usr/local/emhttp/webGui/scripts/notify
 APPROVED="$CFG/approved-version"
 KILL="$CFG/DISABLED"
+EFFECTS="$CFG/effects.cfg"
 START='/* AETHER-GLASS-START */'
 END='/* AETHER-GLASS-END */'
 # HTML pages: the theme goes in as a <style> block just before </head>, fenced by HTML
@@ -134,6 +139,108 @@ restore() {
     rm -f "$tmp"
 }
 
+# ---- Effects ----------------------------------------------------------------------------
+# Three effects, each with levels (the CSS explains what each level changes):
+#   motion  everywhere | hover | still
+#   glass   all | panels | off
+#   glow    all | static | off
+# Presets set all three at once.  "balanced" is the default.
+# The choice is saved in effects.cfg as three fixed lines.  The theme CSS keeps every
+# level's rules behind media conditions that never match on their own; effects_filter
+# switches the chosen ones on in the copy being installed.  The CSS file itself is
+# never changed, and the browser still only receives CSS.
+
+DEFAULT_MOTION=hover DEFAULT_GLASS=all DEFAULT_GLOW=all
+
+# preset name -> "motion glass glow", or nothing for an unknown name
+preset_levels() {
+    case "$1" in
+        best)     echo "everywhere all all" ;;
+        balanced) echo "hover all all" ;;
+        fast)     echo "hover panels static" ;;
+        fastest)  echo "still off off" ;;
+    esac
+}
+
+# Which preset (if any) a set of levels matches, else "custom"
+levels_preset() {
+    local p
+    for p in best balanced fast fastest; do
+        [ "$(preset_levels "$p")" = "$1 $2 $3" ] && { echo "$p"; return; }
+    done
+    echo custom
+}
+
+valid_level() {
+    case "$1=$2" in
+        motion=everywhere|motion=hover|motion=still) return 0 ;;
+        glass=all|glass=panels|glass=off) return 0 ;;
+        glow=all|glow=static|glow=off) return 0 ;;
+    esac
+    return 1
+}
+
+# Read effects.cfg into MOTION, GLASS, GLOW.  Anything missing or not one of the known
+# values falls back to the default, so a damaged file can't break the theme.
+read_effects() {
+    local key val
+    MOTION=$DEFAULT_MOTION GLASS=$DEFAULT_GLASS GLOW=$DEFAULT_GLOW
+    [ -f "$EFFECTS" ] || return 0
+    while IFS='=' read -r key val; do
+        valid_level "$key" "$val" || continue
+        case "$key" in
+            motion) MOTION=$val ;;
+            glass)  GLASS=$val ;;
+            glow)   GLOW=$val ;;
+        esac
+    done < "$EFFECTS"
+}
+
+# Copy CSS from stdin to stdout with the chosen levels switched on
+effects_filter() {
+    local args=()
+    read_effects
+    case "$MOTION" in
+        everywhere) args+=(-e 's/(aether-motion-everywhere)/all/g') ;;
+        still)      args+=(-e 's/(prefers-reduced-motion: reduce)/all/g') ;;
+    esac
+    case "$GLASS" in
+        panels) args+=(-e 's/(aether-glass-panels)/all/g') ;;
+        off)    args+=(-e 's/(prefers-reduced-transparency: reduce)/all/g') ;;
+    esac
+    case "$GLOW" in
+        static) args+=(-e 's/(aether-glow-static)/all/g') ;;
+        off)    args+=(-e 's/(aether-glow-off)/all/g') ;;
+    esac
+    if [ ${#args[@]} -eq 0 ]; then cat; else sed "${args[@]}"; fi
+}
+
+# --effects: check every argument against the known values before saving anything
+set_effects() {
+    local arg key val m="" g="" w="" levels
+    [ $# -gt 0 ] || { say "effects: nothing given; e.g. --effects preset=balanced"; return 1; }
+    for arg in "$@"; do
+        key="${arg%%=*}" val="${arg#*=}"
+        if [ "$arg" = preset=custom ]; then
+            continue   # "Custom" on the Settings page: keep the fine-tuned levels as they are
+        elif [ "$key" = preset ]; then
+            levels="$(preset_levels "$val")"
+            [ -n "$levels" ] || { say "effects: unknown preset '$val'; nothing changed"; return 1; }
+            read -r m g w <<< "$levels"
+        elif valid_level "$key" "$val"; then
+            case "$key" in motion) m=$val ;; glass) g=$val ;; glow) w=$val ;; esac
+        else
+            say "effects: unknown setting '$arg'; nothing changed"
+            return 1
+        fi
+    done
+    read_effects
+    m="${m:-$MOTION}" g="${g:-$GLASS}" w="${w:-$GLOW}"
+    mkdir -p "$CFG" || return 1
+    printf 'motion=%s\nglass=%s\nglow=%s\n' "$m" "$g" "$w" > "$EFFECTS.tmp" && mv "$EFFECTS.tmp" "$EFFECTS" || return 1
+    say "effects: $(levels_preset "$m" "$g" "$w") (motion $m, glass $g, glow $w)"
+}
+
 # add <css file in CFG> <stylesheet under STYLES>
 add() {
     local src="$CFG/$1" dst="$STYLES/$2"
@@ -153,7 +260,7 @@ add() {
     restore "$2"
     # start the block on its own line even if the stock file has no final newline
     [ -n "$(tail -c 1 "$dst")" ] && printf '\n' >> "$dst"
-    { printf '%s\n' "$START"; cat "$src"; printf '\n%s\n' "$END"; } >> "$dst"
+    { printf '%s\n' "$START"; effects_filter < "$src"; printf '\n%s\n' "$END"; } >> "$dst"
     say "applied $1 to $2"
 }
 
@@ -259,6 +366,8 @@ show_status() {
     echo "Unraid version:    ${VERSION:-unknown}"
     echo "Approved version:  ${approved:-none yet}"
     echo "Kill switch:       $([ -f "$KILL" ] && echo ON || echo off)"
+    read_effects
+    echo "Effects:           $(levels_preset "$MOTION" "$GLASS" "$GLOW") (motion $MOTION, glass $GLASS, glow $GLOW)"
     if grep -q '^theme="black"' "$DISPLAY_CFG" 2>/dev/null; then
         echo "Display theme:     Black"
     else
@@ -344,8 +453,13 @@ case "$1" in
     --status)
         show_status
         ;;
+    --effects)
+        shift
+        set_effects "$@" || exit 1
+        boot   # re-applies with the new effects, if the theme is on (approved, not disabled)
+        ;;
     *)
-        echo "usage: apply.sh [--approve | --disable | --enable | --remove | --status]"
+        echo "usage: apply.sh [--approve | --disable | --enable | --remove | --status | --effects preset=NAME | --effects motion=X glass=X glow=X]"
         exit 1
         ;;
 esac
