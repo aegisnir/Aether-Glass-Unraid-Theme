@@ -913,6 +913,20 @@ body .sweet-alert.nchan > p {
 body .sweet-alert.nchan > p > pre:is(#swaltext, #swalbody) {
     border-radius: 28px;
 }
+/* Release notes open with no button (Unraid shows it a moment later), and sweetalert adds 40px
+   of bottom padding to button-less pop-ups, so Done sat higher than in the log windows.  Back
+   to the window's normal 20px so every log-style window ends the same way. */
+body .sweet-alert.nchan[data-has-confirm-button="false"][data-has-cancel-button="false"] {
+    padding-bottom: 20px;
+}
+/* Version headers inside the release notes: Unraid zeroes the padding and margins of headings
+   inside the notes (with an ID selector, which beats the pill rule above), which squashed each
+   pill into a thin rail through the text.  Same ID here, so they get their room back. */
+body .sweet-alert.nchan pre#swalbody :is(h1, h2, h3) {
+    margin: var(--sp-4) 0 var(--sp-3);
+    padding: 6px var(--sp-4);
+    line-height: 1.4;
+}
 @media (prefers-reduced-motion: reduce) {
     .sweet-alert.nchan h1,
     .sweet-alert.nchan h2,

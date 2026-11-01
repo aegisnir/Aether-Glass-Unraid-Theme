@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.31o-dev">
+<!ENTITY version   "2026.10.31p-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "5b949c0d96ac15a81202167c0939be47894125edff19fbc44d0c236a3ce6e0c7">
+<!ENTITY sha_css     "703fea14ba1e2390ca2680f35c1dd946183098b9a8d8de90a33e070235ba1014">
 <!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -26,6 +26,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31p
+- Release notes: version headers are full pills again (they were squashed into thin lines), and the Done button sits at the same height as in the log windows.
+
 ### 2026.10.31o
 - Log and update windows: the log box is inset to the same width as the title pill, with rounded corners.
 
