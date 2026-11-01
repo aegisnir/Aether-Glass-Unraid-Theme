@@ -445,38 +445,390 @@ html:root {
 body div.pie::after {
     box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(200, 190, 255, 0.08);
 }
-/* The ring is one gradient drawn by Unraid's script, so its colours can't be swapped
-   directly.  A "color" blend layer on top keeps the ring's light and dark (how full it
-   is stays readable) but takes the theme violet as its hue.  The percentage in the
-   middle keeps its status colour. */
+/* Dashboard pies, styled like the Aether UI rating ring =====
+   Unraid's script redraws each pie every few seconds as an inline conic-gradient (a colour
+   wheel), one colour per slice, ending with the "free" colour.  CSS can't do maths on that,
+   but it can spot exact text, so the generated rules below read WHERE each slice starts
+   (one rule per percentage, per slice colour).  The pie is then redrawn as separate arcs,
+   one per slice, each with a slight colour shift (deeper at the start, brighter at the end)
+   and a round end layered over the next slice.  The free part is a dim tinted track.
+   Safari writes the stops as "rgb(...) 3%, rgb(...) 3%"; Chrome as "rgb(...) 0% 3%"; both match.
+   The ring is drawn on the number <span>'s ::before / ::after, so it can take its colour
+   from the number, which Unraid colours with YOUR warning / critical thresholds. */
 body div.pie {
+    --aether-ring-t: 12px;                    /* ring thickness: 92px pie minus the 68px centre */
+    --aether-ring-r: 40px;                    /* radius to the middle of the ring */
+    /* slice k runs from --_sk to --_ek (percent).  Pies with one slice leave 2 and 3 empty. */
+    --_s1: 0;
+    --_e1: var(--aether-ring-s2, var(--aether-ring-s3, var(--aether-ring-p, 0)));
+    --_s2: var(--_e1);
+    --_e2: var(--aether-ring-s3, var(--aether-ring-p, 0));
+    --_s3: var(--_e2);
+    --_e3: var(--aether-ring-p, 0);
     position: relative;
     isolation: isolate;
+    background: none !important;              /* hide Unraid's own wheel */
 }
-body div.pie::before {
+body div.pie::before { display: none; }       /* the old violet blend layer */
+body div.pie > span:first-child {
+    --aether-ring-c: #10c98f;                 /* sea green; amber / rose below follow Unraid's colours */
+    --aether-ring-k1: var(--aether-ring-c);
+    --aether-ring-k2: var(--aether-ring-c);
+    --aether-ring-k3: var(--aether-ring-c);
+    color: var(--aether-ring-c) !important;
+}
+body div.pie > span:first-child[style*="rgb(230, 138, 0)"] { --aether-ring-c: #f59e0b; }
+body div.pie > span:first-child[style*="rgb(240, 0, 12)"] { --aether-ring-c: #f43f6e; }
+/* The track: the whole ring in a dim tint of the status colour */
+body div.pie > span:first-child::after,
+body div.pie > span:first-child::before {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: var(--aether-violet);   /* one hue, so filled vs empty reads by brightness alone */
-    mix-blend-mode: color;
     pointer-events: none;
+    --_ring: radial-gradient(circle, transparent calc(var(--aether-ring-r) - var(--aether-ring-t) / 2 - 0.5px), #000 calc(var(--aether-ring-r) - var(--aether-ring-t) / 2), #000 calc(var(--aether-ring-r) + var(--aether-ring-t) / 2), transparent calc(var(--aether-ring-r) + var(--aether-ring-t) / 2 + 0.5px));
 }
-/* The RAM donut has a colour legend (System / VM / Docker / Free) whose dot colours the
-   script also writes inline.  Instead of the violet blend, the ring and its legend dots get
-   the same hue shift (orange -> violet, yellow -> pink; greys stay grey), so the legend still
-   matches.  The centre and the percentage get the opposite shift to keep their own colours. */
-body div.pie#sys0::before {
-    display: none;
+body div.pie > span:first-child::after {
+    z-index: -1;
+    background: color-mix(in srgb, var(--aether-ring-c) 20%, #150d2c);
+    -webkit-mask: var(--_ring);
+    mask: var(--_ring);
 }
-body div.pie#sys0,
-body tbody[title*="Memory"] i.ups.fa-circle {
-    filter: hue-rotate(230deg) saturate(1.2);
+/* The slices, layered: no gaps; each slice is a smooth arc, and its round end sits ON TOP of
+   the start of the next slice (or the track), like Apple's activity rings.  The first slice
+   also has a round start.  At 100% the last round end overlaps that start, so the ring closes
+   with a curve, never a straight cut.  Paint: the end dots (colour of each slice's end) are
+   background layers over the arcs; mask: the ring up to the total, plus every round end. */
+body div.pie > span:first-child::before {
+    --_r1: min(calc(var(--aether-ring-t) / 2), max(0px, calc((var(--_e1) - var(--_s1)) * 100px)));   /* no dot on an empty slice */
+    --_b1: calc(var(--_e1) * 3.6deg);
+    --_r2: min(calc(var(--aether-ring-t) / 2), max(0px, calc((var(--_e2) - var(--_s2)) * 100px)));   /* no dot on an empty slice */
+    --_b2: calc(var(--_e2) * 3.6deg);
+    --_r3: min(calc(var(--aether-ring-t) / 2), max(0px, calc((var(--_e3) - var(--_s3)) * 100px)));   /* no dot on an empty slice */
+    --_b3: calc(var(--_e3) * 3.6deg);
+    --_r0: min(calc(var(--aether-ring-t) / 2), max(0px, calc(var(--aether-ring-p, 0) * 100px)));
+    background: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(var(--_r0) - 0.5px), transparent var(--_r0)), conic-gradient(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(var(--_s1) * 3.6deg), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) var(--_b1), oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(var(--_s2) * 3.6deg), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) var(--_b2), oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(var(--_s3) * 3.6deg), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) var(--_b3));
+    -webkit-mask: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), #000 calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), #000 calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), #000 calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), #000 calc(var(--_r0) - 0.5px), transparent var(--_r0)), var(--_ring), conic-gradient(#000 calc(var(--aether-ring-p, 0) * 3.6deg), transparent 0);
+    -webkit-mask-composite: source-over, source-over, source-over, source-over, source-in;
+    mask: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), #000 calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), #000 calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), #000 calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), #000 calc(var(--_r0) - 0.5px), transparent var(--_r0)), var(--_ring), conic-gradient(#000 calc(var(--aether-ring-p, 0) * 3.6deg), transparent 0);
+    mask-composite: add, add, add, add, intersect;
+    filter: drop-shadow(0 0 4px color-mix(in oklch, var(--aether-ring-c) 40%, transparent));
 }
-body div.pie#sys0 > span,
-body div.pie#sys0::after {
-    filter: saturate(0.833) hue-rotate(-230deg);
+/* RAM: slices by type, matching their legend dots (the number keeps the status colour) */
+body div.pie#sys0 > span:first-child {
+    --aether-ring-k1: #8b6dff;   /* System: violet */
+    --aether-ring-k2: #22d3ee;   /* 1st hook (usually Docker): cyan */
+    --aether-ring-k3: #ff3d9a;   /* 2nd hook (usually VMs): pink */
 }
+body tbody[title*="Memory"] i.ups.fa-circle { filter: none; }
+body tbody[title*="Memory"] i.ups.fa-circle[style*="rgb(120, 120, 120)"] { color: #8b6dff !important; }
+body tbody[title*="Memory"] i.ups.fa-circle[style*="rgb(215, 126, 13)"] { color: #22d3ee !important; }
+body tbody[title*="Memory"] i.ups.fa-circle[style*="rgb(212, 172, 13)"] { color: #ff3d9a !important; }
+
+body div.pie:is([style*="rgb(68, 68, 68) 100%,"], [style*="rgb(68, 68, 68) 100% "]) { --aether-ring-p: 100; }
+body div.pie:is([style*="rgb(68, 68, 68) 99%,"], [style*="rgb(68, 68, 68) 99% "]) { --aether-ring-p: 99; }
+body div.pie:is([style*="rgb(68, 68, 68) 98%,"], [style*="rgb(68, 68, 68) 98% "]) { --aether-ring-p: 98; }
+body div.pie:is([style*="rgb(68, 68, 68) 97%,"], [style*="rgb(68, 68, 68) 97% "]) { --aether-ring-p: 97; }
+body div.pie:is([style*="rgb(68, 68, 68) 96%,"], [style*="rgb(68, 68, 68) 96% "]) { --aether-ring-p: 96; }
+body div.pie:is([style*="rgb(68, 68, 68) 95%,"], [style*="rgb(68, 68, 68) 95% "]) { --aether-ring-p: 95; }
+body div.pie:is([style*="rgb(68, 68, 68) 94%,"], [style*="rgb(68, 68, 68) 94% "]) { --aether-ring-p: 94; }
+body div.pie:is([style*="rgb(68, 68, 68) 93%,"], [style*="rgb(68, 68, 68) 93% "]) { --aether-ring-p: 93; }
+body div.pie:is([style*="rgb(68, 68, 68) 92%,"], [style*="rgb(68, 68, 68) 92% "]) { --aether-ring-p: 92; }
+body div.pie:is([style*="rgb(68, 68, 68) 91%,"], [style*="rgb(68, 68, 68) 91% "]) { --aether-ring-p: 91; }
+body div.pie:is([style*="rgb(68, 68, 68) 90%,"], [style*="rgb(68, 68, 68) 90% "]) { --aether-ring-p: 90; }
+body div.pie:is([style*="rgb(68, 68, 68) 89%,"], [style*="rgb(68, 68, 68) 89% "]) { --aether-ring-p: 89; }
+body div.pie:is([style*="rgb(68, 68, 68) 88%,"], [style*="rgb(68, 68, 68) 88% "]) { --aether-ring-p: 88; }
+body div.pie:is([style*="rgb(68, 68, 68) 87%,"], [style*="rgb(68, 68, 68) 87% "]) { --aether-ring-p: 87; }
+body div.pie:is([style*="rgb(68, 68, 68) 86%,"], [style*="rgb(68, 68, 68) 86% "]) { --aether-ring-p: 86; }
+body div.pie:is([style*="rgb(68, 68, 68) 85%,"], [style*="rgb(68, 68, 68) 85% "]) { --aether-ring-p: 85; }
+body div.pie:is([style*="rgb(68, 68, 68) 84%,"], [style*="rgb(68, 68, 68) 84% "]) { --aether-ring-p: 84; }
+body div.pie:is([style*="rgb(68, 68, 68) 83%,"], [style*="rgb(68, 68, 68) 83% "]) { --aether-ring-p: 83; }
+body div.pie:is([style*="rgb(68, 68, 68) 82%,"], [style*="rgb(68, 68, 68) 82% "]) { --aether-ring-p: 82; }
+body div.pie:is([style*="rgb(68, 68, 68) 81%,"], [style*="rgb(68, 68, 68) 81% "]) { --aether-ring-p: 81; }
+body div.pie:is([style*="rgb(68, 68, 68) 80%,"], [style*="rgb(68, 68, 68) 80% "]) { --aether-ring-p: 80; }
+body div.pie:is([style*="rgb(68, 68, 68) 79%,"], [style*="rgb(68, 68, 68) 79% "]) { --aether-ring-p: 79; }
+body div.pie:is([style*="rgb(68, 68, 68) 78%,"], [style*="rgb(68, 68, 68) 78% "]) { --aether-ring-p: 78; }
+body div.pie:is([style*="rgb(68, 68, 68) 77%,"], [style*="rgb(68, 68, 68) 77% "]) { --aether-ring-p: 77; }
+body div.pie:is([style*="rgb(68, 68, 68) 76%,"], [style*="rgb(68, 68, 68) 76% "]) { --aether-ring-p: 76; }
+body div.pie:is([style*="rgb(68, 68, 68) 75%,"], [style*="rgb(68, 68, 68) 75% "]) { --aether-ring-p: 75; }
+body div.pie:is([style*="rgb(68, 68, 68) 74%,"], [style*="rgb(68, 68, 68) 74% "]) { --aether-ring-p: 74; }
+body div.pie:is([style*="rgb(68, 68, 68) 73%,"], [style*="rgb(68, 68, 68) 73% "]) { --aether-ring-p: 73; }
+body div.pie:is([style*="rgb(68, 68, 68) 72%,"], [style*="rgb(68, 68, 68) 72% "]) { --aether-ring-p: 72; }
+body div.pie:is([style*="rgb(68, 68, 68) 71%,"], [style*="rgb(68, 68, 68) 71% "]) { --aether-ring-p: 71; }
+body div.pie:is([style*="rgb(68, 68, 68) 70%,"], [style*="rgb(68, 68, 68) 70% "]) { --aether-ring-p: 70; }
+body div.pie:is([style*="rgb(68, 68, 68) 69%,"], [style*="rgb(68, 68, 68) 69% "]) { --aether-ring-p: 69; }
+body div.pie:is([style*="rgb(68, 68, 68) 68%,"], [style*="rgb(68, 68, 68) 68% "]) { --aether-ring-p: 68; }
+body div.pie:is([style*="rgb(68, 68, 68) 67%,"], [style*="rgb(68, 68, 68) 67% "]) { --aether-ring-p: 67; }
+body div.pie:is([style*="rgb(68, 68, 68) 66%,"], [style*="rgb(68, 68, 68) 66% "]) { --aether-ring-p: 66; }
+body div.pie:is([style*="rgb(68, 68, 68) 65%,"], [style*="rgb(68, 68, 68) 65% "]) { --aether-ring-p: 65; }
+body div.pie:is([style*="rgb(68, 68, 68) 64%,"], [style*="rgb(68, 68, 68) 64% "]) { --aether-ring-p: 64; }
+body div.pie:is([style*="rgb(68, 68, 68) 63%,"], [style*="rgb(68, 68, 68) 63% "]) { --aether-ring-p: 63; }
+body div.pie:is([style*="rgb(68, 68, 68) 62%,"], [style*="rgb(68, 68, 68) 62% "]) { --aether-ring-p: 62; }
+body div.pie:is([style*="rgb(68, 68, 68) 61%,"], [style*="rgb(68, 68, 68) 61% "]) { --aether-ring-p: 61; }
+body div.pie:is([style*="rgb(68, 68, 68) 60%,"], [style*="rgb(68, 68, 68) 60% "]) { --aether-ring-p: 60; }
+body div.pie:is([style*="rgb(68, 68, 68) 59%,"], [style*="rgb(68, 68, 68) 59% "]) { --aether-ring-p: 59; }
+body div.pie:is([style*="rgb(68, 68, 68) 58%,"], [style*="rgb(68, 68, 68) 58% "]) { --aether-ring-p: 58; }
+body div.pie:is([style*="rgb(68, 68, 68) 57%,"], [style*="rgb(68, 68, 68) 57% "]) { --aether-ring-p: 57; }
+body div.pie:is([style*="rgb(68, 68, 68) 56%,"], [style*="rgb(68, 68, 68) 56% "]) { --aether-ring-p: 56; }
+body div.pie:is([style*="rgb(68, 68, 68) 55%,"], [style*="rgb(68, 68, 68) 55% "]) { --aether-ring-p: 55; }
+body div.pie:is([style*="rgb(68, 68, 68) 54%,"], [style*="rgb(68, 68, 68) 54% "]) { --aether-ring-p: 54; }
+body div.pie:is([style*="rgb(68, 68, 68) 53%,"], [style*="rgb(68, 68, 68) 53% "]) { --aether-ring-p: 53; }
+body div.pie:is([style*="rgb(68, 68, 68) 52%,"], [style*="rgb(68, 68, 68) 52% "]) { --aether-ring-p: 52; }
+body div.pie:is([style*="rgb(68, 68, 68) 51%,"], [style*="rgb(68, 68, 68) 51% "]) { --aether-ring-p: 51; }
+body div.pie:is([style*="rgb(68, 68, 68) 50%,"], [style*="rgb(68, 68, 68) 50% "]) { --aether-ring-p: 50; }
+body div.pie:is([style*="rgb(68, 68, 68) 49%,"], [style*="rgb(68, 68, 68) 49% "]) { --aether-ring-p: 49; }
+body div.pie:is([style*="rgb(68, 68, 68) 48%,"], [style*="rgb(68, 68, 68) 48% "]) { --aether-ring-p: 48; }
+body div.pie:is([style*="rgb(68, 68, 68) 47%,"], [style*="rgb(68, 68, 68) 47% "]) { --aether-ring-p: 47; }
+body div.pie:is([style*="rgb(68, 68, 68) 46%,"], [style*="rgb(68, 68, 68) 46% "]) { --aether-ring-p: 46; }
+body div.pie:is([style*="rgb(68, 68, 68) 45%,"], [style*="rgb(68, 68, 68) 45% "]) { --aether-ring-p: 45; }
+body div.pie:is([style*="rgb(68, 68, 68) 44%,"], [style*="rgb(68, 68, 68) 44% "]) { --aether-ring-p: 44; }
+body div.pie:is([style*="rgb(68, 68, 68) 43%,"], [style*="rgb(68, 68, 68) 43% "]) { --aether-ring-p: 43; }
+body div.pie:is([style*="rgb(68, 68, 68) 42%,"], [style*="rgb(68, 68, 68) 42% "]) { --aether-ring-p: 42; }
+body div.pie:is([style*="rgb(68, 68, 68) 41%,"], [style*="rgb(68, 68, 68) 41% "]) { --aether-ring-p: 41; }
+body div.pie:is([style*="rgb(68, 68, 68) 40%,"], [style*="rgb(68, 68, 68) 40% "]) { --aether-ring-p: 40; }
+body div.pie:is([style*="rgb(68, 68, 68) 39%,"], [style*="rgb(68, 68, 68) 39% "]) { --aether-ring-p: 39; }
+body div.pie:is([style*="rgb(68, 68, 68) 38%,"], [style*="rgb(68, 68, 68) 38% "]) { --aether-ring-p: 38; }
+body div.pie:is([style*="rgb(68, 68, 68) 37%,"], [style*="rgb(68, 68, 68) 37% "]) { --aether-ring-p: 37; }
+body div.pie:is([style*="rgb(68, 68, 68) 36%,"], [style*="rgb(68, 68, 68) 36% "]) { --aether-ring-p: 36; }
+body div.pie:is([style*="rgb(68, 68, 68) 35%,"], [style*="rgb(68, 68, 68) 35% "]) { --aether-ring-p: 35; }
+body div.pie:is([style*="rgb(68, 68, 68) 34%,"], [style*="rgb(68, 68, 68) 34% "]) { --aether-ring-p: 34; }
+body div.pie:is([style*="rgb(68, 68, 68) 33%,"], [style*="rgb(68, 68, 68) 33% "]) { --aether-ring-p: 33; }
+body div.pie:is([style*="rgb(68, 68, 68) 32%,"], [style*="rgb(68, 68, 68) 32% "]) { --aether-ring-p: 32; }
+body div.pie:is([style*="rgb(68, 68, 68) 31%,"], [style*="rgb(68, 68, 68) 31% "]) { --aether-ring-p: 31; }
+body div.pie:is([style*="rgb(68, 68, 68) 30%,"], [style*="rgb(68, 68, 68) 30% "]) { --aether-ring-p: 30; }
+body div.pie:is([style*="rgb(68, 68, 68) 29%,"], [style*="rgb(68, 68, 68) 29% "]) { --aether-ring-p: 29; }
+body div.pie:is([style*="rgb(68, 68, 68) 28%,"], [style*="rgb(68, 68, 68) 28% "]) { --aether-ring-p: 28; }
+body div.pie:is([style*="rgb(68, 68, 68) 27%,"], [style*="rgb(68, 68, 68) 27% "]) { --aether-ring-p: 27; }
+body div.pie:is([style*="rgb(68, 68, 68) 26%,"], [style*="rgb(68, 68, 68) 26% "]) { --aether-ring-p: 26; }
+body div.pie:is([style*="rgb(68, 68, 68) 25%,"], [style*="rgb(68, 68, 68) 25% "]) { --aether-ring-p: 25; }
+body div.pie:is([style*="rgb(68, 68, 68) 24%,"], [style*="rgb(68, 68, 68) 24% "]) { --aether-ring-p: 24; }
+body div.pie:is([style*="rgb(68, 68, 68) 23%,"], [style*="rgb(68, 68, 68) 23% "]) { --aether-ring-p: 23; }
+body div.pie:is([style*="rgb(68, 68, 68) 22%,"], [style*="rgb(68, 68, 68) 22% "]) { --aether-ring-p: 22; }
+body div.pie:is([style*="rgb(68, 68, 68) 21%,"], [style*="rgb(68, 68, 68) 21% "]) { --aether-ring-p: 21; }
+body div.pie:is([style*="rgb(68, 68, 68) 20%,"], [style*="rgb(68, 68, 68) 20% "]) { --aether-ring-p: 20; }
+body div.pie:is([style*="rgb(68, 68, 68) 19%,"], [style*="rgb(68, 68, 68) 19% "]) { --aether-ring-p: 19; }
+body div.pie:is([style*="rgb(68, 68, 68) 18%,"], [style*="rgb(68, 68, 68) 18% "]) { --aether-ring-p: 18; }
+body div.pie:is([style*="rgb(68, 68, 68) 17%,"], [style*="rgb(68, 68, 68) 17% "]) { --aether-ring-p: 17; }
+body div.pie:is([style*="rgb(68, 68, 68) 16%,"], [style*="rgb(68, 68, 68) 16% "]) { --aether-ring-p: 16; }
+body div.pie:is([style*="rgb(68, 68, 68) 15%,"], [style*="rgb(68, 68, 68) 15% "]) { --aether-ring-p: 15; }
+body div.pie:is([style*="rgb(68, 68, 68) 14%,"], [style*="rgb(68, 68, 68) 14% "]) { --aether-ring-p: 14; }
+body div.pie:is([style*="rgb(68, 68, 68) 13%,"], [style*="rgb(68, 68, 68) 13% "]) { --aether-ring-p: 13; }
+body div.pie:is([style*="rgb(68, 68, 68) 12%,"], [style*="rgb(68, 68, 68) 12% "]) { --aether-ring-p: 12; }
+body div.pie:is([style*="rgb(68, 68, 68) 11%,"], [style*="rgb(68, 68, 68) 11% "]) { --aether-ring-p: 11; }
+body div.pie:is([style*="rgb(68, 68, 68) 10%,"], [style*="rgb(68, 68, 68) 10% "]) { --aether-ring-p: 10; }
+body div.pie:is([style*="rgb(68, 68, 68) 9%,"], [style*="rgb(68, 68, 68) 9% "]) { --aether-ring-p: 9; }
+body div.pie:is([style*="rgb(68, 68, 68) 8%,"], [style*="rgb(68, 68, 68) 8% "]) { --aether-ring-p: 8; }
+body div.pie:is([style*="rgb(68, 68, 68) 7%,"], [style*="rgb(68, 68, 68) 7% "]) { --aether-ring-p: 7; }
+body div.pie:is([style*="rgb(68, 68, 68) 6%,"], [style*="rgb(68, 68, 68) 6% "]) { --aether-ring-p: 6; }
+body div.pie:is([style*="rgb(68, 68, 68) 5%,"], [style*="rgb(68, 68, 68) 5% "]) { --aether-ring-p: 5; }
+body div.pie:is([style*="rgb(68, 68, 68) 4%,"], [style*="rgb(68, 68, 68) 4% "]) { --aether-ring-p: 4; }
+body div.pie:is([style*="rgb(68, 68, 68) 3%,"], [style*="rgb(68, 68, 68) 3% "]) { --aether-ring-p: 3; }
+body div.pie:is([style*="rgb(68, 68, 68) 2%,"], [style*="rgb(68, 68, 68) 2% "]) { --aether-ring-p: 2; }
+body div.pie:is([style*="rgb(68, 68, 68) 1%,"], [style*="rgb(68, 68, 68) 1% "]) { --aether-ring-p: 1; }
+body div.pie:is([style*="rgb(68, 68, 68) 0%,"], [style*="rgb(68, 68, 68) 0% "]) { --aether-ring-p: 0; }
+body div.pie:is([style*="rgb(215, 126, 13) 100%,"], [style*="rgb(215, 126, 13) 100% "]) { --aether-ring-s2: 100; }
+body div.pie:is([style*="rgb(215, 126, 13) 99%,"], [style*="rgb(215, 126, 13) 99% "]) { --aether-ring-s2: 99; }
+body div.pie:is([style*="rgb(215, 126, 13) 98%,"], [style*="rgb(215, 126, 13) 98% "]) { --aether-ring-s2: 98; }
+body div.pie:is([style*="rgb(215, 126, 13) 97%,"], [style*="rgb(215, 126, 13) 97% "]) { --aether-ring-s2: 97; }
+body div.pie:is([style*="rgb(215, 126, 13) 96%,"], [style*="rgb(215, 126, 13) 96% "]) { --aether-ring-s2: 96; }
+body div.pie:is([style*="rgb(215, 126, 13) 95%,"], [style*="rgb(215, 126, 13) 95% "]) { --aether-ring-s2: 95; }
+body div.pie:is([style*="rgb(215, 126, 13) 94%,"], [style*="rgb(215, 126, 13) 94% "]) { --aether-ring-s2: 94; }
+body div.pie:is([style*="rgb(215, 126, 13) 93%,"], [style*="rgb(215, 126, 13) 93% "]) { --aether-ring-s2: 93; }
+body div.pie:is([style*="rgb(215, 126, 13) 92%,"], [style*="rgb(215, 126, 13) 92% "]) { --aether-ring-s2: 92; }
+body div.pie:is([style*="rgb(215, 126, 13) 91%,"], [style*="rgb(215, 126, 13) 91% "]) { --aether-ring-s2: 91; }
+body div.pie:is([style*="rgb(215, 126, 13) 90%,"], [style*="rgb(215, 126, 13) 90% "]) { --aether-ring-s2: 90; }
+body div.pie:is([style*="rgb(215, 126, 13) 89%,"], [style*="rgb(215, 126, 13) 89% "]) { --aether-ring-s2: 89; }
+body div.pie:is([style*="rgb(215, 126, 13) 88%,"], [style*="rgb(215, 126, 13) 88% "]) { --aether-ring-s2: 88; }
+body div.pie:is([style*="rgb(215, 126, 13) 87%,"], [style*="rgb(215, 126, 13) 87% "]) { --aether-ring-s2: 87; }
+body div.pie:is([style*="rgb(215, 126, 13) 86%,"], [style*="rgb(215, 126, 13) 86% "]) { --aether-ring-s2: 86; }
+body div.pie:is([style*="rgb(215, 126, 13) 85%,"], [style*="rgb(215, 126, 13) 85% "]) { --aether-ring-s2: 85; }
+body div.pie:is([style*="rgb(215, 126, 13) 84%,"], [style*="rgb(215, 126, 13) 84% "]) { --aether-ring-s2: 84; }
+body div.pie:is([style*="rgb(215, 126, 13) 83%,"], [style*="rgb(215, 126, 13) 83% "]) { --aether-ring-s2: 83; }
+body div.pie:is([style*="rgb(215, 126, 13) 82%,"], [style*="rgb(215, 126, 13) 82% "]) { --aether-ring-s2: 82; }
+body div.pie:is([style*="rgb(215, 126, 13) 81%,"], [style*="rgb(215, 126, 13) 81% "]) { --aether-ring-s2: 81; }
+body div.pie:is([style*="rgb(215, 126, 13) 80%,"], [style*="rgb(215, 126, 13) 80% "]) { --aether-ring-s2: 80; }
+body div.pie:is([style*="rgb(215, 126, 13) 79%,"], [style*="rgb(215, 126, 13) 79% "]) { --aether-ring-s2: 79; }
+body div.pie:is([style*="rgb(215, 126, 13) 78%,"], [style*="rgb(215, 126, 13) 78% "]) { --aether-ring-s2: 78; }
+body div.pie:is([style*="rgb(215, 126, 13) 77%,"], [style*="rgb(215, 126, 13) 77% "]) { --aether-ring-s2: 77; }
+body div.pie:is([style*="rgb(215, 126, 13) 76%,"], [style*="rgb(215, 126, 13) 76% "]) { --aether-ring-s2: 76; }
+body div.pie:is([style*="rgb(215, 126, 13) 75%,"], [style*="rgb(215, 126, 13) 75% "]) { --aether-ring-s2: 75; }
+body div.pie:is([style*="rgb(215, 126, 13) 74%,"], [style*="rgb(215, 126, 13) 74% "]) { --aether-ring-s2: 74; }
+body div.pie:is([style*="rgb(215, 126, 13) 73%,"], [style*="rgb(215, 126, 13) 73% "]) { --aether-ring-s2: 73; }
+body div.pie:is([style*="rgb(215, 126, 13) 72%,"], [style*="rgb(215, 126, 13) 72% "]) { --aether-ring-s2: 72; }
+body div.pie:is([style*="rgb(215, 126, 13) 71%,"], [style*="rgb(215, 126, 13) 71% "]) { --aether-ring-s2: 71; }
+body div.pie:is([style*="rgb(215, 126, 13) 70%,"], [style*="rgb(215, 126, 13) 70% "]) { --aether-ring-s2: 70; }
+body div.pie:is([style*="rgb(215, 126, 13) 69%,"], [style*="rgb(215, 126, 13) 69% "]) { --aether-ring-s2: 69; }
+body div.pie:is([style*="rgb(215, 126, 13) 68%,"], [style*="rgb(215, 126, 13) 68% "]) { --aether-ring-s2: 68; }
+body div.pie:is([style*="rgb(215, 126, 13) 67%,"], [style*="rgb(215, 126, 13) 67% "]) { --aether-ring-s2: 67; }
+body div.pie:is([style*="rgb(215, 126, 13) 66%,"], [style*="rgb(215, 126, 13) 66% "]) { --aether-ring-s2: 66; }
+body div.pie:is([style*="rgb(215, 126, 13) 65%,"], [style*="rgb(215, 126, 13) 65% "]) { --aether-ring-s2: 65; }
+body div.pie:is([style*="rgb(215, 126, 13) 64%,"], [style*="rgb(215, 126, 13) 64% "]) { --aether-ring-s2: 64; }
+body div.pie:is([style*="rgb(215, 126, 13) 63%,"], [style*="rgb(215, 126, 13) 63% "]) { --aether-ring-s2: 63; }
+body div.pie:is([style*="rgb(215, 126, 13) 62%,"], [style*="rgb(215, 126, 13) 62% "]) { --aether-ring-s2: 62; }
+body div.pie:is([style*="rgb(215, 126, 13) 61%,"], [style*="rgb(215, 126, 13) 61% "]) { --aether-ring-s2: 61; }
+body div.pie:is([style*="rgb(215, 126, 13) 60%,"], [style*="rgb(215, 126, 13) 60% "]) { --aether-ring-s2: 60; }
+body div.pie:is([style*="rgb(215, 126, 13) 59%,"], [style*="rgb(215, 126, 13) 59% "]) { --aether-ring-s2: 59; }
+body div.pie:is([style*="rgb(215, 126, 13) 58%,"], [style*="rgb(215, 126, 13) 58% "]) { --aether-ring-s2: 58; }
+body div.pie:is([style*="rgb(215, 126, 13) 57%,"], [style*="rgb(215, 126, 13) 57% "]) { --aether-ring-s2: 57; }
+body div.pie:is([style*="rgb(215, 126, 13) 56%,"], [style*="rgb(215, 126, 13) 56% "]) { --aether-ring-s2: 56; }
+body div.pie:is([style*="rgb(215, 126, 13) 55%,"], [style*="rgb(215, 126, 13) 55% "]) { --aether-ring-s2: 55; }
+body div.pie:is([style*="rgb(215, 126, 13) 54%,"], [style*="rgb(215, 126, 13) 54% "]) { --aether-ring-s2: 54; }
+body div.pie:is([style*="rgb(215, 126, 13) 53%,"], [style*="rgb(215, 126, 13) 53% "]) { --aether-ring-s2: 53; }
+body div.pie:is([style*="rgb(215, 126, 13) 52%,"], [style*="rgb(215, 126, 13) 52% "]) { --aether-ring-s2: 52; }
+body div.pie:is([style*="rgb(215, 126, 13) 51%,"], [style*="rgb(215, 126, 13) 51% "]) { --aether-ring-s2: 51; }
+body div.pie:is([style*="rgb(215, 126, 13) 50%,"], [style*="rgb(215, 126, 13) 50% "]) { --aether-ring-s2: 50; }
+body div.pie:is([style*="rgb(215, 126, 13) 49%,"], [style*="rgb(215, 126, 13) 49% "]) { --aether-ring-s2: 49; }
+body div.pie:is([style*="rgb(215, 126, 13) 48%,"], [style*="rgb(215, 126, 13) 48% "]) { --aether-ring-s2: 48; }
+body div.pie:is([style*="rgb(215, 126, 13) 47%,"], [style*="rgb(215, 126, 13) 47% "]) { --aether-ring-s2: 47; }
+body div.pie:is([style*="rgb(215, 126, 13) 46%,"], [style*="rgb(215, 126, 13) 46% "]) { --aether-ring-s2: 46; }
+body div.pie:is([style*="rgb(215, 126, 13) 45%,"], [style*="rgb(215, 126, 13) 45% "]) { --aether-ring-s2: 45; }
+body div.pie:is([style*="rgb(215, 126, 13) 44%,"], [style*="rgb(215, 126, 13) 44% "]) { --aether-ring-s2: 44; }
+body div.pie:is([style*="rgb(215, 126, 13) 43%,"], [style*="rgb(215, 126, 13) 43% "]) { --aether-ring-s2: 43; }
+body div.pie:is([style*="rgb(215, 126, 13) 42%,"], [style*="rgb(215, 126, 13) 42% "]) { --aether-ring-s2: 42; }
+body div.pie:is([style*="rgb(215, 126, 13) 41%,"], [style*="rgb(215, 126, 13) 41% "]) { --aether-ring-s2: 41; }
+body div.pie:is([style*="rgb(215, 126, 13) 40%,"], [style*="rgb(215, 126, 13) 40% "]) { --aether-ring-s2: 40; }
+body div.pie:is([style*="rgb(215, 126, 13) 39%,"], [style*="rgb(215, 126, 13) 39% "]) { --aether-ring-s2: 39; }
+body div.pie:is([style*="rgb(215, 126, 13) 38%,"], [style*="rgb(215, 126, 13) 38% "]) { --aether-ring-s2: 38; }
+body div.pie:is([style*="rgb(215, 126, 13) 37%,"], [style*="rgb(215, 126, 13) 37% "]) { --aether-ring-s2: 37; }
+body div.pie:is([style*="rgb(215, 126, 13) 36%,"], [style*="rgb(215, 126, 13) 36% "]) { --aether-ring-s2: 36; }
+body div.pie:is([style*="rgb(215, 126, 13) 35%,"], [style*="rgb(215, 126, 13) 35% "]) { --aether-ring-s2: 35; }
+body div.pie:is([style*="rgb(215, 126, 13) 34%,"], [style*="rgb(215, 126, 13) 34% "]) { --aether-ring-s2: 34; }
+body div.pie:is([style*="rgb(215, 126, 13) 33%,"], [style*="rgb(215, 126, 13) 33% "]) { --aether-ring-s2: 33; }
+body div.pie:is([style*="rgb(215, 126, 13) 32%,"], [style*="rgb(215, 126, 13) 32% "]) { --aether-ring-s2: 32; }
+body div.pie:is([style*="rgb(215, 126, 13) 31%,"], [style*="rgb(215, 126, 13) 31% "]) { --aether-ring-s2: 31; }
+body div.pie:is([style*="rgb(215, 126, 13) 30%,"], [style*="rgb(215, 126, 13) 30% "]) { --aether-ring-s2: 30; }
+body div.pie:is([style*="rgb(215, 126, 13) 29%,"], [style*="rgb(215, 126, 13) 29% "]) { --aether-ring-s2: 29; }
+body div.pie:is([style*="rgb(215, 126, 13) 28%,"], [style*="rgb(215, 126, 13) 28% "]) { --aether-ring-s2: 28; }
+body div.pie:is([style*="rgb(215, 126, 13) 27%,"], [style*="rgb(215, 126, 13) 27% "]) { --aether-ring-s2: 27; }
+body div.pie:is([style*="rgb(215, 126, 13) 26%,"], [style*="rgb(215, 126, 13) 26% "]) { --aether-ring-s2: 26; }
+body div.pie:is([style*="rgb(215, 126, 13) 25%,"], [style*="rgb(215, 126, 13) 25% "]) { --aether-ring-s2: 25; }
+body div.pie:is([style*="rgb(215, 126, 13) 24%,"], [style*="rgb(215, 126, 13) 24% "]) { --aether-ring-s2: 24; }
+body div.pie:is([style*="rgb(215, 126, 13) 23%,"], [style*="rgb(215, 126, 13) 23% "]) { --aether-ring-s2: 23; }
+body div.pie:is([style*="rgb(215, 126, 13) 22%,"], [style*="rgb(215, 126, 13) 22% "]) { --aether-ring-s2: 22; }
+body div.pie:is([style*="rgb(215, 126, 13) 21%,"], [style*="rgb(215, 126, 13) 21% "]) { --aether-ring-s2: 21; }
+body div.pie:is([style*="rgb(215, 126, 13) 20%,"], [style*="rgb(215, 126, 13) 20% "]) { --aether-ring-s2: 20; }
+body div.pie:is([style*="rgb(215, 126, 13) 19%,"], [style*="rgb(215, 126, 13) 19% "]) { --aether-ring-s2: 19; }
+body div.pie:is([style*="rgb(215, 126, 13) 18%,"], [style*="rgb(215, 126, 13) 18% "]) { --aether-ring-s2: 18; }
+body div.pie:is([style*="rgb(215, 126, 13) 17%,"], [style*="rgb(215, 126, 13) 17% "]) { --aether-ring-s2: 17; }
+body div.pie:is([style*="rgb(215, 126, 13) 16%,"], [style*="rgb(215, 126, 13) 16% "]) { --aether-ring-s2: 16; }
+body div.pie:is([style*="rgb(215, 126, 13) 15%,"], [style*="rgb(215, 126, 13) 15% "]) { --aether-ring-s2: 15; }
+body div.pie:is([style*="rgb(215, 126, 13) 14%,"], [style*="rgb(215, 126, 13) 14% "]) { --aether-ring-s2: 14; }
+body div.pie:is([style*="rgb(215, 126, 13) 13%,"], [style*="rgb(215, 126, 13) 13% "]) { --aether-ring-s2: 13; }
+body div.pie:is([style*="rgb(215, 126, 13) 12%,"], [style*="rgb(215, 126, 13) 12% "]) { --aether-ring-s2: 12; }
+body div.pie:is([style*="rgb(215, 126, 13) 11%,"], [style*="rgb(215, 126, 13) 11% "]) { --aether-ring-s2: 11; }
+body div.pie:is([style*="rgb(215, 126, 13) 10%,"], [style*="rgb(215, 126, 13) 10% "]) { --aether-ring-s2: 10; }
+body div.pie:is([style*="rgb(215, 126, 13) 9%,"], [style*="rgb(215, 126, 13) 9% "]) { --aether-ring-s2: 9; }
+body div.pie:is([style*="rgb(215, 126, 13) 8%,"], [style*="rgb(215, 126, 13) 8% "]) { --aether-ring-s2: 8; }
+body div.pie:is([style*="rgb(215, 126, 13) 7%,"], [style*="rgb(215, 126, 13) 7% "]) { --aether-ring-s2: 7; }
+body div.pie:is([style*="rgb(215, 126, 13) 6%,"], [style*="rgb(215, 126, 13) 6% "]) { --aether-ring-s2: 6; }
+body div.pie:is([style*="rgb(215, 126, 13) 5%,"], [style*="rgb(215, 126, 13) 5% "]) { --aether-ring-s2: 5; }
+body div.pie:is([style*="rgb(215, 126, 13) 4%,"], [style*="rgb(215, 126, 13) 4% "]) { --aether-ring-s2: 4; }
+body div.pie:is([style*="rgb(215, 126, 13) 3%,"], [style*="rgb(215, 126, 13) 3% "]) { --aether-ring-s2: 3; }
+body div.pie:is([style*="rgb(215, 126, 13) 2%,"], [style*="rgb(215, 126, 13) 2% "]) { --aether-ring-s2: 2; }
+body div.pie:is([style*="rgb(215, 126, 13) 1%,"], [style*="rgb(215, 126, 13) 1% "]) { --aether-ring-s2: 1; }
+body div.pie:is([style*="rgb(215, 126, 13) 0%,"], [style*="rgb(215, 126, 13) 0% "]) { --aether-ring-s2: 0; }
+body div.pie:is([style*="rgb(212, 172, 13) 100%,"], [style*="rgb(212, 172, 13) 100% "]) { --aether-ring-s3: 100; }
+body div.pie:is([style*="rgb(212, 172, 13) 99%,"], [style*="rgb(212, 172, 13) 99% "]) { --aether-ring-s3: 99; }
+body div.pie:is([style*="rgb(212, 172, 13) 98%,"], [style*="rgb(212, 172, 13) 98% "]) { --aether-ring-s3: 98; }
+body div.pie:is([style*="rgb(212, 172, 13) 97%,"], [style*="rgb(212, 172, 13) 97% "]) { --aether-ring-s3: 97; }
+body div.pie:is([style*="rgb(212, 172, 13) 96%,"], [style*="rgb(212, 172, 13) 96% "]) { --aether-ring-s3: 96; }
+body div.pie:is([style*="rgb(212, 172, 13) 95%,"], [style*="rgb(212, 172, 13) 95% "]) { --aether-ring-s3: 95; }
+body div.pie:is([style*="rgb(212, 172, 13) 94%,"], [style*="rgb(212, 172, 13) 94% "]) { --aether-ring-s3: 94; }
+body div.pie:is([style*="rgb(212, 172, 13) 93%,"], [style*="rgb(212, 172, 13) 93% "]) { --aether-ring-s3: 93; }
+body div.pie:is([style*="rgb(212, 172, 13) 92%,"], [style*="rgb(212, 172, 13) 92% "]) { --aether-ring-s3: 92; }
+body div.pie:is([style*="rgb(212, 172, 13) 91%,"], [style*="rgb(212, 172, 13) 91% "]) { --aether-ring-s3: 91; }
+body div.pie:is([style*="rgb(212, 172, 13) 90%,"], [style*="rgb(212, 172, 13) 90% "]) { --aether-ring-s3: 90; }
+body div.pie:is([style*="rgb(212, 172, 13) 89%,"], [style*="rgb(212, 172, 13) 89% "]) { --aether-ring-s3: 89; }
+body div.pie:is([style*="rgb(212, 172, 13) 88%,"], [style*="rgb(212, 172, 13) 88% "]) { --aether-ring-s3: 88; }
+body div.pie:is([style*="rgb(212, 172, 13) 87%,"], [style*="rgb(212, 172, 13) 87% "]) { --aether-ring-s3: 87; }
+body div.pie:is([style*="rgb(212, 172, 13) 86%,"], [style*="rgb(212, 172, 13) 86% "]) { --aether-ring-s3: 86; }
+body div.pie:is([style*="rgb(212, 172, 13) 85%,"], [style*="rgb(212, 172, 13) 85% "]) { --aether-ring-s3: 85; }
+body div.pie:is([style*="rgb(212, 172, 13) 84%,"], [style*="rgb(212, 172, 13) 84% "]) { --aether-ring-s3: 84; }
+body div.pie:is([style*="rgb(212, 172, 13) 83%,"], [style*="rgb(212, 172, 13) 83% "]) { --aether-ring-s3: 83; }
+body div.pie:is([style*="rgb(212, 172, 13) 82%,"], [style*="rgb(212, 172, 13) 82% "]) { --aether-ring-s3: 82; }
+body div.pie:is([style*="rgb(212, 172, 13) 81%,"], [style*="rgb(212, 172, 13) 81% "]) { --aether-ring-s3: 81; }
+body div.pie:is([style*="rgb(212, 172, 13) 80%,"], [style*="rgb(212, 172, 13) 80% "]) { --aether-ring-s3: 80; }
+body div.pie:is([style*="rgb(212, 172, 13) 79%,"], [style*="rgb(212, 172, 13) 79% "]) { --aether-ring-s3: 79; }
+body div.pie:is([style*="rgb(212, 172, 13) 78%,"], [style*="rgb(212, 172, 13) 78% "]) { --aether-ring-s3: 78; }
+body div.pie:is([style*="rgb(212, 172, 13) 77%,"], [style*="rgb(212, 172, 13) 77% "]) { --aether-ring-s3: 77; }
+body div.pie:is([style*="rgb(212, 172, 13) 76%,"], [style*="rgb(212, 172, 13) 76% "]) { --aether-ring-s3: 76; }
+body div.pie:is([style*="rgb(212, 172, 13) 75%,"], [style*="rgb(212, 172, 13) 75% "]) { --aether-ring-s3: 75; }
+body div.pie:is([style*="rgb(212, 172, 13) 74%,"], [style*="rgb(212, 172, 13) 74% "]) { --aether-ring-s3: 74; }
+body div.pie:is([style*="rgb(212, 172, 13) 73%,"], [style*="rgb(212, 172, 13) 73% "]) { --aether-ring-s3: 73; }
+body div.pie:is([style*="rgb(212, 172, 13) 72%,"], [style*="rgb(212, 172, 13) 72% "]) { --aether-ring-s3: 72; }
+body div.pie:is([style*="rgb(212, 172, 13) 71%,"], [style*="rgb(212, 172, 13) 71% "]) { --aether-ring-s3: 71; }
+body div.pie:is([style*="rgb(212, 172, 13) 70%,"], [style*="rgb(212, 172, 13) 70% "]) { --aether-ring-s3: 70; }
+body div.pie:is([style*="rgb(212, 172, 13) 69%,"], [style*="rgb(212, 172, 13) 69% "]) { --aether-ring-s3: 69; }
+body div.pie:is([style*="rgb(212, 172, 13) 68%,"], [style*="rgb(212, 172, 13) 68% "]) { --aether-ring-s3: 68; }
+body div.pie:is([style*="rgb(212, 172, 13) 67%,"], [style*="rgb(212, 172, 13) 67% "]) { --aether-ring-s3: 67; }
+body div.pie:is([style*="rgb(212, 172, 13) 66%,"], [style*="rgb(212, 172, 13) 66% "]) { --aether-ring-s3: 66; }
+body div.pie:is([style*="rgb(212, 172, 13) 65%,"], [style*="rgb(212, 172, 13) 65% "]) { --aether-ring-s3: 65; }
+body div.pie:is([style*="rgb(212, 172, 13) 64%,"], [style*="rgb(212, 172, 13) 64% "]) { --aether-ring-s3: 64; }
+body div.pie:is([style*="rgb(212, 172, 13) 63%,"], [style*="rgb(212, 172, 13) 63% "]) { --aether-ring-s3: 63; }
+body div.pie:is([style*="rgb(212, 172, 13) 62%,"], [style*="rgb(212, 172, 13) 62% "]) { --aether-ring-s3: 62; }
+body div.pie:is([style*="rgb(212, 172, 13) 61%,"], [style*="rgb(212, 172, 13) 61% "]) { --aether-ring-s3: 61; }
+body div.pie:is([style*="rgb(212, 172, 13) 60%,"], [style*="rgb(212, 172, 13) 60% "]) { --aether-ring-s3: 60; }
+body div.pie:is([style*="rgb(212, 172, 13) 59%,"], [style*="rgb(212, 172, 13) 59% "]) { --aether-ring-s3: 59; }
+body div.pie:is([style*="rgb(212, 172, 13) 58%,"], [style*="rgb(212, 172, 13) 58% "]) { --aether-ring-s3: 58; }
+body div.pie:is([style*="rgb(212, 172, 13) 57%,"], [style*="rgb(212, 172, 13) 57% "]) { --aether-ring-s3: 57; }
+body div.pie:is([style*="rgb(212, 172, 13) 56%,"], [style*="rgb(212, 172, 13) 56% "]) { --aether-ring-s3: 56; }
+body div.pie:is([style*="rgb(212, 172, 13) 55%,"], [style*="rgb(212, 172, 13) 55% "]) { --aether-ring-s3: 55; }
+body div.pie:is([style*="rgb(212, 172, 13) 54%,"], [style*="rgb(212, 172, 13) 54% "]) { --aether-ring-s3: 54; }
+body div.pie:is([style*="rgb(212, 172, 13) 53%,"], [style*="rgb(212, 172, 13) 53% "]) { --aether-ring-s3: 53; }
+body div.pie:is([style*="rgb(212, 172, 13) 52%,"], [style*="rgb(212, 172, 13) 52% "]) { --aether-ring-s3: 52; }
+body div.pie:is([style*="rgb(212, 172, 13) 51%,"], [style*="rgb(212, 172, 13) 51% "]) { --aether-ring-s3: 51; }
+body div.pie:is([style*="rgb(212, 172, 13) 50%,"], [style*="rgb(212, 172, 13) 50% "]) { --aether-ring-s3: 50; }
+body div.pie:is([style*="rgb(212, 172, 13) 49%,"], [style*="rgb(212, 172, 13) 49% "]) { --aether-ring-s3: 49; }
+body div.pie:is([style*="rgb(212, 172, 13) 48%,"], [style*="rgb(212, 172, 13) 48% "]) { --aether-ring-s3: 48; }
+body div.pie:is([style*="rgb(212, 172, 13) 47%,"], [style*="rgb(212, 172, 13) 47% "]) { --aether-ring-s3: 47; }
+body div.pie:is([style*="rgb(212, 172, 13) 46%,"], [style*="rgb(212, 172, 13) 46% "]) { --aether-ring-s3: 46; }
+body div.pie:is([style*="rgb(212, 172, 13) 45%,"], [style*="rgb(212, 172, 13) 45% "]) { --aether-ring-s3: 45; }
+body div.pie:is([style*="rgb(212, 172, 13) 44%,"], [style*="rgb(212, 172, 13) 44% "]) { --aether-ring-s3: 44; }
+body div.pie:is([style*="rgb(212, 172, 13) 43%,"], [style*="rgb(212, 172, 13) 43% "]) { --aether-ring-s3: 43; }
+body div.pie:is([style*="rgb(212, 172, 13) 42%,"], [style*="rgb(212, 172, 13) 42% "]) { --aether-ring-s3: 42; }
+body div.pie:is([style*="rgb(212, 172, 13) 41%,"], [style*="rgb(212, 172, 13) 41% "]) { --aether-ring-s3: 41; }
+body div.pie:is([style*="rgb(212, 172, 13) 40%,"], [style*="rgb(212, 172, 13) 40% "]) { --aether-ring-s3: 40; }
+body div.pie:is([style*="rgb(212, 172, 13) 39%,"], [style*="rgb(212, 172, 13) 39% "]) { --aether-ring-s3: 39; }
+body div.pie:is([style*="rgb(212, 172, 13) 38%,"], [style*="rgb(212, 172, 13) 38% "]) { --aether-ring-s3: 38; }
+body div.pie:is([style*="rgb(212, 172, 13) 37%,"], [style*="rgb(212, 172, 13) 37% "]) { --aether-ring-s3: 37; }
+body div.pie:is([style*="rgb(212, 172, 13) 36%,"], [style*="rgb(212, 172, 13) 36% "]) { --aether-ring-s3: 36; }
+body div.pie:is([style*="rgb(212, 172, 13) 35%,"], [style*="rgb(212, 172, 13) 35% "]) { --aether-ring-s3: 35; }
+body div.pie:is([style*="rgb(212, 172, 13) 34%,"], [style*="rgb(212, 172, 13) 34% "]) { --aether-ring-s3: 34; }
+body div.pie:is([style*="rgb(212, 172, 13) 33%,"], [style*="rgb(212, 172, 13) 33% "]) { --aether-ring-s3: 33; }
+body div.pie:is([style*="rgb(212, 172, 13) 32%,"], [style*="rgb(212, 172, 13) 32% "]) { --aether-ring-s3: 32; }
+body div.pie:is([style*="rgb(212, 172, 13) 31%,"], [style*="rgb(212, 172, 13) 31% "]) { --aether-ring-s3: 31; }
+body div.pie:is([style*="rgb(212, 172, 13) 30%,"], [style*="rgb(212, 172, 13) 30% "]) { --aether-ring-s3: 30; }
+body div.pie:is([style*="rgb(212, 172, 13) 29%,"], [style*="rgb(212, 172, 13) 29% "]) { --aether-ring-s3: 29; }
+body div.pie:is([style*="rgb(212, 172, 13) 28%,"], [style*="rgb(212, 172, 13) 28% "]) { --aether-ring-s3: 28; }
+body div.pie:is([style*="rgb(212, 172, 13) 27%,"], [style*="rgb(212, 172, 13) 27% "]) { --aether-ring-s3: 27; }
+body div.pie:is([style*="rgb(212, 172, 13) 26%,"], [style*="rgb(212, 172, 13) 26% "]) { --aether-ring-s3: 26; }
+body div.pie:is([style*="rgb(212, 172, 13) 25%,"], [style*="rgb(212, 172, 13) 25% "]) { --aether-ring-s3: 25; }
+body div.pie:is([style*="rgb(212, 172, 13) 24%,"], [style*="rgb(212, 172, 13) 24% "]) { --aether-ring-s3: 24; }
+body div.pie:is([style*="rgb(212, 172, 13) 23%,"], [style*="rgb(212, 172, 13) 23% "]) { --aether-ring-s3: 23; }
+body div.pie:is([style*="rgb(212, 172, 13) 22%,"], [style*="rgb(212, 172, 13) 22% "]) { --aether-ring-s3: 22; }
+body div.pie:is([style*="rgb(212, 172, 13) 21%,"], [style*="rgb(212, 172, 13) 21% "]) { --aether-ring-s3: 21; }
+body div.pie:is([style*="rgb(212, 172, 13) 20%,"], [style*="rgb(212, 172, 13) 20% "]) { --aether-ring-s3: 20; }
+body div.pie:is([style*="rgb(212, 172, 13) 19%,"], [style*="rgb(212, 172, 13) 19% "]) { --aether-ring-s3: 19; }
+body div.pie:is([style*="rgb(212, 172, 13) 18%,"], [style*="rgb(212, 172, 13) 18% "]) { --aether-ring-s3: 18; }
+body div.pie:is([style*="rgb(212, 172, 13) 17%,"], [style*="rgb(212, 172, 13) 17% "]) { --aether-ring-s3: 17; }
+body div.pie:is([style*="rgb(212, 172, 13) 16%,"], [style*="rgb(212, 172, 13) 16% "]) { --aether-ring-s3: 16; }
+body div.pie:is([style*="rgb(212, 172, 13) 15%,"], [style*="rgb(212, 172, 13) 15% "]) { --aether-ring-s3: 15; }
+body div.pie:is([style*="rgb(212, 172, 13) 14%,"], [style*="rgb(212, 172, 13) 14% "]) { --aether-ring-s3: 14; }
+body div.pie:is([style*="rgb(212, 172, 13) 13%,"], [style*="rgb(212, 172, 13) 13% "]) { --aether-ring-s3: 13; }
+body div.pie:is([style*="rgb(212, 172, 13) 12%,"], [style*="rgb(212, 172, 13) 12% "]) { --aether-ring-s3: 12; }
+body div.pie:is([style*="rgb(212, 172, 13) 11%,"], [style*="rgb(212, 172, 13) 11% "]) { --aether-ring-s3: 11; }
+body div.pie:is([style*="rgb(212, 172, 13) 10%,"], [style*="rgb(212, 172, 13) 10% "]) { --aether-ring-s3: 10; }
+body div.pie:is([style*="rgb(212, 172, 13) 9%,"], [style*="rgb(212, 172, 13) 9% "]) { --aether-ring-s3: 9; }
+body div.pie:is([style*="rgb(212, 172, 13) 8%,"], [style*="rgb(212, 172, 13) 8% "]) { --aether-ring-s3: 8; }
+body div.pie:is([style*="rgb(212, 172, 13) 7%,"], [style*="rgb(212, 172, 13) 7% "]) { --aether-ring-s3: 7; }
+body div.pie:is([style*="rgb(212, 172, 13) 6%,"], [style*="rgb(212, 172, 13) 6% "]) { --aether-ring-s3: 6; }
+body div.pie:is([style*="rgb(212, 172, 13) 5%,"], [style*="rgb(212, 172, 13) 5% "]) { --aether-ring-s3: 5; }
+body div.pie:is([style*="rgb(212, 172, 13) 4%,"], [style*="rgb(212, 172, 13) 4% "]) { --aether-ring-s3: 4; }
+body div.pie:is([style*="rgb(212, 172, 13) 3%,"], [style*="rgb(212, 172, 13) 3% "]) { --aether-ring-s3: 3; }
+body div.pie:is([style*="rgb(212, 172, 13) 2%,"], [style*="rgb(212, 172, 13) 2% "]) { --aether-ring-s3: 2; }
+body div.pie:is([style*="rgb(212, 172, 13) 1%,"], [style*="rgb(212, 172, 13) 1% "]) { --aether-ring-s3: 1; }
+body div.pie:is([style*="rgb(212, 172, 13) 0%,"], [style*="rgb(212, 172, 13) 0% "]) { --aether-ring-s3: 0; }
 body .usage-disk.sys > span:first-child {
     background-color: var(--aether-violet);
 }
