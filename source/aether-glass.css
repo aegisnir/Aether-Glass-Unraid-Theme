@@ -3046,6 +3046,11 @@ html body:has(> .boot-title) {
         corner-shape: squircle;
     }
 }
+/* No pinned background layer here: <html> already paints the aurora, and the card's blur would
+   trap that fixed layer inside the card, drawing a bright violet, square-cornered box behind it. */
+html body:has(> .boot-title)::before {
+    content: none;
+}
 html body .boot-title {
     margin: 0 0 var(--sp-4);
     font-size: clamp(2.6rem, 5vw, 4rem);
@@ -4067,7 +4072,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01m-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01n-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
