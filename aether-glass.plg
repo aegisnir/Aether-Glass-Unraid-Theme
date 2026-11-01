@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.31m-dev">
+<!ENTITY version   "2026.10.31n-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "b090c685dae119abfb0d64db92e325381daa385d1e1c06d6a2e8f68a90e46e85">
+<!ENTITY sha_css     "8e458bb4a5c0f9a0e579edcf45f8d1194f8263e71853bf9f40894ff23b3c5b81">
 <!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -26,6 +26,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.10.31n
+- Log and update windows: the title pill has an even 12px gap on all four sides, with the window's corners rounded to match.
+
 ### 2026.10.31m
 - Log and update windows: the title is a pill again, 8px from the edges, and the window's corners are rounder to match it.
 - Search suggestions, right-click menus and dropdown lists: row corners now run parallel to the menu's corners.
