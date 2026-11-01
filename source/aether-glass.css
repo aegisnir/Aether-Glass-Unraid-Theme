@@ -481,23 +481,17 @@ body div.pie {
     --aether-ring-r: 40px;                    /* radius to the middle of the ring */
     /* slice k runs from --_sk to --_ek (percent); slices that aren't there are empty */
     --_s1: 0;
-    --_e1: var(--aether-ring-s2, var(--aether-ring-s3, var(--aether-ring-s4, var(--aether-ring-s5, var(--aether-ring-s6, var(--aether-ring-p, 0))))));
+    --_e1: var(--aether-ring-s2, var(--aether-ring-s3, var(--aether-ring-s4, var(--aether-ring-p, 0))));
     --_len1: calc(var(--_e1) - var(--_s1));
     --_s2: var(--_e1);
-    --_e2: var(--aether-ring-s3, var(--aether-ring-s4, var(--aether-ring-s5, var(--aether-ring-s6, var(--aether-ring-p, 0)))));
+    --_e2: var(--aether-ring-s3, var(--aether-ring-s4, var(--aether-ring-p, 0)));
     --_len2: calc(var(--_e2) - var(--_s2));
     --_s3: var(--_e2);
-    --_e3: var(--aether-ring-s4, var(--aether-ring-s5, var(--aether-ring-s6, var(--aether-ring-p, 0))));
+    --_e3: var(--aether-ring-s4, var(--aether-ring-p, 0));
     --_len3: calc(var(--_e3) - var(--_s3));
     --_s4: var(--_e3);
-    --_e4: var(--aether-ring-s5, var(--aether-ring-s6, var(--aether-ring-p, 0)));
+    --_e4: var(--aether-ring-p, 0);
     --_len4: calc(var(--_e4) - var(--_s4));
-    --_s5: var(--_e4);
-    --_e5: var(--aether-ring-s6, var(--aether-ring-p, 0));
-    --_len5: calc(var(--_e5) - var(--_s5));
-    --_s6: var(--_e5);
-    --_e6: var(--aether-ring-p, 0);
-    --_len6: calc(var(--_e6) - var(--_s6));
     position: relative;
     isolation: isolate;
     background: none !important;              /* hide Unraid's own wheel */
@@ -509,8 +503,6 @@ body div.pie > span:first-child {
     --aether-ring-k2: var(--aether-ring-c);
     --aether-ring-k3: var(--aether-ring-c);
     --aether-ring-k4: var(--aether-ring-c);
-    --aether-ring-k5: var(--aether-ring-c);
-    --aether-ring-k6: var(--aether-ring-c);
     color: var(--aether-ring-c) !important;
 }
 body div.pie > span:first-child[style*="rgb(230, 138, 0)"] { --aether-ring-c: #f59e0b; }
@@ -558,20 +550,12 @@ body div.pie > span:first-child::before {
     --_c4: min(8.6deg, calc(var(--_len4) * 1.8deg));   /* round end's angular half-width, at most half the slice */
     --_r4: min(calc(var(--aether-ring-t) / 2), max(0px, calc(var(--_len4) * 100px)));   /* no dot on an empty slice */
     --_b4: calc(var(--_e4) * 3.6deg);
-    --_len5: calc(var(--_e5) - var(--_s5));
-    --_c5: min(8.6deg, calc(var(--_len5) * 1.8deg));   /* round end's angular half-width, at most half the slice */
-    --_r5: min(calc(var(--aether-ring-t) / 2), max(0px, calc(var(--_len5) * 100px)));   /* no dot on an empty slice */
-    --_b5: calc(var(--_e5) * 3.6deg);
-    --_len6: calc(var(--_e6) - var(--_s6));
-    --_c6: min(8.6deg, calc(var(--_len6) * 1.8deg));   /* round end's angular half-width, at most half the slice */
-    --_r6: min(calc(var(--aether-ring-t) / 2), max(0px, calc(var(--_len6) * 100px)));   /* no dot on an empty slice */
-    --_b6: calc(var(--_e6) * 3.6deg);
     --_r0: min(calc(var(--aether-ring-t) / 2), max(0px, calc(var(--aether-ring-p, 0) * 100px)));
-    background: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(var(--_r4) - 0.5px), transparent var(--_r4)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b5))) calc(50% - var(--aether-ring-r) * cos(var(--_b5))), oklch(from var(--aether-ring-k5) calc(l + 0.04) c h) calc(var(--_r5) - 0.5px), transparent var(--_r5)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b6))) calc(50% - var(--aether-ring-r) * cos(var(--_b6))), oklch(from var(--aether-ring-k6) calc(l + 0.04) c h) calc(var(--_r6) - 0.5px), transparent var(--_r6)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(var(--_s1) * 3.6deg), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_b1) - var(--_c1)), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) var(--_b1), color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) calc(var(--_s2) * 3.6deg), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_b2) - var(--_c2)), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) var(--_b2), color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) calc(var(--_s3) * 3.6deg), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_b3) - var(--_c3)), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) var(--_b3), color-mix(in oklch, oklch(from var(--aether-ring-k4) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len4) * 4, 100) * 1%), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h)) calc(var(--_s4) * 3.6deg), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(var(--_b4) - var(--_c4)), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) var(--_b4), color-mix(in oklch, oklch(from var(--aether-ring-k5) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len5) * 4, 100) * 1%), oklch(from var(--aether-ring-k5) calc(l + 0.04) c h)) calc(var(--_s5) * 3.6deg), oklch(from var(--aether-ring-k5) calc(l + 0.04) c h) calc(var(--_b5) - var(--_c5)), oklch(from var(--aether-ring-k5) calc(l + 0.04) c h) var(--_b5), color-mix(in oklch, oklch(from var(--aether-ring-k6) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len6) * 4, 100) * 1%), oklch(from var(--aether-ring-k6) calc(l + 0.04) c h)) calc(var(--_s6) * 3.6deg), oklch(from var(--aether-ring-k6) calc(l + 0.04) c h) calc(var(--_b6) - var(--_c6)), oklch(from var(--aether-ring-k6) calc(l + 0.04) c h) var(--_b6), color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(var(--aether-ring-p, 0) * 3.6deg));
-    -webkit-mask: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), #000 calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), #000 calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), #000 calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), #000 calc(var(--_r4) - 0.5px), transparent var(--_r4)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b5))) calc(50% - var(--aether-ring-r) * cos(var(--_b5))), #000 calc(var(--_r5) - 0.5px), transparent var(--_r5)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b6))) calc(50% - var(--aether-ring-r) * cos(var(--_b6))), #000 calc(var(--_r6) - 0.5px), transparent var(--_r6)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), #000 calc(var(--_r0) - 0.5px), transparent var(--_r0)), var(--_ring), conic-gradient(#000 calc(var(--aether-ring-p, 0) * 3.6deg), transparent 0);
-    -webkit-mask-composite: source-over, source-over, source-over, source-over, source-over, source-over, source-over, source-in;
-    mask: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), #000 calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), #000 calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), #000 calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), #000 calc(var(--_r4) - 0.5px), transparent var(--_r4)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b5))) calc(50% - var(--aether-ring-r) * cos(var(--_b5))), #000 calc(var(--_r5) - 0.5px), transparent var(--_r5)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b6))) calc(50% - var(--aether-ring-r) * cos(var(--_b6))), #000 calc(var(--_r6) - 0.5px), transparent var(--_r6)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), #000 calc(var(--_r0) - 0.5px), transparent var(--_r0)), var(--_ring), conic-gradient(#000 calc(var(--aether-ring-p, 0) * 3.6deg), transparent 0);
-    mask-composite: add, add, add, add, add, add, add, intersect;
+    background: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(var(--_r4) - 0.5px), transparent var(--_r4)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(var(--_s1) * 3.6deg), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_b1) - var(--_c1)), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) var(--_b1), color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) calc(var(--_s2) * 3.6deg), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_b2) - var(--_c2)), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) var(--_b2), color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) calc(var(--_s3) * 3.6deg), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_b3) - var(--_c3)), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) var(--_b3), color-mix(in oklch, oklch(from var(--aether-ring-k4) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len4) * 4, 100) * 1%), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h)) calc(var(--_s4) * 3.6deg), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(var(--_b4) - var(--_c4)), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) var(--_b4), color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(var(--aether-ring-p, 0) * 3.6deg));
+    -webkit-mask: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), #000 calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), #000 calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), #000 calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), #000 calc(var(--_r4) - 0.5px), transparent var(--_r4)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), #000 calc(var(--_r0) - 0.5px), transparent var(--_r0)), var(--_ring), conic-gradient(#000 calc(var(--aether-ring-p, 0) * 3.6deg), transparent 0);
+    -webkit-mask-composite: source-over, source-over, source-over, source-over, source-over, source-in;
+    mask: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), #000 calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), #000 calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), #000 calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), #000 calc(var(--_r4) - 0.5px), transparent var(--_r4)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), #000 calc(var(--_r0) - 0.5px), transparent var(--_r0)), var(--_ring), conic-gradient(#000 calc(var(--aether-ring-p, 0) * 3.6deg), transparent 0);
+    mask-composite: add, add, add, add, add, intersect;
     filter: drop-shadow(0 0 4px color-mix(in oklch, var(--aether-ring-c) 40%, transparent));
 }
 /* RAM: the outer ring is the total in the status colour, like the other pies; the inner rings
@@ -580,23 +564,17 @@ body div.pie#sys0 {
     --aether-ring-k1: #4a89f2;   /* System: blue */
     --aether-ring-k2: #ae5ea8;   /* 1st hook (usually Docker): mauve */
     --aether-ring-k3: #bb6802;   /* 2nd hook (usually VMs): bronze */
-    --aether-ring-k4: #01a2c5;   /* 3rd hook: teal */
-    --aether-ring-k5: #9e4766;   /* 4th hook: wine */
-    --aether-ring-k6: #9c7c0b;   /* 5th hook and any after it: gold */
+    --aether-ring-k4: #01a2c5;   /* 3rd hook and any after it: teal */
 }
 body div.pie#sys0 > span:first-child {
     /* outer ring: one slice, 0 to the total */
     --_s2: var(--aether-ring-p, 0);
     --_s3: var(--aether-ring-p, 0);
     --_s4: var(--aether-ring-p, 0);
-    --_s5: var(--aether-ring-p, 0);
-    --_s6: var(--aether-ring-p, 0);
     --_e1: var(--aether-ring-p, 0);
     --_e2: var(--aether-ring-p, 0);
     --_e3: var(--aether-ring-p, 0);
     --_e4: var(--aether-ring-p, 0);
-    --_e5: var(--aether-ring-p, 0);
-    --_e6: var(--aether-ring-p, 0);
 }
 body tbody[title*="Memory"] i.ups.fa-circle { filter: none; }
 /* The legend is written as HTML text, so its colours are hex; match rgb() too in case a
@@ -605,18 +583,18 @@ body i.ups.fa-circle:is([style*="#787878" i], [style*="rgb(120, 120, 120)"]) { c
 body i.ups.fa-circle:is([style*="#d77e0d" i], [style*="rgb(215, 126, 13)"]) { color: #ae5ea8 !important; }
 body i.ups.fa-circle:is([style*="#d4ac0d" i], [style*="rgb(212, 172, 13)"]) { color: #bb6802 !important; }
 body i.ups.fa-circle:is([style*="#cd5c5c" i], [style*="rgb(205, 92, 92)"]) { color: #01a2c5 !important; }
-body i.ups.fa-circle:is([style*="#ffc0cb" i], [style*="rgb(255, 192, 203)"]) { color: #9e4766 !important; }
-body i.ups.fa-circle:is([style*="#e6e6fa" i], [style*="rgb(230, 230, 250)"]) { color: #9c7c0b !important; }
-body i.ups.fa-circle:is([style*="#9370db" i], [style*="rgb(147, 112, 219)"]) { color: #9c7c0b !important; }
-body i.ups.fa-circle:is([style*="#7cfc00" i], [style*="rgb(124, 252, 0)"]) { color: #9c7c0b !important; }
-body i.ups.fa-circle:is([style*="#228b22" i], [style*="rgb(34, 139, 34)"]) { color: #9c7c0b !important; }
-body i.ups.fa-circle:is([style*="#00ffff" i], [style*="rgb(0, 255, 255)"]) { color: #9c7c0b !important; }
-body i.ups.fa-circle:is([style*="#4682b4" i], [style*="rgb(70, 130, 180)"]) { color: #9c7c0b !important; }
+body i.ups.fa-circle:is([style*="#ffc0cb" i], [style*="rgb(255, 192, 203)"]) { color: #01a2c5 !important; }
+body i.ups.fa-circle:is([style*="#e6e6fa" i], [style*="rgb(230, 230, 250)"]) { color: #01a2c5 !important; }
+body i.ups.fa-circle:is([style*="#9370db" i], [style*="rgb(147, 112, 219)"]) { color: #01a2c5 !important; }
+body i.ups.fa-circle:is([style*="#7cfc00" i], [style*="rgb(124, 252, 0)"]) { color: #01a2c5 !important; }
+body i.ups.fa-circle:is([style*="#228b22" i], [style*="rgb(34, 139, 34)"]) { color: #01a2c5 !important; }
+body i.ups.fa-circle:is([style*="#00ffff" i], [style*="rgb(0, 255, 255)"]) { color: #01a2c5 !important; }
+body i.ups.fa-circle:is([style*="#4682b4" i], [style*="rgb(70, 130, 180)"]) { color: #01a2c5 !important; }
 
 /* RAM pie, detail rings (generated, see gen-pie-css.py: inner_rings).  Geometry in the pie's
    own 92px units: the outer ring is 10px wide at radius 36-46; the detail rings share the
-   zone from radius 34 inwards with 1.5px gaps, as thick as fits (max 7px, min 1.75px) while
-   leaving a centre of at least 16px radius for the number. */
+   zone from radius 34 inwards with 1.5px gaps, as thick as fits (max 7px) while leaving a
+   centre of at least 16px radius for the number. */
 body div.pie#sys0 {
     --aether-ring-t: 10px;
     --aether-ring-r: 41px;
@@ -624,20 +602,15 @@ body div.pie#sys0 {
     --_p2: clamp(0, var(--_len2) * 100, 1);   /* 1 if type 2 is there */
     --_p3: clamp(0, var(--_len3) * 100, 1);   /* 1 if type 3 is there */
     --_p4: clamp(0, var(--_len4) * 100, 1);   /* 1 if type 4 is there */
-    --_p5: clamp(0, var(--_len5) * 100, 1);   /* 1 if type 5 is there */
-    --_p6: clamp(0, var(--_len6) * 100, 1);   /* 1 if type 6 is there */
-    --_n: calc(var(--_p1) + var(--_p2) + var(--_p3) + var(--_p4) + var(--_p5) + var(--_p6));
+    --_n: calc(var(--_p1) + var(--_p2) + var(--_p3) + var(--_p4));
     --_t: clamp(1.75, (18 - (var(--_n) - 1) * 1.5) / max(var(--_n), 1), 7);   /* ring thickness */
     --_d: calc(34 - var(--_n) * var(--_t) - (var(--_n) - 1) * 1.5);              /* centre radius */
     --_r1: calc(34 - var(--_t) / 2 - 0 * (var(--_t) + 1.5));   /* ring 1 centre radius */
     --_r2: calc(34 - var(--_t) / 2 - 1 * (var(--_t) + 1.5));   /* ring 2 centre radius */
     --_r3: calc(34 - var(--_t) / 2 - 2 * (var(--_t) + 1.5));   /* ring 3 centre radius */
     --_r4: calc(34 - var(--_t) / 2 - 3 * (var(--_t) + 1.5));   /* ring 4 centre radius */
-    --_r5: calc(34 - var(--_t) / 2 - 4 * (var(--_t) + 1.5));   /* ring 5 centre radius */
-    --_r6: calc(34 - var(--_t) / 2 - 5 * (var(--_t) + 1.5));   /* ring 6 centre radius */
     background: radial-gradient(circle, #150d2c calc(var(--_d) * 1px - 0.5px), transparent calc(var(--_d) * 1px)) !important;
 }
-body div.pie#sys0::after { display: none; }   /* Unraid's centre disc: painted above instead */
 body div.pie#sys0 > span:first-child { font-size: min(19px, calc(var(--_d) * 0.85px)) !important; }
 /* Unraid swaps the number for the size on hover by hiding one span and showing the other.
    Both spans carry rings, so they stay displayed and only their TEXT swaps. */
@@ -664,50 +637,80 @@ body div.pie#sys0:hover > span:first-child::before,
 body div.pie#sys0:hover > span:first-child::after { display: none !important; }
 body div.pie#sys0:hover { background: radial-gradient(circle, #150d2c calc(var(--_d) * 1.353px - 0.5px), transparent calc(var(--_d) * 1.353px)) !important; }
 body div.pie#sys0::before,
-body div.pie#sys0 > span.var0::before {
+body div.pie#sys0::after,
+body div.pie#sys0 > span.var0::before,
+body div.pie#sys0 > span.var0::after {
     transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);   /* springy: overshoots a touch, then settles */
 }
 @media (prefers-reduced-motion: reduce) {
     body div.pie#sys0::before,
-    body div.pie#sys0 > span.var0::before { transition: none; }
+    body div.pie#sys0::after,
+    body div.pie#sys0 > span.var0::before,
+    body div.pie#sys0 > span.var0::after { transition: none; }
 }
 body div.pie#sys0:hover::before,
-body div.pie#sys0:hover > span.var0::before { transform: scale(1.353); }
+body div.pie#sys0:hover::after,
+body div.pie#sys0:hover > span.var0::before,
+body div.pie#sys0:hover > span.var0::after { transform: scale(1.353); }
 body div.pie#sys0::before {
     content: "";
     display: block;
     position: absolute;
     inset: 0;
-    box-sizing: border-box;
+    width: auto;
+    height: auto;
     border-radius: 50%;
-    border: solid transparent;
-    border-width: calc(46px - calc((var(--_r1) - var(--_t) / 2 - 0.75) * 1px));
-    padding: calc(calc((var(--_r1) - var(--_t) / 2 - 0.75) * 1px) - calc((var(--_r2) - var(--_t) / 2 - 0.75) * 1px));
+    box-shadow: none;
     pointer-events: none;
     font-size: 0;
-    background: radial-gradient(circle at calc(50% + var(--_r1) * 1px * sin(calc(var(--_len1) * 3.6deg))) calc(50% - var(--_r1) * 1px * cos(calc(var(--_len1) * 3.6deg))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p1) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p1) * 1px)), radial-gradient(circle at calc(50% + var(--_r1) * 1px * sin(0deg)) calc(50% - var(--_r1) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p1) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p1) * 1px)), radial-gradient(circle at calc(50% + var(--_r2) * 1px * sin(calc(var(--_len2) * 3.6deg))) calc(50% - var(--_r2) * 1px * cos(calc(var(--_len2) * 3.6deg))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p2) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p2) * 1px)), radial-gradient(circle at calc(50% + var(--_r2) * 1px * sin(0deg)) calc(50% - var(--_r2) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p2) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p2) * 1px)), radial-gradient(circle at calc(50% + var(--_r3) * 1px * sin(calc(var(--_len3) * 3.6deg))) calc(50% - var(--_r3) * 1px * cos(calc(var(--_len3) * 3.6deg))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p3) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p3) * 1px)), radial-gradient(circle at calc(50% + var(--_r3) * 1px * sin(0deg)) calc(50% - var(--_r3) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p3) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p3) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(calc(var(--_len3) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r3) * 57.2958deg), calc(var(--_len3) * 1.8deg))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_len3) * 3.6deg), color-mix(in srgb, var(--aether-ring-k3) 20%, #150d2c) calc(var(--_len3) * 3.6deg)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(calc(var(--_len2) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r2) * 57.2958deg), calc(var(--_len2) * 1.8deg))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_len2) * 3.6deg), color-mix(in srgb, var(--aether-ring-k2) 20%, #150d2c) calc(var(--_len2) * 3.6deg)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(calc(var(--_len1) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r1) * 57.2958deg), calc(var(--_len1) * 1.8deg))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_len1) * 3.6deg), color-mix(in srgb, var(--aether-ring-k1) 20%, #150d2c) calc(var(--_len1) * 3.6deg));
-    background-origin: border-box;
-    background-clip: border-box, border-box, border-box, border-box, border-box, border-box, content-box, padding-box, border-box;
-    -webkit-mask: radial-gradient(circle, transparent calc((var(--_r3) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) + var(--_t) / 2) * 1px), transparent calc((var(--_r3) + var(--_t) / 2) * 1px + 0.4px), transparent calc((var(--_r2) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) + var(--_t) / 2) * 1px), transparent calc((var(--_r2) + var(--_t) / 2) * 1px + 0.4px), transparent calc((var(--_r1) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) + var(--_t) / 2) * 1px), transparent calc((var(--_r1) + var(--_t) / 2) * 1px + 0.4px));
-    mask: radial-gradient(circle, transparent calc((var(--_r3) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) + var(--_t) / 2) * 1px), transparent calc((var(--_r3) + var(--_t) / 2) * 1px + 0.4px), transparent calc((var(--_r2) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) + var(--_t) / 2) * 1px), transparent calc((var(--_r2) + var(--_t) / 2) * 1px + 0.4px), transparent calc((var(--_r1) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) + var(--_t) / 2) * 1px), transparent calc((var(--_r1) + var(--_t) / 2) * 1px + 0.4px));
+    background: radial-gradient(circle at calc(50% + var(--_r1) * 1px * sin(calc(var(--_len1) * 3.6deg))) calc(50% - var(--_r1) * 1px * cos(calc(var(--_len1) * 3.6deg))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p1) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p1) * 1px)), radial-gradient(circle at calc(50% + var(--_r1) * 1px * sin(0deg)) calc(50% - var(--_r1) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p1) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p1) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(calc(var(--_len1) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r1) * 57.2958deg), calc(var(--_len1) * 1.8deg))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_len1) * 3.6deg), color-mix(in srgb, var(--aether-ring-k1) 20%, #150d2c) calc(var(--_len1) * 3.6deg));
+    -webkit-mask: radial-gradient(circle, transparent calc((var(--_r1) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) + var(--_t) / 2) * 1px), transparent calc((var(--_r1) + var(--_t) / 2) * 1px + 0.4px));
+    mask: radial-gradient(circle, transparent calc((var(--_r1) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) + var(--_t) / 2) * 1px), transparent calc((var(--_r1) + var(--_t) / 2) * 1px + 0.4px));
+}
+body div.pie#sys0::after {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    border-radius: 50%;
+    box-shadow: none;
+    pointer-events: none;
+    font-size: 0;
+    background: radial-gradient(circle at calc(50% + var(--_r2) * 1px * sin(calc(var(--_len2) * 3.6deg))) calc(50% - var(--_r2) * 1px * cos(calc(var(--_len2) * 3.6deg))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p2) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p2) * 1px)), radial-gradient(circle at calc(50% + var(--_r2) * 1px * sin(0deg)) calc(50% - var(--_r2) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p2) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p2) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(calc(var(--_len2) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r2) * 57.2958deg), calc(var(--_len2) * 1.8deg))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_len2) * 3.6deg), color-mix(in srgb, var(--aether-ring-k2) 20%, #150d2c) calc(var(--_len2) * 3.6deg));
+    -webkit-mask: radial-gradient(circle, transparent calc((var(--_r2) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) + var(--_t) / 2) * 1px), transparent calc((var(--_r2) + var(--_t) / 2) * 1px + 0.4px));
+    mask: radial-gradient(circle, transparent calc((var(--_r2) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) + var(--_t) / 2) * 1px), transparent calc((var(--_r2) + var(--_t) / 2) * 1px + 0.4px));
 }
 body div.pie#sys0 > span.var0::before {
     content: "";
     display: block;
     position: absolute;
     inset: 0;
-    box-sizing: border-box;
+    width: auto;
+    height: auto;
     border-radius: 50%;
-    border: solid transparent;
-    border-width: calc(46px - calc((var(--_r4) - var(--_t) / 2 - 0.75) * 1px));
-    padding: calc(calc((var(--_r4) - var(--_t) / 2 - 0.75) * 1px) - calc((var(--_r5) - var(--_t) / 2 - 0.75) * 1px));
+    box-shadow: none;
     pointer-events: none;
     font-size: 0;
-    background: radial-gradient(circle at calc(50% + var(--_r4) * 1px * sin(calc(var(--_len4) * 3.6deg))) calc(50% - var(--_r4) * 1px * cos(calc(var(--_len4) * 3.6deg))), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p4) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p4) * 1px)), radial-gradient(circle at calc(50% + var(--_r4) * 1px * sin(0deg)) calc(50% - var(--_r4) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k4) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len4) * 4, 100) * 1%), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p4) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p4) * 1px)), radial-gradient(circle at calc(50% + var(--_r5) * 1px * sin(calc(var(--_len5) * 3.6deg))) calc(50% - var(--_r5) * 1px * cos(calc(var(--_len5) * 3.6deg))), oklch(from var(--aether-ring-k5) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p5) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p5) * 1px)), radial-gradient(circle at calc(50% + var(--_r5) * 1px * sin(0deg)) calc(50% - var(--_r5) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k5) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len5) * 4, 100) * 1%), oklch(from var(--aether-ring-k5) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p5) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p5) * 1px)), radial-gradient(circle at calc(50% + var(--_r6) * 1px * sin(calc(var(--_len6) * 3.6deg))) calc(50% - var(--_r6) * 1px * cos(calc(var(--_len6) * 3.6deg))), oklch(from var(--aether-ring-k6) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p6) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p6) * 1px)), radial-gradient(circle at calc(50% + var(--_r6) * 1px * sin(0deg)) calc(50% - var(--_r6) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k6) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len6) * 4, 100) * 1%), oklch(from var(--aether-ring-k6) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p6) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p6) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k6) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len6) * 4, 100) * 1%), oklch(from var(--aether-ring-k6) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k6) calc(l + 0.04) c h) calc(calc(var(--_len6) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r6) * 57.2958deg), calc(var(--_len6) * 1.8deg))), oklch(from var(--aether-ring-k6) calc(l + 0.04) c h) calc(var(--_len6) * 3.6deg), color-mix(in srgb, var(--aether-ring-k6) 20%, #150d2c) calc(var(--_len6) * 3.6deg)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k5) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len5) * 4, 100) * 1%), oklch(from var(--aether-ring-k5) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k5) calc(l + 0.04) c h) calc(calc(var(--_len5) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r5) * 57.2958deg), calc(var(--_len5) * 1.8deg))), oklch(from var(--aether-ring-k5) calc(l + 0.04) c h) calc(var(--_len5) * 3.6deg), color-mix(in srgb, var(--aether-ring-k5) 20%, #150d2c) calc(var(--_len5) * 3.6deg)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k4) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len4) * 4, 100) * 1%), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(calc(var(--_len4) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r4) * 57.2958deg), calc(var(--_len4) * 1.8deg))), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(var(--_len4) * 3.6deg), color-mix(in srgb, var(--aether-ring-k4) 20%, #150d2c) calc(var(--_len4) * 3.6deg));
-    background-origin: border-box;
-    background-clip: border-box, border-box, border-box, border-box, border-box, border-box, content-box, padding-box, border-box;
-    -webkit-mask: radial-gradient(circle, transparent calc((var(--_r6) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p6)) calc((var(--_r6) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p6)) calc((var(--_r6) + var(--_t) / 2) * 1px), transparent calc((var(--_r6) + var(--_t) / 2) * 1px + 0.4px), transparent calc((var(--_r5) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p5)) calc((var(--_r5) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p5)) calc((var(--_r5) + var(--_t) / 2) * 1px), transparent calc((var(--_r5) + var(--_t) / 2) * 1px + 0.4px), transparent calc((var(--_r4) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p4)) calc((var(--_r4) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p4)) calc((var(--_r4) + var(--_t) / 2) * 1px), transparent calc((var(--_r4) + var(--_t) / 2) * 1px + 0.4px));
-    mask: radial-gradient(circle, transparent calc((var(--_r6) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p6)) calc((var(--_r6) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p6)) calc((var(--_r6) + var(--_t) / 2) * 1px), transparent calc((var(--_r6) + var(--_t) / 2) * 1px + 0.4px), transparent calc((var(--_r5) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p5)) calc((var(--_r5) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p5)) calc((var(--_r5) + var(--_t) / 2) * 1px), transparent calc((var(--_r5) + var(--_t) / 2) * 1px + 0.4px), transparent calc((var(--_r4) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p4)) calc((var(--_r4) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p4)) calc((var(--_r4) + var(--_t) / 2) * 1px), transparent calc((var(--_r4) + var(--_t) / 2) * 1px + 0.4px));
+    background: radial-gradient(circle at calc(50% + var(--_r3) * 1px * sin(calc(var(--_len3) * 3.6deg))) calc(50% - var(--_r3) * 1px * cos(calc(var(--_len3) * 3.6deg))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p3) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p3) * 1px)), radial-gradient(circle at calc(50% + var(--_r3) * 1px * sin(0deg)) calc(50% - var(--_r3) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p3) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p3) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(calc(var(--_len3) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r3) * 57.2958deg), calc(var(--_len3) * 1.8deg))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_len3) * 3.6deg), color-mix(in srgb, var(--aether-ring-k3) 20%, #150d2c) calc(var(--_len3) * 3.6deg));
+    -webkit-mask: radial-gradient(circle, transparent calc((var(--_r3) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) + var(--_t) / 2) * 1px), transparent calc((var(--_r3) + var(--_t) / 2) * 1px + 0.4px));
+    mask: radial-gradient(circle, transparent calc((var(--_r3) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) + var(--_t) / 2) * 1px), transparent calc((var(--_r3) + var(--_t) / 2) * 1px + 0.4px));
+}
+body div.pie#sys0 > span.var0::after {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    border-radius: 50%;
+    box-shadow: none;
+    pointer-events: none;
+    font-size: 0;
+    background: radial-gradient(circle at calc(50% + var(--_r4) * 1px * sin(calc(var(--_len4) * 3.6deg))) calc(50% - var(--_r4) * 1px * cos(calc(var(--_len4) * 3.6deg))), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p4) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p4) * 1px)), radial-gradient(circle at calc(50% + var(--_r4) * 1px * sin(0deg)) calc(50% - var(--_r4) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k4) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len4) * 4, 100) * 1%), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p4) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p4) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k4) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len4) * 4, 100) * 1%), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(calc(var(--_len4) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r4) * 57.2958deg), calc(var(--_len4) * 1.8deg))), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(var(--_len4) * 3.6deg), color-mix(in srgb, var(--aether-ring-k4) 20%, #150d2c) calc(var(--_len4) * 3.6deg));
+    -webkit-mask: radial-gradient(circle, transparent calc((var(--_r4) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p4)) calc((var(--_r4) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p4)) calc((var(--_r4) + var(--_t) / 2) * 1px), transparent calc((var(--_r4) + var(--_t) / 2) * 1px + 0.4px));
+    mask: radial-gradient(circle, transparent calc((var(--_r4) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p4)) calc((var(--_r4) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p4)) calc((var(--_r4) + var(--_t) / 2) * 1px), transparent calc((var(--_r4) + var(--_t) / 2) * 1px + 0.4px));
 }
 
 
@@ -1115,208 +1118,6 @@ body div.pie:is([style*="rgb(205, 92, 92) 3%,"], [style*="rgb(205, 92, 92) 3% "]
 body div.pie:is([style*="rgb(205, 92, 92) 2%,"], [style*="rgb(205, 92, 92) 2% "]) { --aether-ring-s4: 2; }
 body div.pie:is([style*="rgb(205, 92, 92) 1%,"], [style*="rgb(205, 92, 92) 1% "]) { --aether-ring-s4: 1; }
 body div.pie:is([style*="rgb(205, 92, 92) 0%,"], [style*="rgb(205, 92, 92) 0% "]) { --aether-ring-s4: 0; }
-body div.pie:is([style*="rgb(255, 192, 203) 100%,"], [style*="rgb(255, 192, 203) 100% "]) { --aether-ring-s5: 100; }
-body div.pie:is([style*="rgb(255, 192, 203) 99%,"], [style*="rgb(255, 192, 203) 99% "]) { --aether-ring-s5: 99; }
-body div.pie:is([style*="rgb(255, 192, 203) 98%,"], [style*="rgb(255, 192, 203) 98% "]) { --aether-ring-s5: 98; }
-body div.pie:is([style*="rgb(255, 192, 203) 97%,"], [style*="rgb(255, 192, 203) 97% "]) { --aether-ring-s5: 97; }
-body div.pie:is([style*="rgb(255, 192, 203) 96%,"], [style*="rgb(255, 192, 203) 96% "]) { --aether-ring-s5: 96; }
-body div.pie:is([style*="rgb(255, 192, 203) 95%,"], [style*="rgb(255, 192, 203) 95% "]) { --aether-ring-s5: 95; }
-body div.pie:is([style*="rgb(255, 192, 203) 94%,"], [style*="rgb(255, 192, 203) 94% "]) { --aether-ring-s5: 94; }
-body div.pie:is([style*="rgb(255, 192, 203) 93%,"], [style*="rgb(255, 192, 203) 93% "]) { --aether-ring-s5: 93; }
-body div.pie:is([style*="rgb(255, 192, 203) 92%,"], [style*="rgb(255, 192, 203) 92% "]) { --aether-ring-s5: 92; }
-body div.pie:is([style*="rgb(255, 192, 203) 91%,"], [style*="rgb(255, 192, 203) 91% "]) { --aether-ring-s5: 91; }
-body div.pie:is([style*="rgb(255, 192, 203) 90%,"], [style*="rgb(255, 192, 203) 90% "]) { --aether-ring-s5: 90; }
-body div.pie:is([style*="rgb(255, 192, 203) 89%,"], [style*="rgb(255, 192, 203) 89% "]) { --aether-ring-s5: 89; }
-body div.pie:is([style*="rgb(255, 192, 203) 88%,"], [style*="rgb(255, 192, 203) 88% "]) { --aether-ring-s5: 88; }
-body div.pie:is([style*="rgb(255, 192, 203) 87%,"], [style*="rgb(255, 192, 203) 87% "]) { --aether-ring-s5: 87; }
-body div.pie:is([style*="rgb(255, 192, 203) 86%,"], [style*="rgb(255, 192, 203) 86% "]) { --aether-ring-s5: 86; }
-body div.pie:is([style*="rgb(255, 192, 203) 85%,"], [style*="rgb(255, 192, 203) 85% "]) { --aether-ring-s5: 85; }
-body div.pie:is([style*="rgb(255, 192, 203) 84%,"], [style*="rgb(255, 192, 203) 84% "]) { --aether-ring-s5: 84; }
-body div.pie:is([style*="rgb(255, 192, 203) 83%,"], [style*="rgb(255, 192, 203) 83% "]) { --aether-ring-s5: 83; }
-body div.pie:is([style*="rgb(255, 192, 203) 82%,"], [style*="rgb(255, 192, 203) 82% "]) { --aether-ring-s5: 82; }
-body div.pie:is([style*="rgb(255, 192, 203) 81%,"], [style*="rgb(255, 192, 203) 81% "]) { --aether-ring-s5: 81; }
-body div.pie:is([style*="rgb(255, 192, 203) 80%,"], [style*="rgb(255, 192, 203) 80% "]) { --aether-ring-s5: 80; }
-body div.pie:is([style*="rgb(255, 192, 203) 79%,"], [style*="rgb(255, 192, 203) 79% "]) { --aether-ring-s5: 79; }
-body div.pie:is([style*="rgb(255, 192, 203) 78%,"], [style*="rgb(255, 192, 203) 78% "]) { --aether-ring-s5: 78; }
-body div.pie:is([style*="rgb(255, 192, 203) 77%,"], [style*="rgb(255, 192, 203) 77% "]) { --aether-ring-s5: 77; }
-body div.pie:is([style*="rgb(255, 192, 203) 76%,"], [style*="rgb(255, 192, 203) 76% "]) { --aether-ring-s5: 76; }
-body div.pie:is([style*="rgb(255, 192, 203) 75%,"], [style*="rgb(255, 192, 203) 75% "]) { --aether-ring-s5: 75; }
-body div.pie:is([style*="rgb(255, 192, 203) 74%,"], [style*="rgb(255, 192, 203) 74% "]) { --aether-ring-s5: 74; }
-body div.pie:is([style*="rgb(255, 192, 203) 73%,"], [style*="rgb(255, 192, 203) 73% "]) { --aether-ring-s5: 73; }
-body div.pie:is([style*="rgb(255, 192, 203) 72%,"], [style*="rgb(255, 192, 203) 72% "]) { --aether-ring-s5: 72; }
-body div.pie:is([style*="rgb(255, 192, 203) 71%,"], [style*="rgb(255, 192, 203) 71% "]) { --aether-ring-s5: 71; }
-body div.pie:is([style*="rgb(255, 192, 203) 70%,"], [style*="rgb(255, 192, 203) 70% "]) { --aether-ring-s5: 70; }
-body div.pie:is([style*="rgb(255, 192, 203) 69%,"], [style*="rgb(255, 192, 203) 69% "]) { --aether-ring-s5: 69; }
-body div.pie:is([style*="rgb(255, 192, 203) 68%,"], [style*="rgb(255, 192, 203) 68% "]) { --aether-ring-s5: 68; }
-body div.pie:is([style*="rgb(255, 192, 203) 67%,"], [style*="rgb(255, 192, 203) 67% "]) { --aether-ring-s5: 67; }
-body div.pie:is([style*="rgb(255, 192, 203) 66%,"], [style*="rgb(255, 192, 203) 66% "]) { --aether-ring-s5: 66; }
-body div.pie:is([style*="rgb(255, 192, 203) 65%,"], [style*="rgb(255, 192, 203) 65% "]) { --aether-ring-s5: 65; }
-body div.pie:is([style*="rgb(255, 192, 203) 64%,"], [style*="rgb(255, 192, 203) 64% "]) { --aether-ring-s5: 64; }
-body div.pie:is([style*="rgb(255, 192, 203) 63%,"], [style*="rgb(255, 192, 203) 63% "]) { --aether-ring-s5: 63; }
-body div.pie:is([style*="rgb(255, 192, 203) 62%,"], [style*="rgb(255, 192, 203) 62% "]) { --aether-ring-s5: 62; }
-body div.pie:is([style*="rgb(255, 192, 203) 61%,"], [style*="rgb(255, 192, 203) 61% "]) { --aether-ring-s5: 61; }
-body div.pie:is([style*="rgb(255, 192, 203) 60%,"], [style*="rgb(255, 192, 203) 60% "]) { --aether-ring-s5: 60; }
-body div.pie:is([style*="rgb(255, 192, 203) 59%,"], [style*="rgb(255, 192, 203) 59% "]) { --aether-ring-s5: 59; }
-body div.pie:is([style*="rgb(255, 192, 203) 58%,"], [style*="rgb(255, 192, 203) 58% "]) { --aether-ring-s5: 58; }
-body div.pie:is([style*="rgb(255, 192, 203) 57%,"], [style*="rgb(255, 192, 203) 57% "]) { --aether-ring-s5: 57; }
-body div.pie:is([style*="rgb(255, 192, 203) 56%,"], [style*="rgb(255, 192, 203) 56% "]) { --aether-ring-s5: 56; }
-body div.pie:is([style*="rgb(255, 192, 203) 55%,"], [style*="rgb(255, 192, 203) 55% "]) { --aether-ring-s5: 55; }
-body div.pie:is([style*="rgb(255, 192, 203) 54%,"], [style*="rgb(255, 192, 203) 54% "]) { --aether-ring-s5: 54; }
-body div.pie:is([style*="rgb(255, 192, 203) 53%,"], [style*="rgb(255, 192, 203) 53% "]) { --aether-ring-s5: 53; }
-body div.pie:is([style*="rgb(255, 192, 203) 52%,"], [style*="rgb(255, 192, 203) 52% "]) { --aether-ring-s5: 52; }
-body div.pie:is([style*="rgb(255, 192, 203) 51%,"], [style*="rgb(255, 192, 203) 51% "]) { --aether-ring-s5: 51; }
-body div.pie:is([style*="rgb(255, 192, 203) 50%,"], [style*="rgb(255, 192, 203) 50% "]) { --aether-ring-s5: 50; }
-body div.pie:is([style*="rgb(255, 192, 203) 49%,"], [style*="rgb(255, 192, 203) 49% "]) { --aether-ring-s5: 49; }
-body div.pie:is([style*="rgb(255, 192, 203) 48%,"], [style*="rgb(255, 192, 203) 48% "]) { --aether-ring-s5: 48; }
-body div.pie:is([style*="rgb(255, 192, 203) 47%,"], [style*="rgb(255, 192, 203) 47% "]) { --aether-ring-s5: 47; }
-body div.pie:is([style*="rgb(255, 192, 203) 46%,"], [style*="rgb(255, 192, 203) 46% "]) { --aether-ring-s5: 46; }
-body div.pie:is([style*="rgb(255, 192, 203) 45%,"], [style*="rgb(255, 192, 203) 45% "]) { --aether-ring-s5: 45; }
-body div.pie:is([style*="rgb(255, 192, 203) 44%,"], [style*="rgb(255, 192, 203) 44% "]) { --aether-ring-s5: 44; }
-body div.pie:is([style*="rgb(255, 192, 203) 43%,"], [style*="rgb(255, 192, 203) 43% "]) { --aether-ring-s5: 43; }
-body div.pie:is([style*="rgb(255, 192, 203) 42%,"], [style*="rgb(255, 192, 203) 42% "]) { --aether-ring-s5: 42; }
-body div.pie:is([style*="rgb(255, 192, 203) 41%,"], [style*="rgb(255, 192, 203) 41% "]) { --aether-ring-s5: 41; }
-body div.pie:is([style*="rgb(255, 192, 203) 40%,"], [style*="rgb(255, 192, 203) 40% "]) { --aether-ring-s5: 40; }
-body div.pie:is([style*="rgb(255, 192, 203) 39%,"], [style*="rgb(255, 192, 203) 39% "]) { --aether-ring-s5: 39; }
-body div.pie:is([style*="rgb(255, 192, 203) 38%,"], [style*="rgb(255, 192, 203) 38% "]) { --aether-ring-s5: 38; }
-body div.pie:is([style*="rgb(255, 192, 203) 37%,"], [style*="rgb(255, 192, 203) 37% "]) { --aether-ring-s5: 37; }
-body div.pie:is([style*="rgb(255, 192, 203) 36%,"], [style*="rgb(255, 192, 203) 36% "]) { --aether-ring-s5: 36; }
-body div.pie:is([style*="rgb(255, 192, 203) 35%,"], [style*="rgb(255, 192, 203) 35% "]) { --aether-ring-s5: 35; }
-body div.pie:is([style*="rgb(255, 192, 203) 34%,"], [style*="rgb(255, 192, 203) 34% "]) { --aether-ring-s5: 34; }
-body div.pie:is([style*="rgb(255, 192, 203) 33%,"], [style*="rgb(255, 192, 203) 33% "]) { --aether-ring-s5: 33; }
-body div.pie:is([style*="rgb(255, 192, 203) 32%,"], [style*="rgb(255, 192, 203) 32% "]) { --aether-ring-s5: 32; }
-body div.pie:is([style*="rgb(255, 192, 203) 31%,"], [style*="rgb(255, 192, 203) 31% "]) { --aether-ring-s5: 31; }
-body div.pie:is([style*="rgb(255, 192, 203) 30%,"], [style*="rgb(255, 192, 203) 30% "]) { --aether-ring-s5: 30; }
-body div.pie:is([style*="rgb(255, 192, 203) 29%,"], [style*="rgb(255, 192, 203) 29% "]) { --aether-ring-s5: 29; }
-body div.pie:is([style*="rgb(255, 192, 203) 28%,"], [style*="rgb(255, 192, 203) 28% "]) { --aether-ring-s5: 28; }
-body div.pie:is([style*="rgb(255, 192, 203) 27%,"], [style*="rgb(255, 192, 203) 27% "]) { --aether-ring-s5: 27; }
-body div.pie:is([style*="rgb(255, 192, 203) 26%,"], [style*="rgb(255, 192, 203) 26% "]) { --aether-ring-s5: 26; }
-body div.pie:is([style*="rgb(255, 192, 203) 25%,"], [style*="rgb(255, 192, 203) 25% "]) { --aether-ring-s5: 25; }
-body div.pie:is([style*="rgb(255, 192, 203) 24%,"], [style*="rgb(255, 192, 203) 24% "]) { --aether-ring-s5: 24; }
-body div.pie:is([style*="rgb(255, 192, 203) 23%,"], [style*="rgb(255, 192, 203) 23% "]) { --aether-ring-s5: 23; }
-body div.pie:is([style*="rgb(255, 192, 203) 22%,"], [style*="rgb(255, 192, 203) 22% "]) { --aether-ring-s5: 22; }
-body div.pie:is([style*="rgb(255, 192, 203) 21%,"], [style*="rgb(255, 192, 203) 21% "]) { --aether-ring-s5: 21; }
-body div.pie:is([style*="rgb(255, 192, 203) 20%,"], [style*="rgb(255, 192, 203) 20% "]) { --aether-ring-s5: 20; }
-body div.pie:is([style*="rgb(255, 192, 203) 19%,"], [style*="rgb(255, 192, 203) 19% "]) { --aether-ring-s5: 19; }
-body div.pie:is([style*="rgb(255, 192, 203) 18%,"], [style*="rgb(255, 192, 203) 18% "]) { --aether-ring-s5: 18; }
-body div.pie:is([style*="rgb(255, 192, 203) 17%,"], [style*="rgb(255, 192, 203) 17% "]) { --aether-ring-s5: 17; }
-body div.pie:is([style*="rgb(255, 192, 203) 16%,"], [style*="rgb(255, 192, 203) 16% "]) { --aether-ring-s5: 16; }
-body div.pie:is([style*="rgb(255, 192, 203) 15%,"], [style*="rgb(255, 192, 203) 15% "]) { --aether-ring-s5: 15; }
-body div.pie:is([style*="rgb(255, 192, 203) 14%,"], [style*="rgb(255, 192, 203) 14% "]) { --aether-ring-s5: 14; }
-body div.pie:is([style*="rgb(255, 192, 203) 13%,"], [style*="rgb(255, 192, 203) 13% "]) { --aether-ring-s5: 13; }
-body div.pie:is([style*="rgb(255, 192, 203) 12%,"], [style*="rgb(255, 192, 203) 12% "]) { --aether-ring-s5: 12; }
-body div.pie:is([style*="rgb(255, 192, 203) 11%,"], [style*="rgb(255, 192, 203) 11% "]) { --aether-ring-s5: 11; }
-body div.pie:is([style*="rgb(255, 192, 203) 10%,"], [style*="rgb(255, 192, 203) 10% "]) { --aether-ring-s5: 10; }
-body div.pie:is([style*="rgb(255, 192, 203) 9%,"], [style*="rgb(255, 192, 203) 9% "]) { --aether-ring-s5: 9; }
-body div.pie:is([style*="rgb(255, 192, 203) 8%,"], [style*="rgb(255, 192, 203) 8% "]) { --aether-ring-s5: 8; }
-body div.pie:is([style*="rgb(255, 192, 203) 7%,"], [style*="rgb(255, 192, 203) 7% "]) { --aether-ring-s5: 7; }
-body div.pie:is([style*="rgb(255, 192, 203) 6%,"], [style*="rgb(255, 192, 203) 6% "]) { --aether-ring-s5: 6; }
-body div.pie:is([style*="rgb(255, 192, 203) 5%,"], [style*="rgb(255, 192, 203) 5% "]) { --aether-ring-s5: 5; }
-body div.pie:is([style*="rgb(255, 192, 203) 4%,"], [style*="rgb(255, 192, 203) 4% "]) { --aether-ring-s5: 4; }
-body div.pie:is([style*="rgb(255, 192, 203) 3%,"], [style*="rgb(255, 192, 203) 3% "]) { --aether-ring-s5: 3; }
-body div.pie:is([style*="rgb(255, 192, 203) 2%,"], [style*="rgb(255, 192, 203) 2% "]) { --aether-ring-s5: 2; }
-body div.pie:is([style*="rgb(255, 192, 203) 1%,"], [style*="rgb(255, 192, 203) 1% "]) { --aether-ring-s5: 1; }
-body div.pie:is([style*="rgb(255, 192, 203) 0%,"], [style*="rgb(255, 192, 203) 0% "]) { --aether-ring-s5: 0; }
-body div.pie:is([style*="rgb(230, 230, 250) 100%,"], [style*="rgb(230, 230, 250) 100% "]) { --aether-ring-s6: 100; }
-body div.pie:is([style*="rgb(230, 230, 250) 99%,"], [style*="rgb(230, 230, 250) 99% "]) { --aether-ring-s6: 99; }
-body div.pie:is([style*="rgb(230, 230, 250) 98%,"], [style*="rgb(230, 230, 250) 98% "]) { --aether-ring-s6: 98; }
-body div.pie:is([style*="rgb(230, 230, 250) 97%,"], [style*="rgb(230, 230, 250) 97% "]) { --aether-ring-s6: 97; }
-body div.pie:is([style*="rgb(230, 230, 250) 96%,"], [style*="rgb(230, 230, 250) 96% "]) { --aether-ring-s6: 96; }
-body div.pie:is([style*="rgb(230, 230, 250) 95%,"], [style*="rgb(230, 230, 250) 95% "]) { --aether-ring-s6: 95; }
-body div.pie:is([style*="rgb(230, 230, 250) 94%,"], [style*="rgb(230, 230, 250) 94% "]) { --aether-ring-s6: 94; }
-body div.pie:is([style*="rgb(230, 230, 250) 93%,"], [style*="rgb(230, 230, 250) 93% "]) { --aether-ring-s6: 93; }
-body div.pie:is([style*="rgb(230, 230, 250) 92%,"], [style*="rgb(230, 230, 250) 92% "]) { --aether-ring-s6: 92; }
-body div.pie:is([style*="rgb(230, 230, 250) 91%,"], [style*="rgb(230, 230, 250) 91% "]) { --aether-ring-s6: 91; }
-body div.pie:is([style*="rgb(230, 230, 250) 90%,"], [style*="rgb(230, 230, 250) 90% "]) { --aether-ring-s6: 90; }
-body div.pie:is([style*="rgb(230, 230, 250) 89%,"], [style*="rgb(230, 230, 250) 89% "]) { --aether-ring-s6: 89; }
-body div.pie:is([style*="rgb(230, 230, 250) 88%,"], [style*="rgb(230, 230, 250) 88% "]) { --aether-ring-s6: 88; }
-body div.pie:is([style*="rgb(230, 230, 250) 87%,"], [style*="rgb(230, 230, 250) 87% "]) { --aether-ring-s6: 87; }
-body div.pie:is([style*="rgb(230, 230, 250) 86%,"], [style*="rgb(230, 230, 250) 86% "]) { --aether-ring-s6: 86; }
-body div.pie:is([style*="rgb(230, 230, 250) 85%,"], [style*="rgb(230, 230, 250) 85% "]) { --aether-ring-s6: 85; }
-body div.pie:is([style*="rgb(230, 230, 250) 84%,"], [style*="rgb(230, 230, 250) 84% "]) { --aether-ring-s6: 84; }
-body div.pie:is([style*="rgb(230, 230, 250) 83%,"], [style*="rgb(230, 230, 250) 83% "]) { --aether-ring-s6: 83; }
-body div.pie:is([style*="rgb(230, 230, 250) 82%,"], [style*="rgb(230, 230, 250) 82% "]) { --aether-ring-s6: 82; }
-body div.pie:is([style*="rgb(230, 230, 250) 81%,"], [style*="rgb(230, 230, 250) 81% "]) { --aether-ring-s6: 81; }
-body div.pie:is([style*="rgb(230, 230, 250) 80%,"], [style*="rgb(230, 230, 250) 80% "]) { --aether-ring-s6: 80; }
-body div.pie:is([style*="rgb(230, 230, 250) 79%,"], [style*="rgb(230, 230, 250) 79% "]) { --aether-ring-s6: 79; }
-body div.pie:is([style*="rgb(230, 230, 250) 78%,"], [style*="rgb(230, 230, 250) 78% "]) { --aether-ring-s6: 78; }
-body div.pie:is([style*="rgb(230, 230, 250) 77%,"], [style*="rgb(230, 230, 250) 77% "]) { --aether-ring-s6: 77; }
-body div.pie:is([style*="rgb(230, 230, 250) 76%,"], [style*="rgb(230, 230, 250) 76% "]) { --aether-ring-s6: 76; }
-body div.pie:is([style*="rgb(230, 230, 250) 75%,"], [style*="rgb(230, 230, 250) 75% "]) { --aether-ring-s6: 75; }
-body div.pie:is([style*="rgb(230, 230, 250) 74%,"], [style*="rgb(230, 230, 250) 74% "]) { --aether-ring-s6: 74; }
-body div.pie:is([style*="rgb(230, 230, 250) 73%,"], [style*="rgb(230, 230, 250) 73% "]) { --aether-ring-s6: 73; }
-body div.pie:is([style*="rgb(230, 230, 250) 72%,"], [style*="rgb(230, 230, 250) 72% "]) { --aether-ring-s6: 72; }
-body div.pie:is([style*="rgb(230, 230, 250) 71%,"], [style*="rgb(230, 230, 250) 71% "]) { --aether-ring-s6: 71; }
-body div.pie:is([style*="rgb(230, 230, 250) 70%,"], [style*="rgb(230, 230, 250) 70% "]) { --aether-ring-s6: 70; }
-body div.pie:is([style*="rgb(230, 230, 250) 69%,"], [style*="rgb(230, 230, 250) 69% "]) { --aether-ring-s6: 69; }
-body div.pie:is([style*="rgb(230, 230, 250) 68%,"], [style*="rgb(230, 230, 250) 68% "]) { --aether-ring-s6: 68; }
-body div.pie:is([style*="rgb(230, 230, 250) 67%,"], [style*="rgb(230, 230, 250) 67% "]) { --aether-ring-s6: 67; }
-body div.pie:is([style*="rgb(230, 230, 250) 66%,"], [style*="rgb(230, 230, 250) 66% "]) { --aether-ring-s6: 66; }
-body div.pie:is([style*="rgb(230, 230, 250) 65%,"], [style*="rgb(230, 230, 250) 65% "]) { --aether-ring-s6: 65; }
-body div.pie:is([style*="rgb(230, 230, 250) 64%,"], [style*="rgb(230, 230, 250) 64% "]) { --aether-ring-s6: 64; }
-body div.pie:is([style*="rgb(230, 230, 250) 63%,"], [style*="rgb(230, 230, 250) 63% "]) { --aether-ring-s6: 63; }
-body div.pie:is([style*="rgb(230, 230, 250) 62%,"], [style*="rgb(230, 230, 250) 62% "]) { --aether-ring-s6: 62; }
-body div.pie:is([style*="rgb(230, 230, 250) 61%,"], [style*="rgb(230, 230, 250) 61% "]) { --aether-ring-s6: 61; }
-body div.pie:is([style*="rgb(230, 230, 250) 60%,"], [style*="rgb(230, 230, 250) 60% "]) { --aether-ring-s6: 60; }
-body div.pie:is([style*="rgb(230, 230, 250) 59%,"], [style*="rgb(230, 230, 250) 59% "]) { --aether-ring-s6: 59; }
-body div.pie:is([style*="rgb(230, 230, 250) 58%,"], [style*="rgb(230, 230, 250) 58% "]) { --aether-ring-s6: 58; }
-body div.pie:is([style*="rgb(230, 230, 250) 57%,"], [style*="rgb(230, 230, 250) 57% "]) { --aether-ring-s6: 57; }
-body div.pie:is([style*="rgb(230, 230, 250) 56%,"], [style*="rgb(230, 230, 250) 56% "]) { --aether-ring-s6: 56; }
-body div.pie:is([style*="rgb(230, 230, 250) 55%,"], [style*="rgb(230, 230, 250) 55% "]) { --aether-ring-s6: 55; }
-body div.pie:is([style*="rgb(230, 230, 250) 54%,"], [style*="rgb(230, 230, 250) 54% "]) { --aether-ring-s6: 54; }
-body div.pie:is([style*="rgb(230, 230, 250) 53%,"], [style*="rgb(230, 230, 250) 53% "]) { --aether-ring-s6: 53; }
-body div.pie:is([style*="rgb(230, 230, 250) 52%,"], [style*="rgb(230, 230, 250) 52% "]) { --aether-ring-s6: 52; }
-body div.pie:is([style*="rgb(230, 230, 250) 51%,"], [style*="rgb(230, 230, 250) 51% "]) { --aether-ring-s6: 51; }
-body div.pie:is([style*="rgb(230, 230, 250) 50%,"], [style*="rgb(230, 230, 250) 50% "]) { --aether-ring-s6: 50; }
-body div.pie:is([style*="rgb(230, 230, 250) 49%,"], [style*="rgb(230, 230, 250) 49% "]) { --aether-ring-s6: 49; }
-body div.pie:is([style*="rgb(230, 230, 250) 48%,"], [style*="rgb(230, 230, 250) 48% "]) { --aether-ring-s6: 48; }
-body div.pie:is([style*="rgb(230, 230, 250) 47%,"], [style*="rgb(230, 230, 250) 47% "]) { --aether-ring-s6: 47; }
-body div.pie:is([style*="rgb(230, 230, 250) 46%,"], [style*="rgb(230, 230, 250) 46% "]) { --aether-ring-s6: 46; }
-body div.pie:is([style*="rgb(230, 230, 250) 45%,"], [style*="rgb(230, 230, 250) 45% "]) { --aether-ring-s6: 45; }
-body div.pie:is([style*="rgb(230, 230, 250) 44%,"], [style*="rgb(230, 230, 250) 44% "]) { --aether-ring-s6: 44; }
-body div.pie:is([style*="rgb(230, 230, 250) 43%,"], [style*="rgb(230, 230, 250) 43% "]) { --aether-ring-s6: 43; }
-body div.pie:is([style*="rgb(230, 230, 250) 42%,"], [style*="rgb(230, 230, 250) 42% "]) { --aether-ring-s6: 42; }
-body div.pie:is([style*="rgb(230, 230, 250) 41%,"], [style*="rgb(230, 230, 250) 41% "]) { --aether-ring-s6: 41; }
-body div.pie:is([style*="rgb(230, 230, 250) 40%,"], [style*="rgb(230, 230, 250) 40% "]) { --aether-ring-s6: 40; }
-body div.pie:is([style*="rgb(230, 230, 250) 39%,"], [style*="rgb(230, 230, 250) 39% "]) { --aether-ring-s6: 39; }
-body div.pie:is([style*="rgb(230, 230, 250) 38%,"], [style*="rgb(230, 230, 250) 38% "]) { --aether-ring-s6: 38; }
-body div.pie:is([style*="rgb(230, 230, 250) 37%,"], [style*="rgb(230, 230, 250) 37% "]) { --aether-ring-s6: 37; }
-body div.pie:is([style*="rgb(230, 230, 250) 36%,"], [style*="rgb(230, 230, 250) 36% "]) { --aether-ring-s6: 36; }
-body div.pie:is([style*="rgb(230, 230, 250) 35%,"], [style*="rgb(230, 230, 250) 35% "]) { --aether-ring-s6: 35; }
-body div.pie:is([style*="rgb(230, 230, 250) 34%,"], [style*="rgb(230, 230, 250) 34% "]) { --aether-ring-s6: 34; }
-body div.pie:is([style*="rgb(230, 230, 250) 33%,"], [style*="rgb(230, 230, 250) 33% "]) { --aether-ring-s6: 33; }
-body div.pie:is([style*="rgb(230, 230, 250) 32%,"], [style*="rgb(230, 230, 250) 32% "]) { --aether-ring-s6: 32; }
-body div.pie:is([style*="rgb(230, 230, 250) 31%,"], [style*="rgb(230, 230, 250) 31% "]) { --aether-ring-s6: 31; }
-body div.pie:is([style*="rgb(230, 230, 250) 30%,"], [style*="rgb(230, 230, 250) 30% "]) { --aether-ring-s6: 30; }
-body div.pie:is([style*="rgb(230, 230, 250) 29%,"], [style*="rgb(230, 230, 250) 29% "]) { --aether-ring-s6: 29; }
-body div.pie:is([style*="rgb(230, 230, 250) 28%,"], [style*="rgb(230, 230, 250) 28% "]) { --aether-ring-s6: 28; }
-body div.pie:is([style*="rgb(230, 230, 250) 27%,"], [style*="rgb(230, 230, 250) 27% "]) { --aether-ring-s6: 27; }
-body div.pie:is([style*="rgb(230, 230, 250) 26%,"], [style*="rgb(230, 230, 250) 26% "]) { --aether-ring-s6: 26; }
-body div.pie:is([style*="rgb(230, 230, 250) 25%,"], [style*="rgb(230, 230, 250) 25% "]) { --aether-ring-s6: 25; }
-body div.pie:is([style*="rgb(230, 230, 250) 24%,"], [style*="rgb(230, 230, 250) 24% "]) { --aether-ring-s6: 24; }
-body div.pie:is([style*="rgb(230, 230, 250) 23%,"], [style*="rgb(230, 230, 250) 23% "]) { --aether-ring-s6: 23; }
-body div.pie:is([style*="rgb(230, 230, 250) 22%,"], [style*="rgb(230, 230, 250) 22% "]) { --aether-ring-s6: 22; }
-body div.pie:is([style*="rgb(230, 230, 250) 21%,"], [style*="rgb(230, 230, 250) 21% "]) { --aether-ring-s6: 21; }
-body div.pie:is([style*="rgb(230, 230, 250) 20%,"], [style*="rgb(230, 230, 250) 20% "]) { --aether-ring-s6: 20; }
-body div.pie:is([style*="rgb(230, 230, 250) 19%,"], [style*="rgb(230, 230, 250) 19% "]) { --aether-ring-s6: 19; }
-body div.pie:is([style*="rgb(230, 230, 250) 18%,"], [style*="rgb(230, 230, 250) 18% "]) { --aether-ring-s6: 18; }
-body div.pie:is([style*="rgb(230, 230, 250) 17%,"], [style*="rgb(230, 230, 250) 17% "]) { --aether-ring-s6: 17; }
-body div.pie:is([style*="rgb(230, 230, 250) 16%,"], [style*="rgb(230, 230, 250) 16% "]) { --aether-ring-s6: 16; }
-body div.pie:is([style*="rgb(230, 230, 250) 15%,"], [style*="rgb(230, 230, 250) 15% "]) { --aether-ring-s6: 15; }
-body div.pie:is([style*="rgb(230, 230, 250) 14%,"], [style*="rgb(230, 230, 250) 14% "]) { --aether-ring-s6: 14; }
-body div.pie:is([style*="rgb(230, 230, 250) 13%,"], [style*="rgb(230, 230, 250) 13% "]) { --aether-ring-s6: 13; }
-body div.pie:is([style*="rgb(230, 230, 250) 12%,"], [style*="rgb(230, 230, 250) 12% "]) { --aether-ring-s6: 12; }
-body div.pie:is([style*="rgb(230, 230, 250) 11%,"], [style*="rgb(230, 230, 250) 11% "]) { --aether-ring-s6: 11; }
-body div.pie:is([style*="rgb(230, 230, 250) 10%,"], [style*="rgb(230, 230, 250) 10% "]) { --aether-ring-s6: 10; }
-body div.pie:is([style*="rgb(230, 230, 250) 9%,"], [style*="rgb(230, 230, 250) 9% "]) { --aether-ring-s6: 9; }
-body div.pie:is([style*="rgb(230, 230, 250) 8%,"], [style*="rgb(230, 230, 250) 8% "]) { --aether-ring-s6: 8; }
-body div.pie:is([style*="rgb(230, 230, 250) 7%,"], [style*="rgb(230, 230, 250) 7% "]) { --aether-ring-s6: 7; }
-body div.pie:is([style*="rgb(230, 230, 250) 6%,"], [style*="rgb(230, 230, 250) 6% "]) { --aether-ring-s6: 6; }
-body div.pie:is([style*="rgb(230, 230, 250) 5%,"], [style*="rgb(230, 230, 250) 5% "]) { --aether-ring-s6: 5; }
-body div.pie:is([style*="rgb(230, 230, 250) 4%,"], [style*="rgb(230, 230, 250) 4% "]) { --aether-ring-s6: 4; }
-body div.pie:is([style*="rgb(230, 230, 250) 3%,"], [style*="rgb(230, 230, 250) 3% "]) { --aether-ring-s6: 3; }
-body div.pie:is([style*="rgb(230, 230, 250) 2%,"], [style*="rgb(230, 230, 250) 2% "]) { --aether-ring-s6: 2; }
-body div.pie:is([style*="rgb(230, 230, 250) 1%,"], [style*="rgb(230, 230, 250) 1% "]) { --aether-ring-s6: 1; }
-body div.pie:is([style*="rgb(230, 230, 250) 0%,"], [style*="rgb(230, 230, 250) 0% "]) { --aether-ring-s6: 0; }
 body .usage-disk.sys > span:first-child {
     background-color: var(--aether-violet);
 }
