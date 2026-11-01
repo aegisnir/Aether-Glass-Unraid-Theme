@@ -2,14 +2,14 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.10.31a">
+<!ENTITY version   "2026.11.01g-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "60aa95b16b7d449c3368ed4535172c7128ef248d6955a546b64fbcd2acaddcee">
-<!ENTITY sha_login   "d4a220066edd20c7d2857b31b8f0cf8f7395603be744355a47984f88ad4cc2cf">
+<!ENTITY sha_css     "114ecbc436ef36011a6d706b7f20ec8076c729d08b0cc6c0044d49fba1092048">
+<!ENTITY sha_login   "dd9f86073a6c9b50527ebd324b8f533ce5246e863bc62a4b5e453ec79f66f38e">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
 <!ENTITY sha_page    "077fa82565d5862318379402bf41a6fac30e07c28fc2bdb7fdcce814ed7a755f">
@@ -19,13 +19,113 @@
 <PLUGIN name="&name;"
         author="&author;"
         version="&version;"
-        pluginURL="&repo;/main/aether-glass.plg"
+        pluginURL="&repo;/dev/aether-glass.plg"
         support="https://github.com/aegisnir/Aether-Glass-Unraid-Theme/issues"
         icon="aether-glass.png"
         launch="Settings/AetherGlass"
         min="7.2.0">
 
 <CHANGES>
+### 2026.11.01
+- Footer: the theme's version shows next to Unraid's copyright.
+- Log windows (plugin installs, container updates) no longer pick up the amber or rose glow of the confirm box that opened them.
+- Headings shimmer like a lava lamp: six soft colour blobs (cyan, pink, orchid, blush, amber, mint) float inside the letters on their own timers.  Vivid on the reboot and shutdown title, pastel on tile headers, page titles, log-window titles and the login page.
+- The spinner next to "In Progress" in plugin windows is visible again (the shimmer had hidden it, and Chrome showed a stray sliver of it in the window corner).
+- Chrome and Edge: squircle corners on dashboard tiles, folder previews and the reboot page now use double the radius, so they match the round corners Safari draws.
+- The blur under the sticky menu bar fades out over 14px instead of 40px, so content just below the menu stays readable.
+
+### 2026.10.31z
+- RAM pie: a ticked last slice now has a ticked round end too, instead of a solid blob.
+
+### 2026.10.31y
+- RAM pie: the last ring splits into one slice per remaining source.  Ten looks in all: the theme's own accents (cyan, violet, amber, rose, white) for the first five sources, then the same five with angled tick marks that follow the ring's curve for sources six to ten; legend dots match (ticked ones show a pinwheel).  Replaces the hatched group.
+
+### 2026.10.31x
+- RAM pie: when the last ring adds up two or more sources it is hatched, and so are their legend dots, so a grouped ring reads as a group.
+- RAM pie: new type colours (blue, orchid, rust, olive) checked so every pair is easy to tell apart, including in the legend; blue and teal were too alike.
+- System tile: with a long memory legend (6+ entries) the pies centre in the taller tile and step up in size when the tile is wide enough for four bigger pies.
+
+### 2026.10.31w
+- RAM pie: detail rings sort themselves live by size, biggest outermost.
+
+### 2026.10.31v
+- RAM pie: fixed the detail rings showing as solid orange in Safari.  Up to four rings now (System, then the first two types, then a fourth that counts everything after), still adaptive in thickness.
+
+### 2026.10.31u
+- RAM pie: detail rings adapt to the number of types: thick for one or two, thin for five or six (System plus up to five, anything beyond counted in the last), and the number shrinks to fit.  Their tracks stay visible and spring outwards with them on hover.
+- System tile: the pie row sits a little lower so the last label clears the tile's buttons.
+- Plugins page: Update is green, and Remove turns rose once its checkbox is ticked (the "Remove Selected Plugins" button too).
+
+### 2026.10.31t
+- System tile: the four pies are 25% larger, with the legend column narrowed to fit and the pie row moved up into the space under the tile's buttons.
+- RAM pie: the outer ring is the total in one status colour (green to red), like the other pies; the inner rings show the breakdown by type.  Hovering hides the total ring and springs the detail rings outwards to fill the pie, with the size in the middle.
+
+### 2026.10.31s
+- Dashboard pies: round ends blend into the ring's colour, so a short slice is one smooth pill.
+- RAM pie: up to five types (System plus four, e.g. Docker and VMs) in a colour-blind-safe palette that stays clear of the status colours; legend dots match.  Thin inner rings show System, the first and second types side by side, each as long as its slice in the outer ring.
+
+### 2026.10.31r
+- Dashboard CPU chart: sits in a rounded well inset 8px inside the Processor tile, with corners that run parallel to the tile's.
+- Dashboard bars (CPU cores, GPU stats): a small value is a round dot instead of a thin sliver, and under 1% the bar shows empty to match its 0% label.
+
+### 2026.10.31q
+- Dashboard pies (RAM, boot device, log, Docker vdisk): redrawn as rings with a slight colour shift per slice and round ends, slices layered with no gaps.  RAM slices are violet (System), cyan and pink (hooks such as Docker and VMs), matching the legend.  Ring and number colours follow your warning and critical levels.
+
+### 2026.10.31p
+- Release notes: version headers are full pills again (they were squashed into thin lines), and the Done button sits at the same height as in the log windows.
+
+### 2026.10.31o
+- Log and update windows: the log box is inset to the same width as the title pill, with rounded corners.
+
+### 2026.10.31n
+- Log and update windows: the title pill has an even 12px gap on all four sides, with the window's corners rounded to match.
+
+### 2026.10.31m
+- Log and update windows: the title is a pill again, 8px from the edges, and the window's corners are rounder to match it.
+- Search suggestions, right-click menus and dropdown lists: row corners now run parallel to the menu's corners.
+
+### 2026.10.31l
+- Apps: the favourite-repository heart on app cards is the theme's rose instead of dark red.
+- Log and update windows: the title capsule's corners now run parallel to the window's corners.
+- Plugin install and update windows: the button lights up violet when the job ends.
+
+### 2026.10.31k
+- Pop-ups are coloured by severity: risky confirms (reboot, shutdown) and errors are rose, OK-only warnings are amber.
+- Fixed the confirm button in pop-ups looking darker than Cancel.
+
+### 2026.10.31j
+- Array Operation: Start is green, Stop is amber, Reboot and Shutdown are rose, so they stand apart from the everyday buttons.
+
+### 2026.10.31i
+- Main page: each section of the device tables (every pool, and parity vs data disks while stopped) is its own rounded glass card, with a clean gap between them.
+
+### 2026.10.31h
+- Scroll buttons: side by side in one capsule, always visible (auto-hide removed; Safari didn't update it reliably).
+
+### 2026.10.31g
+- Scroll buttons: after clicking down, the up button appears right away instead of looking greyed out (Safari).
+
+### 2026.10.31f
+- Scroll buttons hide until you point at them (computers with a mouse; touch screens always show them).
+
+### 2026.10.31e
+- Scroll buttons: the capsule always holds both slots; at the top of the page the up button shows dimmed instead of the capsule changing size (Safari didn't resize it reliably).
+
+### 2026.10.31d
+- Scroll buttons: the capsule now grows to hold both buttons once you've scrolled down.
+- Dev builds now download from their own tag, so they install right after release.
+
+### 2026.10.31c
+- Scroll buttons: the capsule is visible against the page, and hovering a button no longer underlines its arrow.
+
+### 2026.10.31b
+- Main page: scroll-to-top and scroll-to-end are two round buttons in a glass capsule, clear of the footer.
+- Main page: device and slot dropdowns are slimmer and centred in their rows.
+- Main page: disk usage bars show their empty track, and a nearly empty bar is a round dot instead of a sliver.
+- Header: the array bar no longer shows "offline" in full brand colours when the array is stopped.
+- Main page: the blank rows between parity and data disks, and between pools, are now a slim dark divider.
+- New dev channel for testing builds (see README).  Main stays the default.
+
 ### 2026.10.31a
 - The icon on the Plugins page now opens the Aether Glass settings page.
 

@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# Refuses to push main if its .plg is set up as a dev build.  main is what every user's
+# server checks for updates, so a dev .plg landing there would quietly move everyone
+# onto the testing channel.  Typical cause: merging dev into main and pushing before
+# running tools/release.sh <version> on main.
+#
+# Turned on once per clone with:  git config core.hooksPath tools/hooks
+# (GitHub Desktop runs it too.)
+
+PLG=aether-glass.plg
+zero=0000000000000000000000000000000000000000
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    [ "$remote_ref" = "refs/heads/main" ] || continue
+    [ "$local_sha" = "$zero" ] && continue   # deleting a branch, nothing to check
+    plg="$(git show "$local_sha:$PLG" 2>/dev/null)" || continue
+    if grep -q 'ENTITY version *"[^"]*-dev"' <<<"$plg" \
+       || grep -q 'pluginURL="&repo;/dev/' <<<"$plg"; then
+        echo "Push to main stopped: $PLG is still a dev build (-dev version or dev update link)." >&2
+        echo "Run tools/release.sh <version> on main, commit, tag, then push." >&2
+        exit 1
+    fi
+done
+exit 0

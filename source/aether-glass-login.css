@@ -161,6 +161,71 @@ html body #login .case > * {
     color: transparent;
     animation: aether-login-holo 14s linear infinite;
 }
+/* Lava-lamp shimmer for headings: six soft colour blobs float inside the letters over a
+   base colour, like globs in a lava lamp, each on its own wandering path.
+   How: each blob is a radial gradient centred at two registered (@property) percentages,
+   and one animation per heading moves all twelve along six different paths.  The whole
+   stack is clipped to the text (background-clip: text, set by the rules above).
+   Why this way (measured on the Dashboard in Safari, ~36 headings):
+     - twelve separate animations per heading, smooth: ~16 fps;
+     - sliding pre-drawn layers (background-position) was faster, but Safari doesn't
+       repaint text-clipped backgrounds when only their position changes, so it froze;
+     - so: one animation per heading, stepped about 15 times a second.  The blobs drift
+       slowly, so steps still read as smooth, and Safari repaints a quarter as often.
+   Reduced-motion users get the blobs held still. */
+
+@property --aether-login-lava-x1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-y1 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-x2 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-y2 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-x3 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-y3 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-x4 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-y4 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-x5 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-y5 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-x6 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@property --aether-login-lava-y6 { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+@keyframes aether-login-lava {
+    0% { --aether-login-lava-x1: 67%; --aether-login-lava-y1: 18%; --aether-login-lava-x2: 7%; --aether-login-lava-y2: 91%; --aether-login-lava-x3: -3%; --aether-login-lava-y3: 36%; --aether-login-lava-x4: 33%; --aether-login-lava-y4: 75%; --aether-login-lava-x5: 77%; --aether-login-lava-y5: 56%; --aether-login-lava-x6: 3%; --aether-login-lava-y6: 10%; }
+    17% { --aether-login-lava-x1: 86%; --aether-login-lava-y1: -8%; --aether-login-lava-x2: 92%; --aether-login-lava-y2: -3%; --aether-login-lava-x3: -4%; --aether-login-lava-y3: 14%; --aether-login-lava-x4: 9%; --aether-login-lava-y4: 120%; --aether-login-lava-x5: 48%; --aether-login-lava-y5: 26%; --aether-login-lava-x6: 92%; --aether-login-lava-y6: 22%; }
+    33% { --aether-login-lava-x1: 3%; --aether-login-lava-y1: 117%; --aether-login-lava-x2: 46%; --aether-login-lava-y2: 3%; --aether-login-lava-x3: 59%; --aether-login-lava-y3: 87%; --aether-login-lava-x4: 1%; --aether-login-lava-y4: -5%; --aether-login-lava-x5: 47%; --aether-login-lava-y5: 0%; --aether-login-lava-x6: 72%; --aether-login-lava-y6: 18%; }
+    50% { --aether-login-lava-x1: 9%; --aether-login-lava-y1: 73%; --aether-login-lava-x2: 93%; --aether-login-lava-y2: -5%; --aether-login-lava-x3: 21%; --aether-login-lava-y3: 118%; --aether-login-lava-x4: 37%; --aether-login-lava-y4: 107%; --aether-login-lava-x5: 61%; --aether-login-lava-y5: 114%; --aether-login-lava-x6: 110%; --aether-login-lava-y6: 87%; }
+    67% { --aether-login-lava-x1: -1%; --aether-login-lava-y1: 109%; --aether-login-lava-x2: 16%; --aether-login-lava-y2: 37%; --aether-login-lava-x3: 15%; --aether-login-lava-y3: 58%; --aether-login-lava-x4: 94%; --aether-login-lava-y4: 60%; --aether-login-lava-x5: 111%; --aether-login-lava-y5: 67%; --aether-login-lava-x6: -5%; --aether-login-lava-y6: -1%; }
+    83% { --aether-login-lava-x1: 39%; --aether-login-lava-y1: -11%; --aether-login-lava-x2: 0%; --aether-login-lava-y2: 81%; --aether-login-lava-x3: 31%; --aether-login-lava-y3: 6%; --aether-login-lava-x4: 104%; --aether-login-lava-y4: 96%; --aether-login-lava-x5: 99%; --aether-login-lava-y5: 53%; --aether-login-lava-x6: 65%; --aether-login-lava-y6: 67%; }
+    100% { --aether-login-lava-x1: 67%; --aether-login-lava-y1: 18%; --aether-login-lava-x2: 7%; --aether-login-lava-y2: 91%; --aether-login-lava-x3: -3%; --aether-login-lava-y3: 36%; --aether-login-lava-x4: 33%; --aether-login-lava-y4: 75%; --aether-login-lava-x5: 77%; --aether-login-lava-y5: 56%; --aether-login-lava-x6: 3%; --aether-login-lava-y6: 10%; }
+}
+html body #login h1,
+html body #login .case,
+html body #login .case > * {
+    background-color: var(--aether-login-lava-base);
+    background-image:
+        radial-gradient(1.9em 1em at var(--aether-login-lava-x1) var(--aether-login-lava-y1), var(--aether-login-lava-c1), transparent),
+        radial-gradient(2.2em 1.1em at var(--aether-login-lava-x2) var(--aether-login-lava-y2), var(--aether-login-lava-c2), transparent),
+        radial-gradient(1.7em 0.9em at var(--aether-login-lava-x3) var(--aether-login-lava-y3), var(--aether-login-lava-c3), transparent),
+        radial-gradient(1.5em 0.8em at var(--aether-login-lava-x4) var(--aether-login-lava-y4), var(--aether-login-lava-c4), transparent),
+        radial-gradient(1.6em 0.9em at var(--aether-login-lava-x5) var(--aether-login-lava-y5), var(--aether-login-lava-c5), transparent),
+        radial-gradient(1.6em 0.9em at var(--aether-login-lava-x6) var(--aether-login-lava-y6), var(--aether-login-lava-c6), transparent);
+    background-size: auto;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    animation: aether-login-lava 34s infinite;
+    animation-timing-function: steps(85);   /* ~15 updates a second, see above */
+}
+html body #login h1,
+html body #login .case,
+html body #login .case > * {
+    --aether-login-lava-base: #cdb9ff; --aether-login-lava-c1: #8fe0ff; --aether-login-lava-c2: #ff9fd2; --aether-login-lava-c3: #b59bff; --aether-login-lava-c4: #a8f5dc; --aether-login-lava-c5: #ffe2a8; --aether-login-lava-c6: #9ff5c0;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #login h1,
+    html body #login .case,
+    html body #login .case > * {
+        animation: none;
+        --aether-login-lava-x1: 67%; --aether-login-lava-y1: 18%; --aether-login-lava-x2: 7%; --aether-login-lava-y2: 91%; --aether-login-lava-x3: -3%; --aether-login-lava-y3: 36%; --aether-login-lava-x4: 33%; --aether-login-lava-y4: 75%; --aether-login-lava-x5: 77%; --aether-login-lava-y5: 56%; --aether-login-lava-x6: 3%; --aether-login-lava-y6: 10%;
+    }
+}
+
 html body #login .form {
     width: 100%;
     max-width: 320px;

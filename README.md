@@ -38,6 +38,18 @@ It is CSS only.  It changes how pages look and nothing else: the array, Docker, 
 3. **Open** `Settings → Aether Glass` and click **Approve this version and turn on**.  The theme stays off until you do.
 4. **Reload** the page.  If it still looks stock, reload while holding Shift.
 
+## Dev channel (optional)
+
+New changes land on the `dev` branch first and are tested there before they reach `main`.  `main` is always the default: the install link above, and Community Apps.  If you'd like to try changes early, install the dev build instead:
+
+```
+https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme/dev/aether-glass.plg
+```
+
+- It replaces your normal install (same plugin, so the two never run together) and from then on updates from `dev`.  Its version ends in `-dev`, so `Plugins` shows which channel you're on.
+- Dev builds can have rough edges.  Please report them in the issues.
+- To go back, install the `main` link above.  Your settings are kept.  If the dev build is newer than the current release, you stay on that version until the next release passes it.
+
 ## Settings page
 
 `Settings → Aether Glass` shows the Unraid version, the approved version, the kill switch, whether the Display theme is Black, and which pages are themed.
@@ -105,12 +117,29 @@ grep aether-glass /var/log/syslog
 
 ## For maintainers: releasing
 
+Two channels, chosen by the branch you're on.  `tools/release.sh` sets the update link in the `.plg` to match and adds `-dev` to dev versions.  Both channels download files from the version's tag: a new tag is an address GitHub hasn't cached, so a build installs as soon as it's pushed.
+
+One-time setup per clone, so the push guard below runs (GitHub Desktop runs it too):
+
+```
+git config core.hooksPath tools/hooks
+```
+
+**Dev build** (on `dev`)
 1. **Edit** files in `source/`.
-2. **Run** `tools/release.sh 2026.11.02` (new version).  It writes the version and every file's SHA256 into the `.plg` and checks the XML.
+2. **Run** `tools/release.sh 2026.11.02`.  The `.plg` becomes `2026.11.02-dev`, updating from the `dev` branch.
 3. **Add** a line under `<CHANGES>` in the `.plg`.
-4. **Commit**, then **tag** that commit with the same version **before pushing**: `git tag 2026.11.02`.  The `.plg` downloads its files from that tag, so a release pushed without it fails to install.
-5. **Push** the commit and the tag: `git push && git push --tags`.
-6. **Check** the tag is on GitHub and each file in the `.plg` downloads with a matching SHA256.
+4. **Commit**, **tag** it `2026.11.02-dev` before pushing, then **push** `dev` and the tag.
+
+**Release** (to everyone)
+1. **Merge** `dev` into `main`.
+2. **Run** `tools/release.sh 2026.11.02` on `main`.  It refuses to keep a `-dev` version and points the update link back at `main`.
+3. **Commit**, then **tag** that commit with the same version **before pushing**: `git tag 2026.11.02`.  The `.plg` downloads its files from that tag, so a release pushed without it fails to install.
+4. **Push** the commit and the tag: `git push && git push --tags`.
+5. **Check** the tag is on GitHub and each file in the `.plg` downloads with a matching SHA256.
+6. **Merge** `main` back into `dev`, then run `tools/release.sh` on `dev` so it's a dev build again.
+
+The push guard (`tools/hooks/pre-push`) stops a push to `main` while its `.plg` still has a `-dev` version or the `dev` update link.  That's the one mistake that would move every user onto the testing channel.
 
 Changes that don't touch `source/` or the `.plg` (README, screenshots, tools) need no new version and no tag.
 
