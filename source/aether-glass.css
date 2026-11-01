@@ -311,7 +311,6 @@ body table.dashboard > tbody {
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     border-radius: var(--glass-radius);
-    corner-shape: squircle;
     box-shadow: var(--glass-shine), var(--glass-drop);
 }
 body table.dashboard td.stopgap {
@@ -1851,15 +1850,16 @@ body tr.header {
     left: 0;
     right: 0;
     top: 0;
-    bottom: -40px;
+    bottom: -14px;
     z-index: -1;
     pointer-events: none;
-    /* No colour wash, just the blur: solid behind the controls, fading out in the short strip
-       just below them so it never reaches down and washes out the page content. */
+    /* No colour wash, just the blur: solid behind the controls, fading out in a 14px strip
+       just below them.  (It was a 40px fade, which left the first line of content under the
+       menu blurred and hard to read, e.g. the "Array Devices" header on Main.) */
     -webkit-backdrop-filter: blur(28px) saturate(120%);
     backdrop-filter: blur(28px) saturate(120%);
-    -webkit-mask: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
-    mask: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+    -webkit-mask: linear-gradient(180deg, #000 0%, #000 calc(100% - 14px), transparent 100%);
+    mask: linear-gradient(180deg, #000 0%, #000 calc(100% - 14px), transparent 100%);
 }
 /* Utilities (the 90% usage bar + icon buttons) grouped on the right, on one baseline.
    Left in normal flow so Unraid's search field expands and restores the way it expects. */
@@ -2643,7 +2643,6 @@ a:hover {
 /* Docker / VM folder boxes, tabs, tooltips and shaded panels */
 body .folder-preview {
     border-radius: var(--aether-radius);
-    corner-shape: squircle;
 }
 /* Page tabs (Plugins, Docker, VMs and other sub-pages): the tabs sit in one glass capsule,
    the same segmented control as the main nav, with the current tab a raised violet pill.
@@ -3016,8 +3015,27 @@ html body:has(> .boot-title) {
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     border-radius: var(--r-xl);
-    corner-shape: squircle;
     box-shadow: var(--glass-shine), var(--glass-drop), 0 0 80px -30px rgba(124, 92, 255, 0.6);
+}
+
+/* Squircle corners (smooth, Apple-style) where the browser can draw them: Chrome and Edge
+   today, not Safari.  A squircle at the same radius looks noticeably tighter than a normal
+   round corner, so the radius is doubled here: that makes the two shapes read almost the same,
+   and Safari users and Chrome users see the same tile.  (Same rule as the Aether UI library's
+   --aether-corner-scale.)  Browsers without squircles skip this whole block. */
+@supports (corner-shape: squircle) {
+    body table.dashboard > tbody {
+        border-radius: calc(var(--glass-radius) * 2);
+        corner-shape: squircle;
+    }
+    body .folder-preview {
+        border-radius: calc(var(--aether-radius) * 2);
+        corner-shape: squircle;
+    }
+    html body:has(> .boot-title) {
+        border-radius: calc(var(--r-xl) * 2);
+        corner-shape: squircle;
+    }
 }
 html body .boot-title {
     margin: 0 0 var(--sp-4);
@@ -3991,11 +4009,20 @@ html body .boot-title {
     }
 }
 
+/* Spinner in the log-window title: while a plugin job runs, Unraid puts a spinning icon
+   after "In Progress".  The icon is a font glyph, so the shimmer's see-through text fill hid
+   it like the letters around it (and Chrome drew a stray sliver of it in the window corner).
+   Giving the icon its own solid fill brings it back. */
+html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
+    -webkit-text-fill-color: #cdb9ff;
+    color: #cdb9ff;
+}
+
 /* Footer: the theme's version, just left of Unraid's copyright.  tools/release.sh writes
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01f-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.01g-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);

@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.01f-dev">
+<!ENTITY version   "2026.11.01g-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "82f984dea6b5e766b80b456b776b6c4c55a9acd2d6db8928fc2217a4bad4c0b0">
+<!ENTITY sha_css     "114ecbc436ef36011a6d706b7f20ec8076c729d08b0cc6c0044d49fba1092048">
 <!ENTITY sha_login   "dd9f86073a6c9b50527ebd324b8f533ce5246e863bc62a4b5e453ec79f66f38e">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "0444b7e7f41e4b9703c7ef79ca72ca1b82490577a398b61514b97f9342ab0a00">
@@ -30,6 +30,9 @@
 - Footer: the theme's version shows next to Unraid's copyright.
 - Log windows (plugin installs, container updates) no longer pick up the amber or rose glow of the confirm box that opened them.
 - Headings shimmer like a lava lamp: six soft colour blobs (cyan, pink, orchid, blush, amber, mint) float inside the letters on their own timers.  Vivid on the reboot and shutdown title, pastel on tile headers, page titles, log-window titles and the login page.
+- The spinner next to "In Progress" in plugin windows is visible again (the shimmer had hidden it, and Chrome showed a stray sliver of it in the window corner).
+- Chrome and Edge: squircle corners on dashboard tiles, folder previews and the reboot page now use double the radius, so they match the round corners Safari draws.
+- The blur under the sticky menu bar fades out over 14px instead of 40px, so content just below the menu stays readable.
 
 ### 2026.10.31z
 - RAM pie: a ticked last slice now has a ticked round end too, instead of a solid blob.
