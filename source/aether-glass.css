@@ -2161,6 +2161,134 @@ body .tabs button[role="tab"]:active {
     background: transparent !important;
     border-color: var(--glass-edge) !important;
 }
+/* Dialog buttons (File Manager's Start / Queue / Cancel): Unraid styles these with its own
+   nested rule (orange outline, ALL CAPS, wide letter spacing), which is more specific than
+   the theme's general button rule, so they stayed orange.  This matches them to every other
+   button in the theme.  CSS can't tell a Delete dialog from a Copy one (only the text
+   differs), so Start stays the normal violet rather than rose. */
+body .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset button:not(.unapi *) {
+    color: var(--button-text-color);
+    background: var(--button-background);
+    background-size: var(--button-background-size);
+    border-radius: var(--pill);
+    padding: var(--sp-2) var(--sp-5);
+    font-family: var(--aether-font);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: capitalize;
+    box-shadow: var(--pill-edge);
+}
+body .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset button:not(.unapi *):is(:hover, :focus-visible):not([disabled]) {
+    color: var(--hover-button-text-color);
+    background: var(--hover-button-background);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        -8px 0 18px -6px rgba(0, 229, 255, 0.5),
+        8px 0 18px -6px rgba(255, 61, 154, 0.5);
+}
+body .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset button[disabled]:not(.unapi *) {
+    background: rgba(40, 28, 82, 0.45);
+    color: var(--aether-text-dim);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+    cursor: not-allowed;
+}
+/* Titlebar button (File Manager's Minimize, or Expand / Compress in the file editor).
+   Unraid draws it 86px wide and nudges it 20px up past the titlebar; the theme's pill rim
+   then outlined that stretched box, and the minimize glyph sat at the bottom of it like an
+   underscore.  Now it's a round glass icon button, centred in the titlebar.  No !important
+   on display: the Jobs dialog hides this button with an inline display:none, which must win. */
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close:not(.unapi *) {
+    display: grid;
+    place-items: center;
+    width: 28px !important;
+    height: 28px !important;
+    top: 50% !important;
+    right: var(--sp-3) !important;
+    margin: -14px 0 0 0 !important;
+    padding: 0 !important;
+    border-radius: 50%;
+    color: var(--aether-text);
+    background: var(--button-background);
+    box-shadow: var(--pill-edge);
+}
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close:not(.unapi *):is(:hover, :focus-visible) {
+    color: var(--hover-button-text-color);
+    background: var(--hover-button-background);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        -8px 0 18px -6px rgba(0, 229, 255, 0.5),
+        8px 0 18px -6px rgba(255, 61, 154, 0.5);
+}
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close i.fa {
+    font-size: 12px;
+    line-height: 1;
+}
+/* The minimize glyph is drawn at the bottom of its box; a centred minus reads the same
+   and sits in the middle of the circle */
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close i.fa-window-minimize::before {
+    content: "\f068";   /* FontAwesome 4 fa-minus */
+}
+
+/* ===== File Manager: the Age switch =====
+   Unraid's own control is a bare toggle icon (always shown "off") beside the "file type"
+   filter.  Clicking it swaps the Last Modified column between dates and ages ("4 months
+   ago"); the only label is a hover tooltip.  This turns the icon into a labelled switch.
+   The icon itself becomes the track, ::before the knob, ::after the "Age" label.
+   On/off comes from the table: Unraid hides whichever column text isn't in use with an
+   inline display:none, so when an age span is NOT hidden, ages are showing.  (In an empty
+   folder there's nothing to read, so the switch shows off; it has no effect there anyway.) */
+body .title .right > i.fa-toggle-off[onclick^="toggleTime"] {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+    margin-left: 44px;   /* room for the "Age" label on its left (px: ch would measure the icon font) */
+    vertical-align: middle;
+    border-radius: var(--pill);
+    background-color: rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+    transition: background-color 0.2s;
+}
+body .title .right > i.fa-toggle-off[onclick^="toggleTime"]::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+body .title .right > i.fa-toggle-off[onclick^="toggleTime"]::after {
+    content: "Age";
+    position: absolute;
+    top: 50%;
+    right: calc(100% + var(--sp-2));
+    transform: translateY(-50%);
+    font-family: var(--aether-font);
+    font-size: 1.3rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--aether-text);
+    white-space: nowrap;
+}
+body:has(span.my_age:not([style*="none"])) .title .right > i.fa-toggle-off[onclick^="toggleTime"] {
+    background-color: var(--aether-violet);
+}
+body:has(span.my_age:not([style*="none"])) .title .right > i.fa-toggle-off[onclick^="toggleTime"]::before {
+    transform: translateX(16px);
+}
+@media (prefers-reduced-motion: reduce) {
+    body .title .right > i.fa-toggle-off[onclick^="toggleTime"],
+    body .title .right > i.fa-toggle-off[onclick^="toggleTime"]::before {
+        transition: none;
+    }
+}
 .sweet-alert h2,
 .sweet-alert p {
     color: var(--aether-text);
@@ -4076,7 +4204,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.08-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.08a-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
