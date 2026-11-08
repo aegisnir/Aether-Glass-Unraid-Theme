@@ -2136,9 +2136,13 @@ body .tabs button[role="tab"]:active {
 
 /* ===== Dialogs (update log, plugin installs, confirmations) ===== */
 
+/* background-image: none matters here.  jQuery UI's stock overlay also paints a 100px-tall
+   grey image strip (ui-bg_flat_0_aaaaaa_40x100.png, repeat-x, centred), so overriding only
+   the colour left a grey band across the screen behind File Manager dialogs (Delete, Copy...). */
 .sweet-overlay,
 .ui-widget-overlay {
     background-color: rgba(8, 5, 26, 0.45) !important;
+    background-image: none !important;
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
 }
@@ -4072,7 +4076,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.01n-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.08-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
