@@ -2203,6 +2203,7 @@ body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close:not(.unapi *) {
     display: grid;
     place-items: center;
     width: 28px !important;
+    min-width: 0 !important;   /* Unraid gives every button min-width: 86px, which kept it an oval */
     height: 28px !important;
     top: 50% !important;
     right: var(--sp-3) !important;
@@ -2213,7 +2214,10 @@ body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close:not(.unapi *) {
     background: var(--button-background);
     box-shadow: var(--pill-edge);
 }
-body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close:not(.unapi *):is(:hover, :focus-visible) {
+/* Violet fill on hover only.  jQuery UI moves focus into the dialog when it opens, and
+   Safari can count that as keyboard focus, which lit the button up violet before you'd
+   touched it.  Keyboard focus still gets the violet ring, just not the fill. */
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close:not(.unapi *):hover {
     color: var(--hover-button-text-color);
     background: var(--hover-button-background);
     box-shadow:
@@ -2221,6 +2225,9 @@ body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close:not(.unapi *):is(:
         0 0 0 1px rgba(124, 92, 255, 0.6),
         -8px 0 18px -6px rgba(0, 229, 255, 0.5),
         8px 0 18px -6px rgba(255, 61, 154, 0.5);
+}
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close:not(.unapi *):focus-visible:not(:hover) {
+    box-shadow: var(--pill-edge), 0 0 0 1px rgba(124, 92, 255, 0.6);
 }
 body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close i.fa {
     font-size: 12px;
@@ -4204,7 +4211,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.08a-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.08b-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
