@@ -1,6 +1,6 @@
 # <img src="source/aether-glass.png" width="48" height="48" alt="" align="top"> Aether Glass
 
-A deep-violet frosted-glass theme for the Unraid webGUI.
+A frosted-glass theme for the Unraid webGUI, deep violet by default, with your own colours on the Settings page.
 
 > **Unofficial.**  Aether Glass is a community theme.  It is not made, endorsed or supported by Lime Technology.  "Unraid" is a trademark of Lime Technology, Inc.
 
@@ -19,7 +19,7 @@ A deep-violet frosted-glass theme for the Unraid webGUI.
 - **Controls:** pill buttons and fields, macOS-style toggles, a segmented glass main menu.
 - **Pages covered:** every normal page, the login page, the reboot and shutdown page, and the pop-up log windows plugins open (for example a "Downloading Package" window).
 
-It is CSS only.  It changes how pages look and nothing else: the array, Docker, VMs, shares and data are not touched.  The worst case is a page that looks wrong, and the Settings page or the kill switch puts it back to stock.
+The theme is CSS only.  It changes how pages look and nothing else: the array, Docker, VMs, shares and data are not touched.  The worst case is a page that looks wrong, and the Settings page or the kill switch puts it back to stock.
 
 ## Requirements
 
@@ -98,6 +98,31 @@ All 27 combinations (3 levels x 3 effects) were measured twice on the Dashboard,
 So the Speed ring counts the holographic shimmer on every title as the biggest cost, frosted glass as a medium one, and glows as free.  Two levels were added after the benchmark and their cost is estimated from it, not measured: "page titles" (a few always-moving titles, against about 37 for every title) and "menus and popups" (only the menu bar's blur is always on screen, against every panel).  Scrolling topped out near 50 fps in every combination (the self-scrolling test itself is the limit), so compare the rows with each other rather than reading them as absolute speeds.
 
 **Measured on an Apple M5 MacBook Pro, macOS 27.2, Safari 27.2, on a 120 Hz screen.  Results vary with hardware, operating system, browser and screen:** blur in particular costs more on slower graphics chips.
+
+### Appearance
+
+Looks that don't affect speed.  Saved on the flash drive (`appearance.cfg`) and applied straight away, for everyone who opens the webGUI.
+
+| Setting | Choices |
+|---|---|
+| Usage bars | **Status** (default): one colour per bar, from its value in 1% steps (green, amber, red), like the Dashboard rings.  **Spectrum**: one green-to-red gradient across the whole bar, revealed as it fills |
+| Colours | A colour scheme (Violet, Black, Emerald, Crimson, Ocean) or your own colour for each of: **Accent** (buttons, toggles, selected tabs, links), **Background**, **Panels** (glass tiles, menus, title bars), **Glow** (the aurora), and the status colours **Good**, **Warning** and **Critical** |
+
+The % numbers next to Dashboard bars take their bar's colour in both styles.  Usage bars, rings and status dots follow the three status colours.
+
+The page previews colours live while you pick (a small script on the Settings page; the theme itself stays CSS only).  It warns, without blocking, when an accent is close to a status colour or panels are too light for text.  **Restore Default Colours** puts all seven back.
+
+From a terminal:
+
+```bash
+/usr/local/emhttp/plugins/aether-glass/apply.sh --appearance bars=spectrum accent=#10b981 base=#02110c
+```
+
+```bash
+/usr/local/emhttp/plugins/aether-glass/apply.sh --appearance reset
+```
+
+Colours must be `#` and six hex digits.  Anything else is refused and nothing changes.  The saved values in `appearance.cfg` are checked again at every boot, so a damaged file falls back to the theme's own colours.
 
 #### Benchmark your own computer
 
@@ -257,6 +282,8 @@ This should never happen from a CSS theme, but just in case:
 | Unraid | 7.3.4 |
 | Community Applications | 2026.07.21 |
 
+**Browsers:** the theme works its colours out in the browser (CSS relative colours), so it needs Safari 18, Chrome or Edge 119, Firefox 128, or newer.  Older browsers show some colours wrong or missing.
+
 The theme also styles a few popular plugins.  Those rules only match when the plugin is installed and do nothing otherwise:
 
 - **Community Applications:** the Apps page cards, side panel and spotlight.
@@ -277,13 +304,33 @@ Unraid unpacks its webGUI into memory at every boot and reinstalls plugins from 
 
 1. Checks that this Unraid version is approved and the kill switch is off.
 2. Saves untouched copies of three webGUI files in `/tmp`.
-3. Switches on the Effects levels you picked (in the copy it installs; the theme file itself is not changed).
+3. Switches on the Effects levels and Appearance choices you picked (in the copy it installs; the theme file itself is not changed).
 4. Appends the theme to `themes/black.css` (normal pages) and `default-cases.css` (the login page, which loads no other stylesheet), and inserts a `<style>` block into `logging.htm` (the pop-up log window).  Each addition sits between `AETHER-GLASS-START` and `AETHER-GLASS-END` markers.
 
 Results go to the system log under the tag `aether-glass`:
 
 ```bash
 grep aether-glass /var/log/syslog
+```
+
+## For maintainers: theme colours
+
+Every theme colour is worked out from seven *anchors* at the top of `source/aether-glass.css` (and the login and log-window files): `--aether-accent`, `--aether-base`, `--aether-panel`, `--aether-glow`, `--aether-good`, `--aether-warning`, `--aether-critical`.  A colour in the theme is written as a shift of one of them, for example `oklch(from var(--aether-accent) calc(l + 0.11) calc(c * 0.69) calc(h + 7.34))`: the accent, a bit lighter, a bit less vivid, turned slightly round the colour wheel.  With the default anchors that is exactly the old colour; with a new anchor the whole family moves together.
+
+- [ ] **Write** new colours the same way, never as a plain hex (black, white and grey text are the exception).  Pick the anchor by role, not by look.
+- [ ] **Watch** the Dashboard pie block: it comes from a private generator (`gen-pie-css.py`) that still writes plain hex.  Convert its colours to anchors after regenerating it.
+
+`apply.sh` writes the user's anchors in a block after the theme's own CSS, and sets `--aether-accent-ink` (white, or near-black when the accent is too light for white text at 3:1).
+
+## For maintainers: usage bar colours
+
+Each usage bar, and the % number in front of it on the Dashboard, takes one colour from the bar's value, in 1% steps.  CSS can't read the value as a number, so `source/aether-glass.css` has two generated blocks: `BAR-COLOURS` (the 101-colour table and one rule per whole percent for the bars) and `TEXT-COLOURS` (the same for the numbers).  The Spectrum style lives in an `@media (aether-bars-spectrum)` block that `apply.sh` switches on.  To change the colours:
+
+- [ ] **Edit** the `--aether-meter-sNN` stops in the CSS (each is a shift of Good, Warning or Critical).  If you move a stop to a different percent, change `STOPS` in `tools/gen-bar-colours.py` to match.
+- [ ] **Run** it from the repo folder:
+
+```bash
+python3 tools/gen-bar-colours.py
 ```
 
 ## For maintainers: releasing

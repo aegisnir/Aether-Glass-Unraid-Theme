@@ -13,20 +13,34 @@
  */
 
 html:has(#login) {
-    --aether-cyan: #00e5ff;
-    --aether-violet: #7c5cff;
-    --aether-pink: #ff3d9a;
+    /* ---- The seven colours a user can change (Settings -> Aether Glass -> Appearance) ----
+       Every other theme colour is worked out from one of these: the same colour made lighter,
+       darker, more or less vivid, or turned round the colour wheel by a fixed amount.  So
+       changing one here (apply.sh adds the user's values in a block after this file) moves its
+       whole family together, and with these defaults the theme looks exactly as before. */
+    --aether-accent: #7c5cff;      /* buttons, toggles, selected tabs, links, brand gradient */
+    --aether-base: #08051a;        /* the page background */
+    --aether-panel: #140c2e;       /* the glass panels, menus and title bars */
+    --aether-glow: #6d28d9;        /* the aurora behind the glass */
+    --aether-good: #10c98f;        /* healthy, started, low usage */
+    --aether-warning: #f59e0b;     /* past the warning level */
+    --aether-critical: #f43f6e;    /* past the critical level, errors */
+    --aether-accent-ink: #ffffff;  /* text on accent-filled buttons; apply.sh picks white or near-black */
+
+    --aether-cyan: oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92));
+    --aether-violet: var(--aether-accent);
+    --aether-pink: oklch(from var(--aether-accent) calc(l + 0.0781) calc(c * 1.0353) calc(h + 70.58));
     --aether-gradient: linear-gradient(90deg, var(--aether-cyan) 0, var(--aether-violet) 50%, var(--aether-pink) 100%);
-    --aether-bg: #08051a;
+    --aether-bg: var(--aether-base);
     --aether-text: #e6ebf7;
     --aether-text-dim: #8b95b5;
-    --aether-link: #7b8ff5;
-    --aether-problem: #f43f6e;
+    --aether-link: oklch(from var(--aether-accent) calc(l + 0.0812) calc(c * 0.6600) calc(h - 12.85));
+    --aether-problem: var(--aether-critical);
     --aether-font: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-    --glass-tint: rgba(26, 16, 58, 0.42);
+    --glass-tint: oklch(from var(--aether-panel) calc(l + 0.0264) calc(c * 1.1879) calc(h - 0.31) / 0.42);
     --glass-filter: blur(22px) saturate(170%);
-    --glass-edge: rgba(200, 190, 255, 0.12);
+    --glass-edge: oklch(from var(--aether-accent) calc(l + 0.2331) calc(c * 0.3943) calc(h + 5.14) / 0.12);
     --pill: 999px;
     /* Same radius and 4px spacing scale as aether-liquid-glass.css (see there).
        The login page uses the browser's 16px root size, so values are in px. */
@@ -46,12 +60,12 @@ html:has(#login) {
     min-height: 100%;
     background-color: var(--aether-bg);
     background-image:
-        linear-gradient(rgba(124, 92, 255, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124, 92, 255, 0.035) 1px, transparent 1px),
-        radial-gradient(60vw 50vh at 12% 8%, rgba(109, 40, 217, 0.40), transparent 70%),
-        radial-gradient(45vw 40vh at 90% 18%, rgba(255, 61, 154, 0.14), transparent 70%),
-        radial-gradient(45vw 40vh at 85% 85%, rgba(0, 229, 255, 0.08), transparent 70%),
-        radial-gradient(70vw 60vh at 40% 100%, rgba(79, 70, 229, 0.30), transparent 70%);
+        linear-gradient(rgb(from var(--aether-accent) r g b / 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(from var(--aether-accent) r g b / 0.035) 1px, transparent 1px),
+        radial-gradient(60vw 50vh at 12% 8%, rgb(from var(--aether-glow) r g b / 0.40), transparent 70%),
+        radial-gradient(45vw 40vh at 90% 18%, oklch(from var(--aether-accent) calc(l + 0.0781) calc(c * 1.0353) calc(h + 70.58) / 0.14), transparent 70%),
+        radial-gradient(45vw 40vh at 85% 85%, oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92) / 0.08), transparent 70%),
+        radial-gradient(70vw 60vh at 40% 100%, oklch(from var(--aether-glow) calc(l + 0.0199) calc(c * 0.9537) calc(h - 15.62) / 0.30), transparent 70%);
     background-size: 24px 24px, 24px 24px, auto, auto, auto, auto;
     background-attachment: fixed;
 }
@@ -81,7 +95,7 @@ html body #login {
         inset 0 1px 0 rgba(255, 255, 255, 0.14),
         inset 0 0 0 1px var(--glass-edge),
         0 30px 80px -20px rgba(0, 0, 0, 0.8),
-        0 0 80px -30px rgba(124, 92, 255, 0.6);
+        0 0 80px -30px rgb(from var(--aether-accent) r g b / 0.6);
 }
 
 /* Header: Unraid's hard skewed banner becomes a soft gradient wash that fades into the glass */
@@ -124,8 +138,8 @@ html body #login .case {
     width: auto;
     font-size: 5.6rem;
     line-height: 1;
-    color: #c4b5fd;
-    filter: drop-shadow(0 0 14px rgba(124, 92, 255, 0.55));
+    color: oklch(from var(--aether-accent) calc(l + 0.2121) calc(c * 0.4405) calc(h + 7.37));
+    filter: drop-shadow(0 0 14px rgb(from var(--aether-accent) r g b / 0.55));
 }
 /* Space under the icon only when there is one (no case chosen = no gap) */
 html body #login .case > * {
@@ -153,7 +167,7 @@ html body #login h2 {
 html body #login h1,
 html body #login .case,
 html body #login .case > * {
-    background: linear-gradient(90deg, #a9e3ff, #cdb9ff, #ffc2e2, #cdb9ff, #a9e3ff);
+    background: linear-gradient(90deg, oklch(from var(--aether-accent) calc(l + 0.2866) calc(c * 0.3067) calc(h - 56.93)), oklch(from var(--aether-accent) calc(l + 0.2278) calc(c * 0.4298) calc(h + 11.10)), oklch(from var(--aether-accent) calc(l + 0.2790) calc(c * 0.3498) calc(h + 59.87)), oklch(from var(--aether-accent) calc(l + 0.2278) calc(c * 0.4298) calc(h + 11.10)), oklch(from var(--aether-accent) calc(l + 0.2866) calc(c * 0.3067) calc(h - 56.93)));
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
@@ -215,7 +229,7 @@ html body #login .case > * {
 html body #login h1,
 html body #login .case,
 html body #login .case > * {
-    --aether-login-lava-base: #cdb9ff; --aether-login-lava-c1: #8fe0ff; --aether-login-lava-c2: #ff9fd2; --aether-login-lava-c3: #b59bff; --aether-login-lava-c4: #a8f5dc; --aether-login-lava-c5: #ffe2a8; --aether-login-lava-c6: #9ff5c0;
+    --aether-login-lava-base: oklch(from var(--aether-accent) calc(l + 0.2278) calc(c * 0.4298) calc(h + 11.10)); --aether-login-lava-c1: oklch(from var(--aether-accent) calc(l + 0.2665) calc(c * 0.3914) calc(h - 61.87)); --aether-login-lava-c2: oklch(from var(--aether-accent) calc(l + 0.2151) calc(c * 0.5613) calc(h + 61.04)); --aether-login-lava-c3: oklch(from var(--aether-accent) calc(l + 0.1528) calc(c * 0.6200) calc(h + 8.49)); --aether-login-lava-c4: oklch(from var(--aether-good) calc(l + 0.1724) calc(c * 0.5323) calc(h + 8.58)); --aether-login-lava-c5: oklch(from var(--aether-warning) calc(l + 0.1546) calc(c * 0.4892) calc(h + 14.24)); --aether-login-lava-c6: oklch(from var(--aether-good) calc(l + 0.1606) calc(c * 0.7100) calc(h - 7.18));
 }
 @media (prefers-reduced-motion: reduce) {
     html body #login h1,
@@ -259,12 +273,12 @@ html body #login input[type="password"] {
     font-family: var(--aether-font);
     font-size: 16px;          /* 16px or more stops iPhone Safari zooming in on focus */
     color: var(--aether-text);
-    caret-color: #c4b5fd;
+    caret-color: oklch(from var(--aether-accent) calc(l + 0.2121) calc(c * 0.4405) calc(h + 7.37));
     border: 0;
     border-radius: var(--pill);
     height: 44px;             /* Apple's minimum touch target; fields and button match */
     padding: 0 var(--sp-5);
-    background-color: rgba(8, 5, 26, 0.45);
+    background-color: rgb(from var(--aether-base) r g b / 0.45);
     background-image: var(--pill-sheen);
     box-shadow: var(--pill-edge);
     transition: box-shadow 0.25s;
@@ -282,25 +296,25 @@ html body #login input[type="password"]:focus {
     0%, 100% {
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.16),
-            0 0 0 1px rgba(124, 92, 255, 0.6),
-            -8px 0 18px -6px rgba(0, 229, 255, 0.55),
-            8px 0 18px -6px rgba(255, 61, 154, 0.55),
-            0 0 24px -8px rgba(124, 92, 255, 0.8);
+            0 0 0 1px rgb(from var(--aether-accent) r g b / 0.6),
+            -8px 0 18px -6px oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92) / 0.55),
+            8px 0 18px -6px oklch(from var(--aether-accent) calc(l + 0.0781) calc(c * 1.0353) calc(h + 70.58) / 0.55),
+            0 0 24px -8px rgb(from var(--aether-accent) r g b / 0.8);
     }
     50% {
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.16),
-            0 0 0 1px rgba(124, 92, 255, 0.6),
-            -8px 0 18px -6px rgba(255, 61, 154, 0.55),
-            8px 0 18px -6px rgba(0, 229, 255, 0.55),
-            0 0 24px -8px rgba(124, 92, 255, 0.8);
+            0 0 0 1px rgb(from var(--aether-accent) r g b / 0.6),
+            -8px 0 18px -6px oklch(from var(--aether-accent) calc(l + 0.0781) calc(c * 1.0353) calc(h + 70.58) / 0.55),
+            8px 0 18px -6px oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92) / 0.55),
+            0 0 24px -8px rgb(from var(--aether-accent) r g b / 0.8);
     }
 }
 /* Safari / Chrome autofill paints fields pale yellow-blue; keep them dark */
 html body #login input:-webkit-autofill {
     -webkit-text-fill-color: var(--aether-text);
-    -webkit-box-shadow: 0 0 0 100px #140c2e inset;
-    caret-color: #c4b5fd;
+    -webkit-box-shadow: 0 0 0 100px var(--aether-panel) inset;
+    caret-color: oklch(from var(--aether-accent) calc(l + 0.2121) calc(c * 0.4405) calc(h + 7.37));
 }
 
 /* Log in: the one primary action, so it's a filled violet pill */
@@ -315,19 +329,19 @@ html body #login .button {
     border-radius: var(--pill);
     height: 44px;
     padding: 0 var(--sp-8);
-    background: linear-gradient(180deg, #9a82ff 0, #7354f0 55%, #5534c9 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 14px -4px rgba(124, 92, 255, 0.6);
+    background: linear-gradient(180deg, oklch(from var(--aether-accent) calc(l + 0.0861) calc(c * 0.7764) calc(h + 3.47)) 0, oklch(from var(--aether-accent) calc(l - 0.0310) calc(c * 0.9664) calc(h - 0.13)) 55%, oklch(from var(--aether-accent) calc(l - 0.1343) calc(c * 0.9322) calc(h - 1.68)) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 14px -4px rgb(from var(--aether-accent) r g b / 0.6);
     transition: box-shadow 0.25s;
 }
 html body #login .button:hover,
 html body #login .button:focus-visible {
     outline: none;
-    background: linear-gradient(180deg, #a892ff 0, #7d60f5 55%, #5c3bd3 100%);
+    background: linear-gradient(180deg, oklch(from var(--aether-accent) calc(l + 0.1258) calc(c * 0.6757) calc(h + 5.10)) 0, oklch(from var(--aether-accent) calc(l - 0.0007) calc(c * 0.9258) calc(h + 0.85)) 55%, oklch(from var(--aether-accent) calc(l - 0.1100) calc(c * 0.9482) calc(h - 1.26)) 100%);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.35),
-        0 0 0 1px rgba(124, 92, 255, 0.6),
-        -8px 0 18px -6px rgba(0, 229, 255, 0.5),
-        8px 0 18px -6px rgba(255, 61, 154, 0.5);
+        0 0 0 1px rgb(from var(--aether-accent) r g b / 0.6),
+        -8px 0 18px -6px oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92) / 0.5),
+        8px 0 18px -6px oklch(from var(--aether-accent) calc(l + 0.0781) calc(c * 1.0353) calc(h + 70.58) / 0.5);
 }
 
 /* Links and errors: plain sentence-case link, rose error text */
@@ -339,7 +353,7 @@ html body #login a {
 }
 html body #login a:hover {
     color: #ffffff;
-    text-shadow: 0 0 8px rgba(167, 139, 250, 0.7);
+    text-shadow: 0 0 8px oklch(from var(--aether-accent) calc(l + 0.1099) calc(c * 0.6922) calc(h + 7.34) / 0.7);
 }
 html body #login .error {
     color: var(--aether-problem);
@@ -363,7 +377,7 @@ html body #login .error {
 @media (prefers-reduced-motion: reduce) {
     html body #login input:focus {
         animation: none;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgba(124, 92, 255, 0.6), 0 0 20px -6px rgba(124, 92, 255, 0.8);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgb(from var(--aether-accent) r g b / 0.6), 0 0 20px -6px rgb(from var(--aether-accent) r g b / 0.8);
     }
     html body #login h1,
     html body #login .case,
@@ -374,7 +388,7 @@ html body #login .error {
 
 @media (prefers-reduced-transparency: reduce) {
     html:has(#login) {
-        --glass-tint: #161033;
+        --glass-tint: oklch(from var(--aether-panel) calc(l + 0.0154) calc(c * 1.0183) calc(h - 2.65));
         --glass-filter: none;
     }
 }

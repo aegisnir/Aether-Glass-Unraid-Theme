@@ -11,15 +11,29 @@
  */
 
 :root {
+    /* ---- The seven colours a user can change (Settings -> Aether Glass -> Appearance) ----
+       Every other theme colour is worked out from one of these: the same colour made lighter,
+       darker, more or less vivid, or turned round the colour wheel by a fixed amount.  So
+       changing one here (apply.sh adds the user's values in a block after this file) moves its
+       whole family together, and with these defaults the theme looks exactly as before. */
+    --aether-accent: #7c5cff;      /* buttons, toggles, selected tabs, links, brand gradient */
+    --aether-base: #08051a;        /* the page background */
+    --aether-panel: #140c2e;       /* the glass panels, menus and title bars */
+    --aether-glow: #6d28d9;        /* the aurora behind the glass */
+    --aether-good: #10c98f;        /* healthy, started, low usage */
+    --aether-warning: #f59e0b;     /* past the warning level */
+    --aether-critical: #f43f6e;    /* past the critical level, errors */
+    --aether-accent-ink: #ffffff;  /* text on accent-filled buttons; apply.sh picks white or near-black */
+
     color-scheme: dark;
-    --lg-bg: #0e0a24;
+    --lg-bg: oklch(from var(--aether-panel) calc(l - 0.0208) calc(c * 0.7987) calc(h - 3.08));
     --lg-text: #e6ebf7;
     --lg-dim: #8b95b5;
-    --lg-violet: #7c5cff;
-    --lg-ok: #10c98f;
-    --lg-attention: #f59e0b;
-    --lg-problem: #f43f6e;
-    --lg-cyan: #00e5ff;
+    --lg-violet: var(--aether-accent);
+    --lg-ok: var(--aether-good);
+    --lg-attention: var(--aether-warning);
+    --lg-problem: var(--aether-critical);
+    --lg-cyan: oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92));
 }
 
 /* Deep violet sheet with the same faint top glow as the theme's glass panels */
@@ -29,7 +43,7 @@ html {
 body {
     color: var(--lg-text);
     background:
-        radial-gradient(120% 60% at 50% 0%, rgba(124, 92, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(120% 60% at 50% 0%, rgb(from var(--aether-accent) r g b / 0.12) 0%, transparent 60%),
         var(--lg-bg);
     min-height: 100%;
 }
@@ -43,7 +57,7 @@ body {
 
 /* Links in the log (rare) use the theme's violet */
 a {
-    color: #a78bfa;
+    color: oklch(from var(--aether-accent) calc(l + 0.1099) calc(c * 0.6922) calc(h + 7.34));
 }
 
 /* Coloured log lines: Unraid paints them as pale pastel bars meant for a white page.
@@ -57,24 +71,24 @@ span.login {
     padding: 1px 6px;
 }
 span.error {
-    color: #ff9db6;
-    background-color: rgba(244, 63, 110, 0.16);
+    color: oklch(from var(--aether-critical) calc(l + 0.1539) calc(c * 0.5535) calc(h - 7.18));
+    background-color: rgb(from var(--aether-critical) r g b / 0.16);
 }
 span.warn {
-    color: #ffd48a;
-    background-color: rgba(245, 158, 11, 0.16);
+    color: oklch(from var(--aether-warning) calc(l + 0.1223) calc(c * 0.6310) calc(h + 10.30));
+    background-color: rgb(from var(--aether-warning) r g b / 0.16);
 }
 span.system {
-    color: #8ff3ff;
-    background-color: rgba(0, 229, 255, 0.12);
+    color: oklch(from var(--aether-accent) calc(l + 0.3081) calc(c * 0.4144) calc(h - 80.65));
+    background-color: oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92) / 0.12);
 }
 span.array {
-    color: #7ff0c6;
-    background-color: rgba(16, 201, 143, 0.15);
+    color: oklch(from var(--aether-good) calc(l + 0.1360) calc(c * 0.7692) calc(h + 3.71));
+    background-color: rgb(from var(--aether-good) r g b / 0.15);
 }
 span.login {
-    color: #c4b5fd;
-    background-color: rgba(124, 92, 255, 0.18);
+    color: oklch(from var(--aether-accent) calc(l + 0.2121) calc(c * 0.4405) calc(h + 7.37));
+    background-color: rgb(from var(--aether-accent) r g b / 0.18);
 }
 
 /* The "Done" button: a glass pill like every other button in the theme,
@@ -94,9 +108,9 @@ a.button {
     border: 0;
     border-radius: 999px;
     color: var(--lg-text);
-    background: linear-gradient(180deg, rgba(124, 92, 255, 0.55) 0%, rgba(124, 92, 255, 0.32) 100%);
+    background: linear-gradient(180deg, rgb(from var(--aether-accent) r g b / 0.55) 0%, rgb(from var(--aether-accent) r g b / 0.32) 100%);
     background-size: auto;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 0 0 1px rgba(200, 190, 255, 0.35), 0 6px 18px -8px rgba(124, 92, 255, 0.8);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 0 0 1px oklch(from var(--aether-accent) calc(l + 0.2331) calc(c * 0.3943) calc(h + 5.14) / 0.35), 0 6px 18px -8px rgb(from var(--aether-accent) r g b / 0.8);
     transition: box-shadow 0.2s ease, background 0.2s ease;
 }
 input:hover[type=button],
@@ -106,16 +120,16 @@ button:hover,
 button:hover[type=button],
 a.button:hover {
     color: #fff;
-    background: linear-gradient(180deg, rgba(124, 92, 255, 0.75) 0%, rgba(124, 92, 255, 0.5) 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(200, 190, 255, 0.5), 0 0 22px -4px rgba(124, 92, 255, 0.9);
+    background: linear-gradient(180deg, rgb(from var(--aether-accent) r g b / 0.75) 0%, rgb(from var(--aether-accent) r g b / 0.5) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 0 0 1px oklch(from var(--aether-accent) calc(l + 0.2331) calc(c * 0.3943) calc(h + 5.14) / 0.5), 0 0 22px -4px rgb(from var(--aether-accent) r g b / 0.9);
 }
 button:focus-visible {
     outline: none;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 3px rgba(0, 229, 255, 0.45);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 3px oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92) / 0.45);
 }
 
 /* Thin violet scrollbar to match the rest of the theme */
 html {
-    scrollbar-color: rgba(124, 92, 255, 0.45) transparent;
+    scrollbar-color: rgb(from var(--aether-accent) r g b / 0.45) transparent;
     scrollbar-width: thin;
 }

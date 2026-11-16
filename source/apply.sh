@@ -39,6 +39,10 @@
 #   apply.sh --effects motion=hover glass=all glow=all
 #                         pick how much motion, frosted glass and glow to use (see
 #                         "Effects" below); saved on the flash drive, applied right away
+#   apply.sh --appearance bars=status accent=#7c5cff
+#   apply.sh --appearance reset
+#                         pick how the theme looks: bar style and colours (see "Appearance"
+#                         below); saved on the flash drive, applied right away
 #
 # Results go to the syslog under the tag "aether-glass".
 
@@ -47,6 +51,8 @@ PLUGIN=aether-glass
 # Run as root, so use only the system's own tools, never a same-named file in the
 # current folder.
 PATH=/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin
+# Plain "C" rules for text, so checks like "six hex digits" mean exactly 0-9 and a-f everywhere
+export LC_ALL=C
 
 # The AG_* overrides below exist only so the script can be tested against a fake folder
 # tree on another computer.  On a real Unraid server they are ignored: the webGUI can set
@@ -69,6 +75,7 @@ NOTIFY=/usr/local/emhttp/webGui/scripts/notify
 APPROVED="$CFG/approved-version"
 KILL="$CFG/DISABLED"
 EFFECTS="$CFG/effects.cfg"
+APPEARANCE="$CFG/appearance.cfg"
 START='/* AETHER-GLASS-START */'
 END='/* AETHER-GLASS-END */'
 # HTML pages: the theme goes in as a <style> block just before </head>, fenced by HTML
@@ -198,10 +205,163 @@ read_effects() {
     done < "$EFFECTS"
 }
 
-# Copy CSS from stdin to stdout with the chosen levels switched on
+# ---- Appearance ---------------------------------------------------------------------------
+# Looks that cost nothing in speed, so they live apart from Effects (and its presets):
+#   bars      status | spectrum   usage bars: one colour per bar from its value (the
+#                                 default), or the older full-width green -> red gradient
+#   accent, base, panel, glow, good, warning, critical
+#             a colour each, written #rrggbb: the seven colours the whole theme is worked out
+#             from (see the top of aether-glass.css)
+#   reset     (no value) every colour back to the theme's own; bars stays as it is
+# Saved in appearance.cfg as fixed "key=value" lines.
+#   - bars is switched on in the installed copy the same way as the Effects levels: the CSS
+#     keeps the non-default look behind a media condition that never matches on its own,
+#     "(aether-bars-spectrum)", and only the fixed sed command below is ever run.
+#   - Colours are the one place a user types a free value, so they are held to one strict
+#     rule: exactly "#" and six hex digits, nothing else.  Anything else is refused and
+#     nothing is saved.  They are checked again every time the file is read (it lives on the
+#     flash drive and can be edited by hand), and they only ever reach the theme as
+#     "--aether-NAME: #rrggbb;" lines in a block after the theme's own CSS.  A value never
+#     goes into a command, a sed pattern or anything that runs.
+# The Settings page sends each colour as two arguments ("accent=" then "#7c5cff"), because a
+# colour picker can only send the colour itself; both spellings are accepted.
+
+DEFAULT_BARS=status
+COLOUR_KEYS="accent base panel glow good warning critical"
+
+valid_appearance() {
+    case "$1=$2" in
+        bars=status|bars=spectrum) return 0 ;;
+    esac
+    return 1
+}
+
+is_colour_key() {
+    case "$1" in
+        accent|base|panel|glow|good|warning|critical) return 0 ;;
+    esac
+    return 1
+}
+
+# Exactly "#" and six hex digits.  Prints it in lower case.
+valid_hex() {
+    [[ "$1" =~ ^#[0-9a-fA-F]{6}$ ]] || return 1
+    printf '%s' "$1" | tr 'A-F' 'a-f'
+}
+
+# The colour saved for a key (empty for "the theme's own").  No eval: a fixed case per key.
+colour_get() {
+    case "$1" in
+        accent) printf '%s' "$C_ACCENT" ;;   base) printf '%s' "$C_BASE" ;;
+        panel) printf '%s' "$C_PANEL" ;;     glow) printf '%s' "$C_GLOW" ;;
+        good) printf '%s' "$C_GOOD" ;;       warning) printf '%s' "$C_WARNING" ;;
+        critical) printf '%s' "$C_CRITICAL" ;;
+    esac
+}
+colour_set() {
+    case "$1" in
+        accent) C_ACCENT=$2 ;;   base) C_BASE=$2 ;;   panel) C_PANEL=$2 ;;   glow) C_GLOW=$2 ;;
+        good) C_GOOD=$2 ;;       warning) C_WARNING=$2 ;;   critical) C_CRITICAL=$2 ;;
+    esac
+}
+
+# Read appearance.cfg into BARS and the C_* colours.  Anything missing or not valid falls
+# back to the default, so a damaged or hand-edited file can't break the theme.
+read_appearance() {
+    local key val hex k
+    BARS=$DEFAULT_BARS
+    for k in $COLOUR_KEYS; do colour_set "$k" ""; done
+    [ -f "$APPEARANCE" ] || return 0
+    while IFS='=' read -r key val; do
+        if valid_appearance "$key" "$val"; then
+            BARS=$val
+        elif is_colour_key "$key" && hex="$(valid_hex "$val")"; then
+            colour_set "$key" "$hex"
+        fi
+    done < "$APPEARANCE"
+}
+
+# Text colour for accent-filled buttons: white while it stands out at least 3:1 against the
+# accent (WCAG's bar for bold labels), otherwise near-black.  Same rule as the Settings page.
+accent_ink() {
+    awk -v h="$1" 'function lin(c) { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ^ 2.4 }
+        function hx(s) { return index("0123456789abcdef", substr(s, 1, 1)) * 16 + index("0123456789abcdef", substr(s, 2, 1)) - 17 }
+        BEGIN { L = 0.2126 * lin(hx(substr(h, 2, 2))) + 0.7152 * lin(hx(substr(h, 4, 2))) + 0.0722 * lin(hx(substr(h, 6, 2)))
+                print (1.05 / (L + 0.05) >= 3) ? "#ffffff" : "#0b0b10" }'
+}
+
+# The CSS block with the saved colours, printed after the theme's own CSS so it wins.  Nothing
+# at all when every colour is the theme's own.  "html:has(#login)" covers the login page,
+# whose copy of the theme sets its colours on that selector.
+colours_css() {
+    local k v any=""
+    for k in $COLOUR_KEYS; do [ -n "$(colour_get "$k")" ] && any=1; done
+    [ -n "$any" ] || return 0
+    printf '\n/* Aether Glass: colours set in Settings -> Aether Glass -> Appearance */\nhtml:root, html:has(#login) {\n'
+    for k in $COLOUR_KEYS; do
+        v="$(colour_get "$k")"
+        if [ -n "$v" ]; then printf '    --aether-%s: %s;\n' "$k" "$v"; fi
+    done
+    [ -n "$C_ACCENT" ] && printf '    --aether-accent-ink: %s;\n' "$(accent_ink "$C_ACCENT")"
+    printf '}\n'
+}
+
+# --appearance: check every argument before saving anything
+set_appearance() {
+    local key val hex k b="" reset="" new_keys="" new_vals=""
+    [ $# -gt 0 ] || { say "appearance: nothing given; e.g. --appearance bars=status accent=#7c5cff"; return 1; }
+    while [ $# -gt 0 ]; do
+        if [ "$1" = reset ]; then
+            reset=1; shift; continue
+        fi
+        key="${1%%=*}" val="${1#*=}"
+        # "accent=" followed by "#7c5cff" as the next argument (the Settings page's form)
+        if [ "$1" = "$key=" ] && is_colour_key "$key" && [ $# -ge 2 ]; then
+            val="$2"; shift
+        fi
+        if valid_appearance "$key" "$val"; then
+            b=$val
+        elif is_colour_key "$key" && hex="$(valid_hex "$val")"; then
+            new_keys="$new_keys $key" new_vals="$new_vals $hex"
+        else
+            say "appearance: '$1' isn't a known setting or a #rrggbb colour; nothing changed"
+            return 1
+        fi
+        shift
+    done
+    read_appearance
+    BARS="${b:-$BARS}"
+    if [ -n "$reset" ]; then
+        for k in $COLOUR_KEYS; do colour_set "$k" ""; done
+    fi
+    set -- $new_vals
+    for k in $new_keys; do colour_set "$k" "$1"; shift; done
+    mkdir -p "$CFG" || return 1
+    {
+        printf 'bars=%s\n' "$BARS"
+        for k in $COLOUR_KEYS; do
+            if [ -n "$(colour_get "$k")" ]; then printf '%s=%s\n' "$k" "$(colour_get "$k")"; fi
+        done
+    } > "$APPEARANCE.tmp" && mv "$APPEARANCE.tmp" "$APPEARANCE" || return 1
+    say "appearance: $(appearance_summary)"
+}
+
+# One line for --status and the log, e.g. "bars status, colours theme" or
+# "bars status, colours accent #10b981 base #02110c"
+appearance_summary() {
+    local k v cols=""
+    for k in $COLOUR_KEYS; do
+        v="$(colour_get "$k")"
+        [ -n "$v" ] && cols="$cols $k $v"
+    done
+    printf 'bars %s, colours%s' "$BARS" "${cols:- theme}"
+}
+
+# Copy CSS from stdin to stdout with the chosen Effects levels and Appearance looks switched on
 effects_filter() {
     local args=()
     read_effects
+    read_appearance
     case "$MOTION" in
         everywhere) args+=(-e 's/(aether-motion-everywhere)/all, &/g') ;;
         titles)     args+=(-e 's/(aether-motion-titles)/all, &/g') ;;
@@ -215,6 +375,9 @@ effects_filter() {
     case "$GLOW" in
         static) args+=(-e 's/(aether-glow-static)/all, &/g') ;;
         off)    args+=(-e 's/(aether-glow-off)/all, &/g') ;;
+    esac
+    case "$BARS" in
+        spectrum) args+=(-e 's/(aether-bars-spectrum)/all, &/g') ;;
     esac
     if [ ${#args[@]} -eq 0 ]; then cat; else sed "${args[@]}"; fi
 }
@@ -264,7 +427,8 @@ add() {
     restore "$2"
     # start the block on its own line even if the stock file has no final newline
     [ -n "$(tail -c 1 "$dst")" ] && printf '\n' >> "$dst"
-    { printf '%s\n' "$START"; effects_filter < "$src"; printf '\n%s\n' "$END"; } >> "$dst"
+    read_appearance
+    { printf '%s\n' "$START"; effects_filter < "$src"; colours_css; printf '\n%s\n' "$END"; } >> "$dst"
     say "applied $1 to $2"
 }
 
@@ -297,7 +461,7 @@ restore_page() {
 
 # add_page <css file in CFG> <page under PAGES>
 add_page() {
-    local src="$CFG/$1" dst="$PAGES/$2" copy tmp
+    local src="$CFG/$1" dst="$PAGES/$2" copy tmp css
     if [ ! -f "$dst" ]; then
         say "SKIPPED $2: not found (an Unraid update may have renamed it)"
         return
@@ -318,17 +482,22 @@ add_page() {
         say "SKIPPED $2: $1 contains </style, which isn't allowed inside a style block"
         return
     fi
+    # The page gets the saved colours too, in the same <style> block (only #rrggbb values)
+    read_appearance
+    css="$(mktemp)" || return 1
+    { cat "$src"; colours_css; } > "$css"
     copy="$(page_copy "$2")"
     if [ ! -f "$copy" ] && ! grep -qF "$HSTART" "$dst"; then
         if ! { stock_dir && cp -p "$dst" "$copy"; }; then
             say "SKIPPED $2: couldn't save a stock copy first"
+            rm -f "$css"
             return
         fi
     fi
     restore_page "$2"
-    tmp="$(mktemp)" || return 1
+    tmp="$(mktemp)" || { rm -f "$css"; return 1; }
     # Print the block right before the first </head> line, and every line as it was
-    awk -v s="$HSTART" -v e="$HEND" -v css="$src" '
+    awk -v s="$HSTART" -v e="$HEND" -v css="$css" '
         !done && $0 ~ /^[[:space:]]*<\/head>[[:space:]]*$/ {
             print s
             print "<style>"
@@ -339,7 +508,7 @@ add_page() {
         }
         { print }
     ' "$dst" > "$tmp" && cat "$tmp" > "$dst"
-    rm -f "$tmp"
+    rm -f "$tmp" "$css"
     say "applied $1 to $2"
 }
 
@@ -372,6 +541,8 @@ show_status() {
     echo "Kill switch:       $([ -f "$KILL" ] && echo ON || echo off)"
     read_effects
     echo "Effects:           $(levels_preset "$MOTION" "$GLASS" "$GLOW") (motion $MOTION, glass $GLASS, glow $GLOW)"
+    read_appearance
+    echo "Appearance:        $(appearance_summary)"
     if grep -q '^theme="black"' "$DISPLAY_CFG" 2>/dev/null; then
         echo "Display theme:     Black"
     else
@@ -462,8 +633,13 @@ case "$1" in
         set_effects "$@" || exit 1
         boot   # re-applies with the new effects, if the theme is on (approved, not disabled)
         ;;
+    --appearance)
+        shift
+        set_appearance "$@" || exit 1
+        boot   # re-applies with the new look, if the theme is on (approved, not disabled)
+        ;;
     *)
-        echo "usage: apply.sh [--approve | --disable | --enable | --remove | --status | --effects preset=NAME | --effects motion=X glass=X glow=X]"
+        echo "usage: apply.sh [--approve | --disable | --enable | --remove | --status | --effects preset=NAME | --effects motion=X glass=X glow=X | --appearance bars=status|spectrum NAME=#rrggbb ... | --appearance reset]"
         exit 1
         ;;
 esac

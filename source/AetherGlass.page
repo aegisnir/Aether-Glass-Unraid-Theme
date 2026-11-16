@@ -11,8 +11,10 @@ Markdown="false"
  * Every button posts to Unraid's own /update.php, which runs apply.sh with fixed
  * arguments.  update.php only runs scripts inside the webGUI folder and quotes the
  * arguments, and apply.sh rejects anything that isn't one of its known options and values.
- * No JavaScript: the theme is CSS only, and so is this page.  The preset panel and the
- * choice buttons react to clicks with CSS alone (radio buttons underneath).
+ * The theme itself is CSS only.  This page is too, except one small script that previews the
+ * Appearance colour pickers live and fills them in from a colour scheme; without it the
+ * pickers still work and the change shows after Apply.  The preset panel and the choice
+ * buttons react to clicks with CSS alone (radio buttons underneath).
  */
 $apply  = '/usr/local/emhttp/plugins/aether-glass/apply.sh';
 $status = shell_exec(escapeshellarg($apply).' --status 2>&1') ?? '';
@@ -37,6 +39,37 @@ $is_on       = !$kill_on && $is_approved && $themed[_('Normal pages')];
 // Effects: "Effects:  fast (motion hover, glass panels, glow static)"
 preg_match('/^Effects:\s+(\w+) \(motion (\w+), glass (\w+), glow (\w+)\)/m', $status, $fx);
 [$preset, $motion, $glass, $glow] = [$fx[1] ?? 'balanced', $fx[2] ?? 'hover', $fx[3] ?? 'all', $fx[4] ?? 'all'];
+
+// Appearance: "Appearance:  bars status, colours accent #10b981 base #02110c" ("colours theme"
+// when none are set).  Only known names and #rrggbb values are used; anything else shows the default.
+preg_match('/^Appearance:\s+bars (\w+), colours (.*)$/m', $status, $ap);
+$bars = in_array($ap[1] ?? '', ['status', 'spectrum'], true) ? $ap[1] : 'status';
+// The seven colours, with the theme's own as the starting values (same as the top of aether-glass.css)
+$ag_default = ['accent' => '#7c5cff', 'base' => '#08051a', 'panel' => '#140c2e', 'glow' => '#6d28d9',
+               'good' => '#10c98f', 'warning' => '#f59e0b', 'critical' => '#f43f6e'];
+$ag_cols = $ag_default;
+preg_match_all('/\b(accent|base|panel|glow|good|warning|critical) (#[0-9a-f]{6})\b/', $ap[2] ?? '', $ag_m, PREG_SET_ORDER);
+foreach ($ag_m as [, $k, $v]) $ag_cols[$k] = $v;
+// Colour schemes: each one only fills in the pickers.  Status colours stay the theme's own.
+$ag_status = array_slice($ag_default, 4);
+$ag_schemes = [
+  'violet'  => [_('Violet'),  $ag_default],
+  'black'   => [_('Black'),   ['accent' => '#a1a1aa', 'base' => '#000000', 'panel' => '#18181b', 'glow' => '#3f3f46'] + $ag_status],
+  'emerald' => [_('Emerald'), ['accent' => '#10b981', 'base' => '#02110c', 'panel' => '#0a1f18', 'glow' => '#047857'] + $ag_status],
+  'crimson' => [_('Crimson'), ['accent' => '#f43f5e', 'base' => '#12040a', 'panel' => '#220a14', 'glow' => '#9f1239'] + $ag_status],
+  'ocean'   => [_('Ocean'),   ['accent' => '#0ea5e9', 'base' => '#020c17', 'panel' => '#071a2b', 'glow' => '#0369a1'] + $ag_status],
+];
+$ag_scheme_now = 'custom';
+foreach ($ag_schemes as $key => [, $cols]) if ($cols == $ag_cols) $ag_scheme_now = $key;
+$ag_fields = [
+  'accent'   => [_('Accent'),     _('Buttons, toggles, selected tabs, links')],
+  'base'     => [_('Background'), _('Behind everything')],
+  'panel'    => [_('Panels'),     _('Glass tiles, menus, title bars')],
+  'glow'     => [_('Glow'),       _('The aurora behind the glass')],
+  'good'     => [_('Good'),       _('Healthy, started, low usage')],
+  'warning'  => [_('Warning'),    _('Past the warning level')],
+  'critical' => [_('Critical'),   _('Past the critical level, errors')],
+];
 
 // Hidden fields every form needs
 function ag_form_head($apply, $var, $arg0) {
@@ -276,11 +309,77 @@ function ag_fx_css($fx, $names) {
 .ag form.ag-preset:has(option:checked:not(.ag-saved)) input[type="submit"] {
   color: #04130d; background: linear-gradient(180deg, #4ade9c 0, #10c98f 55%, #0aa676 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgba(16, 201, 143, 0.6); }
+/* ---- Appearance: a picture for each choice, like macOS's Light / Dark picker ----
+   Each option is a radio button drawn as a small glass card showing three sample bars
+   (about 30%, 75% and 95%) in that style.  The samples carry their own colours, so they
+   look right even while the theme is off.  The colours are the theme's 1% table at those
+   values (see "Usage bars" in aether-glass.css). */
+.ag-picks { display: flex; flex-wrap: wrap; gap: 1.6rem; margin: 1.4rem 0 0.6rem; }
+.ag-pick input { position: absolute; opacity: 0; pointer-events: none; }
+.ag-pick label { display: grid; gap: 0.8rem; justify-items: center; cursor: pointer; }
+.ag-pickcard { display: grid; gap: 0.9rem; width: 19rem; padding: 1.5rem 1.6rem; border-radius: 1.4rem;
+  background: rgba(22, 16, 51, 0.7); box-shadow: 0 0 0 1px var(--ag-line); transition: box-shadow 0.2s; }
+.ag-pick label:hover .ag-pickcard { box-shadow: 0 0 0 1px rgba(200, 190, 255, 0.35); }
+.ag-pick input:checked + label .ag-pickcard { box-shadow: 0 0 0 2px var(--ag-accent), 0 0 18px -4px var(--ag-accent); }
+.ag-pick input:focus-visible + label .ag-pickcard { outline: 2px solid var(--ag-accent); outline-offset: 4px; }
+.ag-pick .ag-cap2 { font-size: 1.3rem; color: #b4bad6; }
+.ag-pick input:checked + label .ag-cap2 { color: #fff; font-weight: 600; }
+.ag-sb { position: relative; height: 0.9rem; border-radius: 999px; overflow: hidden; container-type: inline-size; }
+.ag-sb > i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; }
+.ag-sb.s30 > i { width: 30%; } .ag-sb.s74 > i { width: 74%; } .ag-sb.s94 > i { width: 94%; }
+/* Status: one colour per bar, deeper at the start, on a dim track of that colour */
+.ag-status .s30 { background: color-mix(in srgb, #51c889 20%, #150d2c); }
+.ag-status .s30 > i { background: linear-gradient(90deg in oklch, oklch(from #51c889 calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from #51c889 calc(l + 0.04) c h)); }
+.ag-status .s74 { background: color-mix(in srgb, #f09a3b 20%, #150d2c); }
+.ag-status .s74 > i { background: linear-gradient(90deg in oklch, oklch(from #f09a3b calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from #f09a3b calc(l + 0.04) c h)); }
+.ag-status .s94 { background: color-mix(in srgb, #e94178 20%, #150d2c); }
+.ag-status .s94 > i { background: linear-gradient(90deg in oklch, oklch(from #e94178 calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from #e94178 calc(l + 0.04) c h)); }
+/* Spectrum: one green-to-rose gradient across the whole bar, revealed by the fill */
+.ag-spectrum .ag-sb { background: linear-gradient(90deg, #1d2a3a, #24283a 45%, #2f2a35 60%, #3a2a2f 72%, #3b222f 90%, #3a2035); }
+.ag-spectrum .ag-sb > i { background: linear-gradient(90deg, #12a57c 0%, #3cc48e 25%, #8fd27a 45%, #d4c457 60%, #f0a23a 72%, #f2733f 84%, #ec4470 92%, #e0388f 100%);
+  background-size: 100cqw 100%; background-repeat: no-repeat; }
+/* ---- Appearance: colours.  One row per colour, like a System Settings list: name and a short
+   hint on the left, the picker and its hex value on the right.  The colour schemes above the
+   list only fill in the pickers; they need the small script at the end of the page, so they
+   stay hidden until it runs (the pickers work without it). */
+.ag-schemes { display: none; flex-wrap: wrap; gap: 1.6rem; margin: 1.2rem 0 0.4rem; }
+.ag.ag-js .ag-schemes { display: flex; }
+/* The theme (and Unraid) style every <button> as a pill; these are swatches, so undo that.
+   !important because the button rules are far more specific than anything sensible here. */
+.ag .ag-schemes .ag-scheme, .ag .ag-schemes .ag-scheme:hover, .ag .ag-schemes .ag-scheme:focus {
+  all: unset; display: grid !important; justify-items: center; gap: 0.6rem; cursor: pointer; font-size: 1.2rem; color: #b4bad6;
+  background: none !important; box-shadow: none !important; border: 0 !important; padding: 0 !important; margin: 0 !important;
+  min-width: 0 !important; height: auto !important; animation: none !important; text-transform: none !important; }
+.ag-scheme i { width: 4.2rem; height: 4.2rem; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14); }
+.ag-scheme[aria-pressed="true"] { color: #fff; font-weight: 600; }
+.ag-scheme[aria-pressed="true"] i { box-shadow: 0 0 0 2px #0b0b10, 0 0 0 4px #fff; }
+.ag-scheme:focus-visible i { outline: 2px solid var(--ag-accent); outline-offset: 4px; }
+.ag-cols { max-width: 62rem; margin-top: 1rem; }
+.ag-colhead { font-size: 1.1rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ag-dim); margin: 1.6rem 0 0.2rem; }
+.ag-col { display: grid; grid-template-columns: 1fr auto; gap: 1.2rem; align-items: center; padding: 0.9rem 0; border-bottom: 1px solid var(--ag-line); }
+.ag-col label b { display: block; font-size: 1.35rem; }
+.ag-col label small { color: var(--ag-dim); font-size: 1.15rem; }
+.ag-col .ag-warn2 { grid-column: 1 / -1; margin-top: -0.4rem; font-size: 1.15rem; color: #fbbf24; }
+.ag-swatch { display: inline-flex; align-items: center; gap: 0.8rem; }
+.ag-swatch code { font: 1.2rem ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ag-dim); min-width: 6.4rem; }
+.ag .ag-swatch input[type="color"] { -webkit-appearance: none; appearance: none; width: 2.8rem; height: 2.8rem; min-width: 0; margin: 0; padding: 0;
+  border: 0; border-radius: 50%; background: none; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2); }
+.ag-swatch input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.ag-swatch input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.ag-swatch input[type="color"]::-moz-color-swatch { border: 0; border-radius: 50%; }
+.ag-swatch input[type="color"]:focus-visible { outline: 2px solid var(--ag-accent); outline-offset: 3px; }
+/* Apply turns green and Cancel shows once a colour is changed (the script marks the form) */
+.ag form.ag-dirty .ag-cancel { display: inline-block; }
+.ag form.ag-dirty input[type="submit"] {
+  color: #04130d; background: linear-gradient(180deg, #4ade9c 0, #10c98f 55%, #0aa676 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgba(16, 201, 143, 0.6); }
+.ag-reset { margin-top: 1.2rem; }
+.ag-reset input[type="submit"] { background: none; box-shadow: none; color: #c4b5fd; padding: 0; min-width: 0; }
 <?=ag_fx_css($ag_fx, $ag_names)?>
 </style>
 
 <div class="ag">
-<p>An unofficial deep-violet frosted-glass theme for the webGUI.  It changes how pages look and nothing else, and it is CSS only.
+<p>An unofficial frosted-glass theme for the webGUI, deep violet unless you pick other colours under Appearance.  It changes how pages look and nothing else, and the theme itself is CSS only.
 Main pages need <b>Settings &rarr; Display Settings &rarr; Dynamix color theme = Black</b>; the login page is themed on any setting.</p>
 </div>
 
@@ -350,6 +449,118 @@ Main pages need <b>Settings &rarr; Display Settings &rarr; Dynamix color theme =
   </form>
 </div>
 </div><!-- /ag-fx -->
+
+<div class="title nocontrol"><span class="left"><i class="title fa fa-paint-brush"></i> _(Appearance)_</span></div>
+<div class="ag">
+  <p>_(Looks that don't affect speed.  These settings apply to everyone who opens this server's webGUI.)_</p>
+  <form class="ag-ap" method="POST" action="/update.php" target="progressFrame">
+    <?=ag_form_head($apply, $var, '--appearance')?>
+    <div class="ag-fxname"><b>_(Usage bars)_</b></div>
+    <div class="ag-picks" role="radiogroup" aria-label="_(Usage bars)_">
+      <?php foreach (['status' => _('Status'), 'spectrum' => _('Spectrum')] as $val => $name): ?>
+      <div class="ag-pick ag-<?=$val?>">
+        <input type="radio" id="ag-bars-<?=$val?>" name="#arg[1]" value="bars=<?=$val?>"<?=$val === $bars ? ' class="ag-saved" checked' : ''?>>
+        <label for="ag-bars-<?=$val?>">
+          <span class="ag-pickcard" aria-hidden="true"><span class="ag-sb s30"><i></i></span><span class="ag-sb s74"><i></i></span><span class="ag-sb s94"><i></i></span></span>
+          <span class="ag-cap2"><?php if ($val === $bars): ?><span class="ag-applied" title="_(Applied)_">&check;</span><?php endif; ?><?=$name?></span>
+        </label>
+      </div>
+      <?php endforeach; ?>
+    </div>
+
+    <div class="ag-fxname" style="margin-top:2.4rem"><b>_(Colours)_</b></div>
+    <div class="ag-schemes" role="group" aria-label="_(Colour scheme)_">
+      <?php foreach ($ag_schemes as $key => [$name, $cols]): ?>
+      <button type="button" class="ag-scheme" data-cols='<?=htmlspecialchars(json_encode($cols), ENT_QUOTES)?>' aria-pressed="<?=$key === $ag_scheme_now ? 'true' : 'false'?>">
+        <i style="background: linear-gradient(135deg, <?=$cols['base']?> 0 50%, <?=$cols['accent']?> 50% 100%)"></i><?=$name?></button>
+      <?php endforeach; ?>
+      <button type="button" class="ag-scheme ag-custom" aria-pressed="<?=$ag_scheme_now === 'custom' ? 'true' : 'false'?>">
+        <i style="background: conic-gradient(#f43f5e, #f59e0b, #10b981, #0ea5e9, #7c5cff, #f43f5e)"></i>_(Custom)_</button>
+    </div>
+    <div class="ag-cols">
+      <?php $n = 2; foreach ($ag_fields as $key => [$label, $hint]): ?>
+      <?php if ($key === 'good'): ?><div class="ag-colhead">_(Status)_</div><?php endif; ?>
+      <div class="ag-col">
+        <label for="ag-col-<?=$key?>"><b><?=$label?></b><small><?=$hint?></small></label>
+        <span class="ag-swatch">
+          <!-- apply.sh gets "accent=" then the colour: a picker can only send the colour itself -->
+          <input type="hidden" name="#arg[<?=$n++?>]" value="<?=$key?>=">
+          <code id="ag-hex-<?=$key?>"><?=$ag_cols[$key]?></code>
+          <input type="color" id="ag-col-<?=$key?>" name="#arg[<?=$n++?>]" value="<?=$ag_cols[$key]?>" data-key="<?=$key?>">
+        </span>
+        <span class="ag-warn2" id="ag-warn-<?=$key?>" hidden></span>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <div class="ag-btn"><input type="submit" value="_(Apply)_"><input type="reset" class="ag-cancel" value="_(Cancel)_"></div>
+  </form>
+  <form class="ag-reset" method="POST" action="/update.php" target="progressFrame">
+    <?=ag_form_head($apply, $var, '--appearance')?><input type="hidden" name="#arg[1]" value="reset">
+    <input type="submit" value="_(Restore Default Colours)_">
+  </form>
+</div>
+
+<script>
+/* Appearance: live preview of the colour pickers.  The whole theme is worked out from seven
+   colours set on the page root (see the top of aether-glass.css), so setting them on <html>
+   here recolours this page as you pick.  Nothing is saved until Apply; Cancel or leaving the
+   page puts everything back.  The checks below match apply.sh and the README.  (Warnings are plain English: translation
+   markers aren't safe inside a script.) */
+(function () {
+  var box = document.querySelector('.ag-ap'); if (!box) return;
+  var root = document.documentElement, form = box, pickers = form.querySelectorAll('input[type="color"]');
+  box.parentNode.classList.add('ag-js');
+  function rgb(h) { return [1, 3, 5].map(function (i) { return parseInt(h.substr(i, 2), 16) / 255; }); }
+  function lin(c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function lum(h) { var c = rgb(h).map(lin); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function lab(h) { var c = rgb(h).map(lin);
+    var l = Math.cbrt(0.4122214708 * c[0] + 0.5363325363 * c[1] + 0.0514459929 * c[2]),
+        m = Math.cbrt(0.2119034982 * c[0] + 0.6806995451 * c[1] + 0.1073969566 * c[2]),
+        s = Math.cbrt(0.0883024619 * c[0] + 0.2817188376 * c[1] + 0.6299787005 * c[2]);
+    return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+            0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s]; }
+  function dist(a, b) { var x = lab(a), y = lab(b); return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]); }
+  function mix(a, b, t) { var x = rgb(a), y = rgb(b); return '#' + x.map(function (v, i) {
+    return ('0' + Math.round((v * (1 - t) + y[i] * t) * 255).toString(16)).slice(-2); }).join(''); }
+  function val(k) { return form.querySelector('[data-key="' + k + '"]').value; }
+  function warn(k, text) { var w = document.getElementById('ag-warn-' + k); w.hidden = !text; w.textContent = text || ''; }
+  function check() {
+    var names = { good: 'Good', warning: 'Warning', critical: 'Critical' }, near = null, d = 9;
+    ['good', 'warning', 'critical'].forEach(function (k) { var x = dist(val('accent'), val(k)); if (x < d) { d = x; near = k; } });
+    warn('accent', d < 0.1 ? '\u26a0\ufe0f ' + 'Close to ' + names[near] + ': ' + 'an accent button may read as a status.' : '');
+    var panelOnBase = mix(val('base'), val('panel'), 0.62);
+    warn('panel', contrast('#e6ebf7', panelOnBase) < 4.5 ? '\u26a0\ufe0f ' + 'Text on panels is hard to read.' : '');
+  }
+  function show(k, v) {
+    root.style.setProperty('--aether-' + k, v);
+    if (k === 'accent') root.style.setProperty('--aether-accent-ink', contrast('#ffffff', v) >= 3 ? '#ffffff' : '#0b0b10');
+    document.getElementById('ag-hex-' + k).textContent = v;
+  }
+  function changed() {
+    var dirty = false;
+    pickers.forEach(function (p) { if (p.value !== p.defaultValue) dirty = true; });
+    form.classList.toggle('ag-dirty', dirty);
+    var cols = {}; pickers.forEach(function (p) { cols[p.dataset.key] = p.value; });
+    var match = null;
+    form.querySelectorAll('.ag-scheme[data-cols]').forEach(function (b) {
+      var s = JSON.parse(b.dataset.cols), same = Object.keys(s).every(function (k) { return s[k] === cols[k]; });
+      b.setAttribute('aria-pressed', same); if (same) match = b; });
+    form.querySelector('.ag-custom').setAttribute('aria-pressed', !match);
+    check();
+  }
+  pickers.forEach(function (p) { p.addEventListener('input', function () { show(p.dataset.key, p.value); changed(); }); });
+  form.querySelectorAll('.ag-scheme[data-cols]').forEach(function (b) {
+    b.addEventListener('click', function () { var s = JSON.parse(b.dataset.cols);
+      pickers.forEach(function (p) { p.value = s[p.dataset.key]; show(p.dataset.key, p.value); }); changed(); });
+  });
+  form.addEventListener('reset', function () { setTimeout(function () {
+    pickers.forEach(function (p) { root.style.removeProperty('--aether-' + p.dataset.key);
+      document.getElementById('ag-hex-' + p.dataset.key).textContent = p.value; });
+    root.style.removeProperty('--aether-accent-ink'); changed(); }); });
+  check();
+})();
+</script>
 
 <div class="title nocontrol"><span class="left"><i class="title fa fa-tachometer"></i> _(Benchmark your computer)_</span></div>
 <div class="ag">

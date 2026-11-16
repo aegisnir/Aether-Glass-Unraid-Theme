@@ -2,17 +2,17 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.15d-dev">
+<!ENTITY version   "2026.11.16-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "e86bce1b115c9a054397d18aceac75bc1dd1bb221d9d3c292b9fd75ac315046f">
-<!ENTITY sha_login   "dd9f86073a6c9b50527ebd324b8f533ce5246e863bc62a4b5e453ec79f66f38e">
-<!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
-<!ENTITY sha_apply   "dd43000e0488e4aed71d39b40c1235697c7f76f4beb965e561f51f5cab9d0ea0">
-<!ENTITY sha_page    "267af9c6439ad894f05776002451bffa1651fb4113579f9c0ed4af959d0ab653">
+<!ENTITY sha_css     "4b465e946776ad13c6c8d719460afddb74e4b0dec49a8a879f22ad3a1f0b9132">
+<!ENTITY sha_login   "efb5ba93c4b84c0199a3d983190b6bddd82925b665b4d03c54ebf92b1b30800d">
+<!ENTITY sha_logging "1cb56c6b6764e4423889280efa74461bc1780e0e9ac2a195f8dac0ca15139fcb">
+<!ENTITY sha_apply   "58288a2c5c9c8e2d77d51b392a250cbd0e2b77f4981c60400fb402a3611c3205">
+<!ENTITY sha_page    "e0e2c510afc967623aaf8d85504ea226f35e50b93d30d2446ed6cd662bc31170">
 <!ENTITY sha_icon    "ec8be7110f1cc9d0fe440edfb2d4d3de394dc482519ba26eccbd7a7e2e2d6159">
 ]>
 
@@ -26,6 +26,11 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.11.16
+- New Appearance section in Settings -> Aether Glass: usage bar style, colour schemes (Violet, Black, Emerald, Crimson, Ocean) and a colour picker for the accent, background, panels, glow and the Good / Warning / Critical colours.  The page previews colours live as you pick, and Restore Default Colours puts them back.
+- Usage bars (disks, array, CPU, RAM, the header array bar, Docker and VM CPU) default to the new Status style, like the Dashboard rings: one colour per bar, picked from its value in 1% steps from green through amber to rose, on a dim track of the same colour.  A 95% disk is rose from end to end.  The previous look is still there as Spectrum.
+- The % numbers next to Dashboard bars now change colour every 1%, matching their bar exactly (they used 10% steps).
+
 ### 2026.11.15d
 - Log windows on Unraid 7.3 phones: round corners again, and the title fits on one line (the 15a restyle had given them 7.4's full-screen square corners and room for a Minimize button 7.3 doesn't have).
 
@@ -206,7 +211,7 @@
 <INLINE>
 **Aether Glass**
 
-An unofficial deep-violet frosted-glass theme for the Unraid webGUI.  CSS only: it changes how pages look, nothing else.  Pauses itself after every Unraid update until you approve the new version in Settings -> Aether Glass.
+An unofficial frosted-glass theme for the Unraid webGUI, deep violet or your own colours.  CSS only: it changes how pages look, nothing else.  Pauses itself after every Unraid update until you approve the new version in Settings -> Aether Glass.
 </INLINE>
 </FILE>
 
@@ -245,7 +250,7 @@ rm -f "&emhttp;/images/aether-glass.png"
 rmdir "&emhttp;/images" 2>/dev/null
 rmdir "&emhttp;" 2>/dev/null
 
-for f in aether-glass.css aether-glass-login.css aether-glass-logging.css apply.sh AetherGlass.page aether-glass.png approved-version DISABLED effects.cfg; do
+for f in aether-glass.css aether-glass-login.css aether-glass-logging.css apply.sh AetherGlass.page aether-glass.png approved-version DISABLED effects.cfg appearance.cfg; do
     rm -f "&cfg;/$f"
 done
 rmdir "&cfg;" 2>/dev/null
