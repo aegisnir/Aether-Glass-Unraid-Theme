@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.15c-dev">
+<!ENTITY version   "2026.11.15d-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "fa02387528407bc96e8c7798da9667641040dbd6068152ad0def345806a8e952">
+<!ENTITY sha_css     "e86bce1b115c9a054397d18aceac75bc1dd1bb221d9d3c292b9fd75ac315046f">
 <!ENTITY sha_login   "dd9f86073a6c9b50527ebd324b8f533ce5246e863bc62a4b5e453ec79f66f38e">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "dd43000e0488e4aed71d39b40c1235697c7f76f4beb965e561f51f5cab9d0ea0">
@@ -26,6 +26,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.11.15d
+- Log windows on Unraid 7.3 phones: round corners again, and the title fits on one line (the 15a restyle had given them 7.4's full-screen square corners and room for a Minimize button 7.3 doesn't have).
+
 ### 2026.11.15c
 - Header on Unraid 7.4: the UNRAID logo and the account circle are back in the theme gradient (7.4's new header had turned them red and orange again), and the logo no longer flashes orange while a page loads.
 
