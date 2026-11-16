@@ -2501,6 +2501,235 @@ body .sweet-alert.nchan pre#swalbody :is(h1, h2, h3) {
     box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(170, 155, 255, 0.08);
 }
 
+/* ===== Task tray (bottom right: minimized log windows and background tasks, Unraid 7.4+) =====
+ * Unraid draws each task as a separate solid card with a coloured stripe on the left.  Here
+ * the whole tray is one glass panel, like a grouped notification stack: each task is a row
+ * inside it, its status is a tinted disc on the left, and its actions are round glass buttons.
+ * Concentric corners: panel 28 with 8px padding, so rows are 28 - 8 = 20.  Rows are 40px with
+ * a 6px inset and 28px discs and buttons, so 14 + 6 = 20 as well.
+ * Unraid's markup (BodyInlineJS trayRender):
+ *   #opTray.op-tray > .op-tray-head (only with 2+ tasks) > .op-tray-count + .op-tray-head-acts
+ *                   > .op-task.op-running|op-queued|op-done|op-error|op-aborting
+ *                       > .op-icon + .op-title + .op-actions > a.op-act (Show, Abort, Cancel, Dismiss)
+ * The tray is hidden and emptied when there are no tasks, so the panel never shows empty. */
+body .op-tray {
+    gap: 2px;
+    padding: 8px;
+    border-radius: 28px;
+    background: var(--glass-tint-strong);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shine), var(--glass-drop);
+    scrollbar-width: none;           /* it still scrolls when the list is taller than 60% of the screen */
+}
+body .op-tray::-webkit-scrollbar {
+    display: none;
+}
+/* Header: "3 operations" in sentence case (Unraid shouts it in capitals) and Clear finished as a small pill */
+body .op-tray .op-tray-head {
+    padding: 2px 2px 6px 12px;
+}
+body .op-tray .op-tray-count {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    opacity: 1;
+    color: var(--aether-text-dim);
+}
+body .op-tray .op-tray-head-acts {
+    gap: 4px;
+}
+body .op-tray .op-tray-head .op-act:not(.op-collapse) {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 11px;
+    border-radius: var(--pill);
+    font-size: 1.15rem;
+    font-weight: 600;
+    opacity: 1;
+    color: #cdb9ff;
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 0 1px var(--glass-edge);
+    transition: background-color 0.15s, color 0.15s;
+}
+body .op-tray .op-tray-head .op-act:not(.op-collapse):hover {
+    color: #ffffff;
+    background: var(--aether-violet);
+}
+body .op-tray .op-tray-head .op-act:not(.op-collapse) > i {
+    display: none;                   /* the words say it; the little check icon only adds noise */
+}
+/* Rows: no card of their own, just a faint highlight under the pointer */
+body .op-tray .op-task {
+    gap: 10px;
+    min-height: 40px;
+    padding: 0 6px;
+    font-size: 1.3rem;
+    color: var(--aether-text);
+    background: transparent;
+    border: 0;
+    border-radius: 20px;
+    box-shadow: none;
+    transition: background-color 0.15s;
+}
+body .op-tray .op-task:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+/* Finished and waiting tasks step back so the running one stands out */
+body .op-tray .op-task:is(.op-done, .op-queued) .op-title {
+    color: var(--aether-text-dim);
+}
+/* Status disc: the same colours as the status chip in the log window */
+body .op-tray .op-icon {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    color: #cdb9ff;
+    background: rgba(124, 92, 255, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(124, 92, 255, 0.5);
+}
+body .op-tray .op-queued .op-icon {
+    color: #aab3d1;
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 0 1px var(--glass-edge);
+}
+body .op-tray .op-done .op-icon {
+    color: #8ff0cb;
+    background: rgba(16, 201, 143, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(16, 201, 143, 0.45);
+}
+body .op-tray .op-error .op-icon {
+    color: #ffa3ba;
+    background: rgba(244, 63, 110, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(244, 63, 110, 0.5);
+}
+/* Unraid colours the check green and the warning orange, and the theme adds a glow to those
+   colour classes.  The disc carries the colour here, so the icon just follows it. */
+body .op-tray .op-icon > i {
+    color: inherit;
+    text-shadow: none;
+}
+/* Actions: round glass buttons, violet on hover, like the log window's Minimize button */
+body .op-tray .op-actions {
+    gap: 4px;
+}
+body .op-tray .op-actions .op-act {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: #cdb9ff;
+    background: var(--button-background);
+    box-shadow: var(--pill-edge);
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+body .op-tray .op-actions .op-act:hover {
+    color: var(--hover-button-text-color);
+    background: var(--hover-button-background);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        -6px 0 14px -6px rgba(0, 229, 255, 0.6),
+        6px 0 14px -6px rgba(255, 61, 154, 0.6);
+}
+/* Abort: a plain square stop glyph (a circled stop inside a round button reads as a target),
+   and red on hover so it can't be mistaken for Show */
+body .op-tray .op-actions .op-act > i.fa-stop-circle::before {
+    content: "\f04d";                /* Font Awesome 4: fa-stop */
+    font-size: 0.85em;
+}
+body .op-tray .op-actions .op-act:has(> i.fa-stop-circle):hover {
+    background: linear-gradient(180deg, #ff7d9c 0, #f43f6e 60%, #c9234f 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 14px -3px rgba(244, 63, 110, 0.8);
+}
+/* Phones: Unraid stretches the tray across the screen and stacks it into one card until tapped.
+   Bigger touch targets: rows 48px, discs and buttons 36px, still 6px in, so 18 + 6 = 24 for the
+   rows and 24 + 8 = 32 for the panel. */
+@media (max-width: 767px) {
+    body .op-tray {
+        border-radius: 32px;
+    }
+    body .op-tray .op-task {
+        gap: 10px;
+        min-height: 48px;
+        padding: 0 6px;
+        font-size: 1.45rem;
+        border-radius: 24px;
+    }
+    body .op-tray .op-icon,
+    body .op-tray .op-actions .op-act {
+        width: 36px;
+        height: 36px;
+        min-width: 0;
+        min-height: 0;
+        font-size: 1.4rem;
+    }
+    /* Clear finished: the same 36px height as the buttons (Unraid's touch sizing made it a tall lozenge) */
+    body .op-tray .op-tray-head .op-act:not(.op-collapse) {
+        height: 36px;
+        min-height: 0;
+        padding: 0 14px;
+        font-size: 1.3rem;
+    }
+    /* Collapse chevron, shown once the stack is expanded: another round glass button */
+    body .op-tray .op-tray-head .op-collapse {
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        min-width: 0;
+        min-height: 0;
+        border-radius: 50%;
+        opacity: 1;
+        color: #cdb9ff;
+        background: var(--button-background);
+        box-shadow: var(--pill-edge);
+    }
+    /* Collapsed stack: the panel steps aside and the newest task becomes the card, with two
+       solid edges peeking out under it.  No blur on this card: a blur would pull the edges in
+       front of it.  It is nearly opaque instead, so it still reads as the same glass. */
+    body .op-tray.op-collapsed {
+        padding: 0 0 0.9rem;
+        border-radius: 0;
+        background: none;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        box-shadow: none;
+    }
+    body .op-tray.op-collapsed .op-task.op-top {
+        z-index: auto;               /* lets the edges below slide behind the card */
+        background: rgba(20, 12, 46, 0.94);
+        box-shadow: var(--glass-shine), var(--glass-drop);
+    }
+    body .op-tray.op-collapsed.op-multi .op-task.op-top::before,
+    body .op-tray.op-collapsed.op-multi .op-task.op-top::after {
+        height: 2.4rem;
+        border: 0;
+        border-radius: 0 0 20px 20px;
+        box-shadow: inset 0 -1px 0 rgba(200, 190, 255, 0.3), inset 0 0 0 1px rgba(200, 190, 255, 0.14);
+    }
+    body .op-tray.op-collapsed.op-multi .op-task.op-top::after {
+        opacity: 1;
+        background: #2a1f5c;
+    }
+    body .op-tray.op-collapsed.op-multi .op-task.op-top::before {
+        opacity: 1;
+        background: #1c1442;
+    }
+    /* Count badge on the stack: violet instead of Unraid's orange (which the theme makes cyan) */
+    body .op-tray.op-collapsed .op-stack-badge {
+        border-radius: var(--pill);
+        color: #ffffff;
+        background: var(--aether-violet);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+}
+
 /* ===== GUI search autocomplete (the header search-box dropdown) ===== */
 /* Unraid's search is powered by Awesomplete: a bare <ul id="awesomplete_list_N"> of
    <li role="option"> rows, with the typed match wrapped in <mark>.  Out of the box the
@@ -4313,7 +4542,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.15a-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.15b-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
