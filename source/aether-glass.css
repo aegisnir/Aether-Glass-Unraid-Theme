@@ -1956,8 +1956,11 @@ img[src$="/dynamix.system.buttons/icons/buttons.png"] {
  *     repainted cyan -> violet -> pink through a mask of Unraid's own logo file
  *   - the round avatar on the right is a red -> orange gradient circle; only that
  *     exact element is targeted, so Unraid's red error text elsewhere stays red
+ * Unraid 7.3 and older draw the logo in <unraid-header-os-version> and the avatar in
+ * #UserProfile.  7.4 replaced both with one <unraid-header> component (#UnraidHeader
+ * inside it), so each rule names both parents.
  */
-unraid-header-os-version a[href="https://unraid.net"] img {
+:is(unraid-header-os-version, unraid-header) a[href="https://unraid.net"] img {
     /* Recolour Unraid's own wordmark without shipping a copy of it: the stock picture is
        slid out of its box (object-position), the box is painted with the theme gradient,
        and Unraid's logo file on this server is used as a stencil (mask) so the gradient
@@ -1967,9 +1970,21 @@ unraid-header-os-version a[href="https://unraid.net"] img {
     -webkit-mask: url("/webGui/images/UN-logotype-gradient.svg") center / contain no-repeat;
     mask: url("/webGui/images/UN-logotype-gradient.svg") center / contain no-repeat;
 }
-#UserProfile .rounded-full.from-unraid-red.to-orange {
+:is(#UserProfile, #UnraidHeader) .rounded-full.from-unraid-red.to-orange {
     background-image: linear-gradient(135deg, var(--aether-cyan) 0, var(--aether-violet) 55%, var(--aether-pink) 100%);
     box-shadow: 0 0 14px rgba(124, 92, 255, 0.55);
+}
+/* 7.4 shows a stand-in logo while the header loads: an inline drawing with Unraid's
+   red -> orange gradient built in.  Same stencil trick as the real logo, so the page opens
+   with the theme gradient instead of flashing orange.  The "theme colour" logo option
+   (the -theme class) is a plain one-colour logo and is left alone. */
+#header .unraid-header-boot-logo a svg:not(.unraid-header-boot-logo-theme) {
+    background: var(--aether-gradient);
+    -webkit-mask: url("/webGui/images/UN-logotype-gradient.svg") center / contain no-repeat;
+    mask: url("/webGui/images/UN-logotype-gradient.svg") center / contain no-repeat;
+}
+#header .unraid-header-boot-logo a svg:not(.unraid-header-boot-logo-theme) path {
+    fill: transparent;               /* hides Unraid's orange letters; the gradient shows through the stencil */
 }
 
 /*
@@ -4542,7 +4557,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.15b-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.15c-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
