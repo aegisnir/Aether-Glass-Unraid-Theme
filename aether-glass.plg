@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.08b-dev">
+<!ENTITY version   "2026.11.15">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "256273f73e1531f1ece8687e415640373ec9d63160a131a710edf860014d1939">
+<!ENTITY sha_css     "c7580e28d76dfd6810b2f92f33eb131c3c95fffacc20495f95c3f680622c893f">
 <!ENTITY sha_login   "dd9f86073a6c9b50527ebd324b8f533ce5246e863bc62a4b5e453ec79f66f38e">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "dd43000e0488e4aed71d39b40c1235697c7f76f4beb965e561f51f5cab9d0ea0">
@@ -19,13 +19,21 @@
 <PLUGIN name="&name;"
         author="&author;"
         version="&version;"
-        pluginURL="&repo;/dev/aether-glass.plg"
+        pluginURL="&repo;/main/aether-glass.plg"
         support="https://github.com/aegisnir/Aether-Glass-Unraid-Theme/issues"
         icon="aether-glass.png"
         launch="Settings/AetherGlass"
         min="7.2.0">
 
 <CHANGES>
+### 2026.11.15
+- Settings: new Effects section.  Pick a level for holographic titles, frosted glass and glows, or a preset (Vivid, Balanced, Light, Minimal).  Two rings show the result for Visuals and Speed.  Still CSS only.
+- Settings page redesigned, with a browser benchmark that tests the four presets and recommends one.
+- Holographic titles: tile titles hold still and move while the pointer is over them (Balanced), and each step repaints only the title, so the Dashboard runs about twice as smooth.
+- The page background no longer repaints under the frosted glass.
+- Bars: Docker and VM CPU bars use the status spectrum instead of plain violet, and bar tracks are dimmed like the pie rings.
+- File Manager dialogs: no grey band behind them, Start / Queue / Cancel are glass buttons, Minimize is a round icon button, and the Time/Age icon is a labelled Age switch.
+
 ### 2026.11.01
 - Footer: the theme's version shows next to Unraid's copyright.
 - Log windows (plugin installs, container updates) no longer pick up the amber or rose glow of the confirm box that opened them.
