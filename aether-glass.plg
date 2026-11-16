@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.08b-dev">
+<!ENTITY version   "2026.11.15a-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "256273f73e1531f1ece8687e415640373ec9d63160a131a710edf860014d1939">
+<!ENTITY sha_css     "6d73974879de0f68c71d2e9c9949ca4657a240a526f7635b84c9412dc79ad61a">
 <!ENTITY sha_login   "dd9f86073a6c9b50527ebd324b8f533ce5246e863bc62a4b5e453ec79f66f38e">
 <!ENTITY sha_logging "09b146cd97b72ee8759d8582f711d662b7b32534451737bde96462f9719edc46">
 <!ENTITY sha_apply   "dd43000e0488e4aed71d39b40c1235697c7f76f4beb965e561f51f5cab9d0ea0">
@@ -26,6 +26,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.11.15a
+- Log windows (plugin installs, updates, release notes): restyled for Unraid's new task window.  Shimmering title in a glass pill with a round Minimize button, status as a coloured chip under it (Finished, In Progress, Error), and a centred violet Dismiss.  The log box has no scrollbar and still scrolls.  The width grip on the right edge shows on hover.
+
 ### 2026.11.15
 - Settings: new Effects section.  Pick a level for holographic titles, frosted glass and glows, or a preset (Vivid, Balanced, Light, Minimal).  Two rings show the result for Visuals and Speed.  Still CSS only.
 - Settings page redesigned, with a browser benchmark that tests the four presets and recommends one.

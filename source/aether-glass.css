@@ -2345,38 +2345,140 @@ body:has(span.my_age:not([style*="none"])) .title .right > i.fa-toggle-off[oncli
     background: rgba(20, 13, 44, 0.62);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(200, 190, 255, 0.2);
 }
-/* Concentric corners on the log window: the title stays a pill with the same gap on all four
-   sides (top, left, right, and down to the log), and the window's corner radius is the pill's
-   radius plus that gap, so the two curves run parallel.
-   The maths (measured on Unraid 7.3.4):
-     - the window has 20px of padding; a margin of (gap - 20px) sets the gap around the pill
-     - the pill is 56px tall (36px line + 10px padding top and bottom), so its radius is 28px
-     - window radius = 28px + gap (only on these log windows; other pop-ups keep 28px) */
-.sweet-alert.nchan {
+/* ===== Log windows (plugin installs, updates, release notes) =====
+   Newer Unraid builds the log window as a "task sheet" that can be minimized to a task tray:
+     <h2>title</h2>
+     <div id="pluginProgressTitle" class="nchan-state nchan-done">✓ Finished</div>   (task sheets only)
+     <p><pre id="swaltext">log</pre><hr></p>
+     <div class="sa-button-container"> ... <button class="confirm">Dismiss</button> </div>
+     <a class="nchan-close">minimize or close</a>   <div class="nchan-resize">width grip</div>
+   Unraid lays it out as a flat card (left title, grey status strip, footer bar).  The theme
+   lays it out as concentric glass: one gap on every side, every corner running parallel.
+     - the window has a 12px padding (the gap)
+     - the title pill is 56px tall, so its radius is 28px; window radius = 28 + 12 = 40px
+     - the minimize button is 32px, 12px inside the pill: radius 16 + 12 = 28px, parallel again
+     - the log box takes the pill's 28px corners
+   The same rules fit the older layout (title, log, Done), which has no status or corner button. */
+body .sweet-alert.nchan {
     --aether-title-gap: 12px;
+    padding: var(--aether-title-gap);
     border-radius: calc(28px + var(--aether-title-gap)) !important;
 }
-.sweet-alert.nchan > h2 {
-    margin: calc(var(--aether-title-gap) - 20px) calc(var(--aether-title-gap) - 20px) var(--aether-title-gap);
+body .sweet-alert.nchan > h2 {
+    flex: 0 0 auto;
+    margin: 0 0 var(--aether-title-gap);
+    padding: 10px 56px;              /* room for the minimize button, on both sides so the title stays centred */
     line-height: 36px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    font-size: 2rem;
+    text-align: center;
 }
-/* The log box lines up with the title pill: Unraid stretches the <p> that holds the log edge
-   to edge with a -20px margin (to cancel the window's 20px padding); this pulls it back in to
-   the same gap as the pill, and rounds its corners to the pill's 28px so the two read as a set. */
+/* Status: a coloured chip centred under the title, in place of Unraid's grey strip */
+body .sweet-alert.nchan > .nchan-state {
+    align-self: center;
+    display: inline-flex;
+    gap: 6px;
+    margin: 0 0 var(--aether-title-gap);
+    padding: 5px 12px;
+    border: 0;
+    border-radius: var(--pill);
+    font-size: 1.2rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+body .sweet-alert.nchan > .nchan-state.nchan-running {
+    color: #cdb9ff;
+    background: rgba(124, 92, 255, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(124, 92, 255, 0.5);
+}
+body .sweet-alert.nchan > .nchan-state.nchan-done {
+    color: #8ff0cb;
+    background: rgba(16, 201, 143, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(16, 201, 143, 0.45);
+}
+body .sweet-alert.nchan > .nchan-state.nchan-error {
+    color: #ffa3ba;
+    background: rgba(244, 63, 110, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(244, 63, 110, 0.5);
+}
+body .sweet-alert.nchan > .nchan-state i {
+    color: inherit;                  /* Unraid colours only the icon; the whole chip carries the colour here */
+}
+/* The log box: fills the window between title and button, same gap on both sides */
 body .sweet-alert.nchan > p {
-    margin-left: calc(var(--aether-title-gap) - 20px);
-    margin-right: calc(var(--aether-title-gap) - 20px);
+    margin: 0;
+    padding: 0;
+}
+body .sweet-alert.nchan > p > hr {
+    display: none;
 }
 body .sweet-alert.nchan > p > pre:is(#swaltext, #swalbody) {
+    padding: var(--sp-4) var(--sp-5);
     border-radius: 28px;
+    scrollbar-width: none;           /* no scrollbar: the log still scrolls with a trackpad, wheel or keys */
+}
+body .sweet-alert.nchan > p > pre:is(#swaltext, #swalbody)::-webkit-scrollbar {
+    display: none;
+}
+/* Dismiss / Done: a violet pill centred under the log, in place of Unraid's footer bar */
+body .sweet-alert.nchan .sa-button-container {
+    justify-content: center;
+    margin: 0;
+    padding: var(--aether-title-gap) 0 0;
+    border: 0;
+}
+body .sweet-alert.nchan .sa-confirm-button-container {
+    justify-content: center;
+}
+body .sweet-alert.nchan .sa-button-container button.confirm:not(.unapi *) {
+    padding: 9px 24px;
+    border-radius: var(--pill);
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #ffffff !important;
+    background: var(--hover-button-background) !important;   /* Unraid's own rule for this button uses !important */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        0 0 16px -2px rgba(124, 92, 255, 0.7) !important;
+}
+/* Minimize (task sheets) or close (release notes): a round glass button inside the title pill */
+body .sweet-alert.nchan > .nchan-close {
+    top: calc(var(--aether-title-gap) * 2);
+    right: calc(var(--aether-title-gap) * 2);
+    width: 32px;
+    height: 32px;
+    border: 0;
+    font-size: 12px;
+    color: var(--aether-text);
+    background: var(--button-background);
+    box-shadow: var(--pill-edge);
+}
+body .sweet-alert.nchan > .nchan-close:hover {
+    color: var(--hover-button-text-color);
+    background: var(--hover-button-background);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(124, 92, 255, 0.6),
+        -8px 0 18px -6px rgba(0, 229, 255, 0.5),
+        8px 0 18px -6px rgba(255, 61, 154, 0.5);
+}
+/* Width grip on the right edge: hidden until the pointer finds it, then violet */
+body .sweet-alert.nchan > .nchan-resize::before {
+    background: transparent;
+}
+body .sweet-alert.nchan > .nchan-resize:hover::before {
+    background: var(--aether-violet);
+}
+/* Phones: Unraid makes the window full screen, so square corners there */
+@media (max-width: 767px) {
+    body .sweet-alert.nchan {
+        border-radius: 0 !important;
+    }
 }
 /* Release notes open with no button (Unraid shows it a moment later), and sweetalert adds 40px
-   of bottom padding to button-less pop-ups, so Done sat higher than in the log windows.  Back
-   to the window's normal 20px so every log-style window ends the same way. */
+   of bottom padding to button-less pop-ups.  Back to the normal gap. */
 body .sweet-alert.nchan[data-has-confirm-button="false"][data-has-cancel-button="false"] {
-    padding-bottom: 20px;
+    padding-bottom: var(--aether-title-gap);
 }
 /* Version headers inside the release notes: Unraid zeroes the padding and margins of headings
    inside the notes (with an ID selector, which beats the pill rule above), which squashed each
@@ -4211,7 +4313,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.08b-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.15a-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
