@@ -106,11 +106,11 @@ Looks that don't affect speed.  Saved on the flash drive (`appearance.cfg`) and 
 | Setting | Choices |
 |---|---|
 | Usage bars | **Status** (default): one colour per bar, from its value in 1% steps (green, amber, red), like the Dashboard rings.  **Spectrum**: one green-to-red gradient across the whole bar, revealed as it fills |
-| Colours | A colour scheme (Purple, Blue, Teal, Green, Yellow, Orange, Red, Pink, Black), or **Custom** for your own colour for each of: **Accent** (buttons, toggles, selected tabs, links), **Background**, **Panels** (glass tiles, menus, title bars), **Glow** (the aurora), and the status colours **Healthy**, **Attention** and **Problem** |
+| Colours | A colour scheme (Iris, the default, Ocean, Lagoon, Emerald, Citrine, Ember, Crimson, Sakura, Obsidian), fine-tuned or replaced with your own colour for each of: **Accent** (buttons, toggles, selected tabs, links), **Background**, **Panels** (glass tiles, menus, title bars), **Glow** (the aurora), and the status colours **Healthy**, **Attention** and **Problem** |
 
 The % numbers next to Dashboard bars take their bar's colour in both styles.  Usage bars, rings and status dots follow the three status colours.
 
-The page previews colours live while you pick (a small script on the Settings page; the theme itself stays CSS only).  Under Custom it warns, without blocking, when the accent is almost the same as a status colour (buttons could look like status lights) or panels are too light for text.  Text and lines take a faint tint of the accent, so nothing stays violet under another scheme.  **Restore Default Colours** puts all seven back.
+The page previews colours live while you pick (a small script on the Settings page; the theme itself stays CSS only).  When the colours match no scheme it warns, without blocking, when the accent is almost the same as a status colour (buttons could look like status lights) or panels are too light for text.  Text and lines take a faint tint of the accent, so nothing stays violet under another scheme.  **Restore Default Colours** puts all seven back.
 
 From a terminal:
 
@@ -326,7 +326,7 @@ Every theme colour is worked out from seven *anchors* at the top of `source/aeth
 
 Each usage bar, and the % number in front of it on the Dashboard, takes one colour from the bar's value, in 1% steps.  CSS can't read the value as a number, so `source/aether-glass.css` has two generated blocks: `BAR-COLOURS` (the 101-colour table and one rule per whole percent for the bars) and `TEXT-COLOURS` (the same for the numbers).  The Spectrum style lives in an `@media (aether-bars-spectrum)` block that `apply.sh` switches on.  To change the colours:
 
-- [ ] **Edit** the `--aether-meter-sNN` stops in the CSS (each is a shift of Good, Warning or Critical).  If you move a stop to a different percent, change `STOPS` in `tools/gen-bar-colours.py` to match.
+- [ ] **Edit** the `--aether-meter-sNN` stops in the CSS (Healthy at 0%, Attention at 72%, Problem at 100%, the stops between are `color-mix()` blends of those).  If you move a stop to a different percent, change `STOPS` in `tools/gen-bar-colours.py` to match.
 - [ ] **Run** it from the repo folder:
 
 ```bash

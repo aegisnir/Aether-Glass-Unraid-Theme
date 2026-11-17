@@ -20,10 +20,13 @@
     --aether-base: #08051a;        /* the page background */
     --aether-panel: #140c2e;       /* the glass panels, menus and title bars */
     --aether-glow: #6d28d9;        /* the aurora behind the glass */
-    --aether-good: #10c98f;        /* healthy, started, low usage */
-    --aether-warning: #f59e0b;     /* past the warning level */
-    --aether-critical: #f43f6e;    /* past the critical level, errors */
+    --aether-good: #14c98e;        /* healthy, started, low usage */
+    --aether-warning: #e2aa00;     /* past the warning level */
+    --aether-critical: #fc094c;    /* past the critical level, errors */
     --aether-accent-ink: #ffffff;  /* text on accent-filled buttons; apply.sh picks white or near-black */
+    /* Red words (Runenir's danger-text): the Problem red lifted just enough that small text reads
+       (6.2:1 on the page).  The Problem red itself stays for icons, washes and edges. */
+    --aether-critical-text: oklch(from var(--aether-critical) calc(l + 0.0495) calc(c * 0.8324) calc(h - 0.03));
 
     color-scheme: dark;
     --lg-bg: oklch(from var(--aether-panel) calc(l - 0.0208) calc(c * 0.7987) calc(h - 3.08));
@@ -71,7 +74,7 @@ span.login {
     padding: 1px 6px;
 }
 span.error {
-    color: oklch(from var(--aether-critical) calc(l + 0.1539) calc(c * 0.5535) calc(h - 7.18));
+    color: var(--aether-critical-text);
     background-color: rgb(from var(--aether-critical) r g b / 0.16);
 }
 span.warn {

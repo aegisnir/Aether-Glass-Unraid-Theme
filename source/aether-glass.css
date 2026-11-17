@@ -32,10 +32,13 @@ html:root {
     --aether-base: #08051a;        /* the page background */
     --aether-panel: #140c2e;       /* the glass panels, menus and title bars */
     --aether-glow: #6d28d9;        /* the aurora behind the glass */
-    --aether-good: #10c98f;        /* healthy, started, low usage */
-    --aether-warning: #f59e0b;     /* past the warning level */
-    --aether-critical: #f43f6e;    /* past the critical level, errors */
+    --aether-good: #14c98e;        /* healthy, started, low usage */
+    --aether-warning: #e2aa00;     /* past the warning level */
+    --aether-critical: #fc094c;    /* past the critical level, errors */
     --aether-accent-ink: #ffffff;  /* text on accent-filled buttons; apply.sh picks white or near-black */
+    /* Red words (Runenir's danger-text): the Problem red lifted just enough that small text reads
+       (6.2:1 on the page).  The Problem red itself stays for icons, washes and edges. */
+    --aether-critical-text: oklch(from var(--aether-critical) calc(l + 0.0495) calc(c * 0.8324) calc(h - 0.03));
 
     --aether-cyan: oklch(from var(--aether-accent) calc(l + 0.2451) calc(c * 0.6334) calc(h - 76.92));
     --aether-violet: var(--aether-accent);
@@ -591,7 +594,7 @@ body div.pie > span:first-child::before {
     --_r4: min(calc(var(--aether-ring-t) / 2), max(0px, calc(var(--_len4) * 100px)));   /* no dot on an empty slice */
     --_b4: calc(var(--_e4) * 3.6deg);
     --_r0: min(calc(var(--aether-ring-t) / 2), max(0px, calc(var(--aether-ring-p, 0) * 100px)));
-    background: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(var(--_r4) - 0.5px), transparent var(--_r4)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(var(--_s1) * 3.6deg), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_b1) - var(--_c1)), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) var(--_b1), color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) calc(var(--_s2) * 3.6deg), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_b2) - var(--_c2)), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) var(--_b2), color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) calc(var(--_s3) * 3.6deg), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_b3) - var(--_c3)), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) var(--_b3), color-mix(in oklch, oklch(from var(--aether-ring-k4) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len4) * 4, 100) * 1%), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h)) calc(var(--_s4) * 3.6deg), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) calc(var(--_b4) - var(--_c4)), oklch(from var(--aether-ring-k4) calc(l + 0.04) c h) var(--_b4), color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(var(--aether-ring-p, 0) * 3.6deg));
+    background: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h) calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h) calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h) calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), oklch(from var(--aether-ring-k4) calc(l + var(--aether-fill-end)) c h) calc(var(--_r4) - 0.5px), transparent var(--_r4)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h)) calc(var(--_s1) * 3.6deg), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h) calc(var(--_b1) - var(--_c1)), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h) var(--_b1), color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h)) calc(var(--_s2) * 3.6deg), oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h) calc(var(--_b2) - var(--_c2)), oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h) var(--_b2), color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h)) calc(var(--_s3) * 3.6deg), oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h) calc(var(--_b3) - var(--_c3)), oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h) var(--_b3), color-mix(in oklch, oklch(from var(--aether-ring-k4) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len4) * 4, 100) * 1%), oklch(from var(--aether-ring-k4) calc(l + var(--aether-fill-end)) c h)) calc(var(--_s4) * 3.6deg), oklch(from var(--aether-ring-k4) calc(l + var(--aether-fill-end)) c h) calc(var(--_b4) - var(--_c4)), oklch(from var(--aether-ring-k4) calc(l + var(--aether-fill-end)) c h) var(--_b4), color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h)) calc(var(--aether-ring-p, 0) * 3.6deg));
     -webkit-mask: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), #000 calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), #000 calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), #000 calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), #000 calc(var(--_r4) - 0.5px), transparent var(--_r4)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), #000 calc(var(--_r0) - 0.5px), transparent var(--_r0)), var(--_ring), conic-gradient(#000 calc(var(--aether-ring-p, 0) * 3.6deg), transparent 0);
     -webkit-mask-composite: source-over, source-over, source-over, source-over, source-over, source-in;
     mask: radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b1))) calc(50% - var(--aether-ring-r) * cos(var(--_b1))), #000 calc(var(--_r1) - 0.5px), transparent var(--_r1)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b2))) calc(50% - var(--aether-ring-r) * cos(var(--_b2))), #000 calc(var(--_r2) - 0.5px), transparent var(--_r2)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b3))) calc(50% - var(--aether-ring-r) * cos(var(--_b3))), #000 calc(var(--_r3) - 0.5px), transparent var(--_r3)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(var(--_b4))) calc(50% - var(--aether-ring-r) * cos(var(--_b4))), #000 calc(var(--_r4) - 0.5px), transparent var(--_r4)), radial-gradient(circle at calc(50% + var(--aether-ring-r) * sin(0deg)) calc(50% - var(--aether-ring-r) * cos(0deg)), #000 calc(var(--_r0) - 0.5px), transparent var(--_r0)), var(--_ring), conic-gradient(#000 calc(var(--aether-ring-p, 0) * 3.6deg), transparent 0);
@@ -707,7 +710,7 @@ body div.pie#sys0::before {
     box-shadow: none;
     pointer-events: none;
     font-size: 0;
-    background: radial-gradient(circle at calc(50% + var(--_r1) * 1px * sin(calc(var(--_len1) * 3.6deg))) calc(50% - var(--_r1) * 1px * cos(calc(var(--_len1) * 3.6deg))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p1) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p1) * 1px)), radial-gradient(circle at calc(50% + var(--_r1) * 1px * sin(0deg)) calc(50% - var(--_r1) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p1) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p1) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(calc(var(--_len1) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r1) * 57.2958deg), calc(var(--_len1) * 1.8deg))), oklch(from var(--aether-ring-k1) calc(l + 0.04) c h) calc(var(--_len1) * 3.6deg), color-mix(in srgb, var(--aether-ring-k1) 20%, oklch(from var(--aether-panel) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))) calc(var(--_len1) * 3.6deg));
+    background: radial-gradient(circle at calc(50% + var(--_r1) * 1px * sin(calc(var(--_len1) * 3.6deg))) calc(50% - var(--_r1) * 1px * cos(calc(var(--_len1) * 3.6deg))), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h) calc(calc(var(--_t) / 2 * var(--_p1) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p1) * 1px)), radial-gradient(circle at calc(50% + var(--_r1) * 1px * sin(0deg)) calc(50% - var(--_r1) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h)) calc(calc(var(--_t) / 2 * var(--_p1) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p1) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len1) * 4, 100) * 1%), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h)) 0deg, oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h) calc(calc(var(--_len1) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r1) * 57.2958deg), calc(var(--_len1) * 1.8deg))), oklch(from var(--aether-ring-k1) calc(l + var(--aether-fill-end)) c h) calc(var(--_len1) * 3.6deg), color-mix(in srgb, var(--aether-ring-k1) 20%, oklch(from var(--aether-panel) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))) calc(var(--_len1) * 3.6deg));
     -webkit-mask: radial-gradient(circle, transparent calc((var(--_r1) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) + var(--_t) / 2) * 1px), transparent calc((var(--_r1) + var(--_t) / 2) * 1px + 0.4px));
     mask: radial-gradient(circle, transparent calc((var(--_r1) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p1)) calc((var(--_r1) + var(--_t) / 2) * 1px), transparent calc((var(--_r1) + var(--_t) / 2) * 1px + 0.4px));
 }
@@ -722,7 +725,7 @@ body div.pie#sys0::after {
     box-shadow: none;
     pointer-events: none;
     font-size: 0;
-    background: radial-gradient(circle at calc(50% + var(--_r2) * 1px * sin(calc(var(--_len2) * 3.6deg))) calc(50% - var(--_r2) * 1px * cos(calc(var(--_len2) * 3.6deg))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p2) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p2) * 1px)), radial-gradient(circle at calc(50% + var(--_r2) * 1px * sin(0deg)) calc(50% - var(--_r2) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p2) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p2) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(calc(var(--_len2) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r2) * 57.2958deg), calc(var(--_len2) * 1.8deg))), oklch(from var(--aether-ring-k2) calc(l + 0.04) c h) calc(var(--_len2) * 3.6deg), color-mix(in srgb, var(--aether-ring-k2) 20%, oklch(from var(--aether-panel) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))) calc(var(--_len2) * 3.6deg));
+    background: radial-gradient(circle at calc(50% + var(--_r2) * 1px * sin(calc(var(--_len2) * 3.6deg))) calc(50% - var(--_r2) * 1px * cos(calc(var(--_len2) * 3.6deg))), oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h) calc(calc(var(--_t) / 2 * var(--_p2) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p2) * 1px)), radial-gradient(circle at calc(50% + var(--_r2) * 1px * sin(0deg)) calc(50% - var(--_r2) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h)) calc(calc(var(--_t) / 2 * var(--_p2) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p2) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len2) * 4, 100) * 1%), oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h)) 0deg, oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h) calc(calc(var(--_len2) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r2) * 57.2958deg), calc(var(--_len2) * 1.8deg))), oklch(from var(--aether-ring-k2) calc(l + var(--aether-fill-end)) c h) calc(var(--_len2) * 3.6deg), color-mix(in srgb, var(--aether-ring-k2) 20%, oklch(from var(--aether-panel) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))) calc(var(--_len2) * 3.6deg));
     -webkit-mask: radial-gradient(circle, transparent calc((var(--_r2) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) + var(--_t) / 2) * 1px), transparent calc((var(--_r2) + var(--_t) / 2) * 1px + 0.4px));
     mask: radial-gradient(circle, transparent calc((var(--_r2) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p2)) calc((var(--_r2) + var(--_t) / 2) * 1px), transparent calc((var(--_r2) + var(--_t) / 2) * 1px + 0.4px));
 }
@@ -737,7 +740,7 @@ body div.pie#sys0 > span.var0::before {
     box-shadow: none;
     pointer-events: none;
     font-size: 0;
-    background: radial-gradient(circle at calc(50% + var(--_r3) * 1px * sin(calc(var(--_len3) * 3.6deg))) calc(50% - var(--_r3) * 1px * cos(calc(var(--_len3) * 3.6deg))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(calc(var(--_t) / 2 * var(--_p3) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p3) * 1px)), radial-gradient(circle at calc(50% + var(--_r3) * 1px * sin(0deg)) calc(50% - var(--_r3) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) calc(calc(var(--_t) / 2 * var(--_p3) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p3) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l - 0.12) calc(c * 1.08) calc(h - 18)) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h)) 0deg, oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(calc(var(--_len3) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r3) * 57.2958deg), calc(var(--_len3) * 1.8deg))), oklch(from var(--aether-ring-k3) calc(l + 0.04) c h) calc(var(--_len3) * 3.6deg), color-mix(in srgb, var(--aether-ring-k3) 20%, oklch(from var(--aether-panel) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))) calc(var(--_len3) * 3.6deg));
+    background: radial-gradient(circle at calc(50% + var(--_r3) * 1px * sin(calc(var(--_len3) * 3.6deg))) calc(50% - var(--_r3) * 1px * cos(calc(var(--_len3) * 3.6deg))), oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h) calc(calc(var(--_t) / 2 * var(--_p3) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p3) * 1px)), radial-gradient(circle at calc(50% + var(--_r3) * 1px * sin(0deg)) calc(50% - var(--_r3) * 1px * cos(0deg)), color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h)) calc(calc(var(--_t) / 2 * var(--_p3) * 1px) - 0.4px), transparent calc(var(--_t) / 2 * var(--_p3) * 1px)), conic-gradient(in oklch, color-mix(in oklch, oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue))) calc(clamp(0, var(--_len3) * 4, 100) * 1%), oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h)) 0deg, oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h) calc(calc(var(--_len3) * 3.6deg) - min(calc(var(--_t) / 2 / var(--_r3) * 57.2958deg), calc(var(--_len3) * 1.8deg))), oklch(from var(--aether-ring-k3) calc(l + var(--aether-fill-end)) c h) calc(var(--_len3) * 3.6deg), color-mix(in srgb, var(--aether-ring-k3) 20%, oklch(from var(--aether-panel) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))) calc(var(--_len3) * 3.6deg));
     -webkit-mask: radial-gradient(circle, transparent calc((var(--_r3) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) + var(--_t) / 2) * 1px), transparent calc((var(--_r3) + var(--_t) / 2) * 1px + 0.4px));
     mask: radial-gradient(circle, transparent calc((var(--_r3) - var(--_t) / 2) * 1px - 0.4px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) - var(--_t) / 2) * 1px), rgb(0 0 0 / var(--_p3)) calc((var(--_r3) + var(--_t) / 2) * 1px), transparent calc((var(--_r3) + var(--_t) / 2) * 1px + 0.4px));
 }
@@ -2430,7 +2433,7 @@ body .sweet-alert.nchan > .nchan-state.nchan-done {
     box-shadow: inset 0 0 0 1px rgb(from var(--aether-good) r g b / 0.45);
 }
 body .sweet-alert.nchan > .nchan-state.nchan-error {
-    color: oklch(from var(--aether-critical) calc(l + 0.1648) calc(c * 0.5170) calc(h - 7.19));
+    color: var(--aether-critical-text);
     background: rgb(from var(--aether-critical) r g b / 0.14);
     box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.5);
 }
@@ -2638,7 +2641,7 @@ body .op-tray .op-done .op-icon {
     box-shadow: inset 0 0 0 1px rgb(from var(--aether-good) r g b / 0.45);
 }
 body .op-tray .op-error .op-icon {
-    color: oklch(from var(--aether-critical) calc(l + 0.1648) calc(c * 0.5170) calc(h - 7.19));
+    color: var(--aether-critical);
     background: rgb(from var(--aether-critical) r g b / 0.14);
     box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.5);
 }
@@ -3354,7 +3357,7 @@ html:root .unapi.dark {
    script-drawn gradient, which CSS can't recolour. */
 body [style*="color: rgb(79, 138, 16)"] { color: var(--aether-ok) !important; }
 body [style*="color: rgb(230, 138, 0)"] { color: var(--aether-attention) !important; }
-body [style*="color: rgb(240, 0, 12)"] { color: var(--aether-problem) !important; }
+body [style*="color: rgb(240, 0, 12)"] { color: var(--aether-critical-text) !important; }
 
 body .green-text,
 body .passed {
@@ -3366,7 +3369,7 @@ body .warning {
 }
 body .red-text,
 body .failed {
-    color: var(--aether-problem);
+    color: var(--aether-critical-text);   /* red words: Runenir's danger-text */
 }
 
 /* Capacity bars on Main, Shares and Dashboard, and the array usage bar in the header */
@@ -3576,7 +3579,7 @@ html body .boot-subtext {
 }
 html body .boot-subtext .green { color: var(--aether-ok); }
 html body .boot-subtext .orange { color: var(--aether-attention); }
-html body .boot-subtext .red { color: var(--aether-problem); }
+html body .boot-subtext .red { color: var(--aether-critical-text); }
 html body .boot-subtext .blue { color: oklch(from var(--aether-accent) calc(l + 0.0812) calc(c * 0.6600) calc(h - 12.85)); }
 
 
@@ -3719,7 +3722,7 @@ body .upgrade_notice.done {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgb(from var(--aether-good) r g b / 0.55), 0 12px 32px -10px rgba(0, 0, 0, 0.8);
 }
 body .upgrade_notice.alert {
-    color: var(--aether-problem);
+    color: var(--aether-critical-text);
     background: rgb(from var(--aether-panel) r g b / 0.88);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.55), 0 12px 32px -10px rgba(0, 0, 0, 0.8);
 }
@@ -4300,18 +4303,27 @@ html:root {
        70%, critical 90%): amber from ~70, rose from ~90, so the tip mostly agrees with the
        text colour.  Green starts warming toward gold from ~45% on purpose; strict 70%
        alignment made every bar mostly green.  The CPU graph below uses the same stops. */
-    /* The scale's stops, by percent.  tools/gen-bar-colours.py mixes the 1% table from these. */
-    --aether-meter-s0: oklch(from var(--aether-good) calc(l - 0.0986) calc(c * 0.8196) calc(h + 3.44));
-    --aether-meter-s25: oklch(from var(--aether-good) calc(l - 0.0066) calc(c * 0.8986) calc(h - 1.13));
-    --aether-meter-s45: oklch(from var(--aether-good) calc(l + 0.0573) calc(c * 0.8736) calc(h - 24.99));
-    --aether-meter-s60: oklch(from var(--aether-warning) calc(l + 0.0439) calc(c * 0.7928) calc(h + 30.94));
-    --aether-meter-s72: oklch(from var(--aether-warning) calc(l + 0.0034) calc(c * 0.8901) calc(h - 0.52));
-    --aether-meter-s84: oklch(from var(--aether-warning) calc(l - 0.0710) calc(c * 1.0316) calc(h - 28.52));
-    --aether-meter-s92: oklch(from var(--aether-critical) calc(l - 0.0083) calc(c * 0.9454) calc(h - 1.05));
-    --aether-meter-s100: oklch(from var(--aether-critical) calc(l - 0.0288) calc(c * 0.9966) calc(h - 16.88));
+    /* The scale's stops, by percent: Healthy at 0%, Attention at 72%, Problem at 100%, blended
+       in a straight line between them, so every 1% moves the colour.  The in-between stops are
+       mixes of the two either side, so the scale follows the three status colours exactly.
+       tools/gen-bar-colours.py mixes the 1% table from these. */
+    --aether-meter-s0: var(--aether-good);
+    --aether-meter-s25: color-mix(in srgb, var(--aether-good) 65.28%, var(--aether-warning));
+    --aether-meter-s45: color-mix(in srgb, var(--aether-good) 37.5%, var(--aether-warning));
+    --aether-meter-s60: color-mix(in srgb, var(--aether-good) 16.67%, var(--aether-warning));
+    --aether-meter-s72: var(--aether-warning);
+    --aether-meter-s84: color-mix(in srgb, var(--aether-warning) 57.14%, var(--aether-critical));
+    --aether-meter-s92: color-mix(in srgb, var(--aether-warning) 28.57%, var(--aether-critical));
+    --aether-meter-s100: var(--aether-critical);
     --aether-meter: linear-gradient(90deg,
         var(--aether-meter-s0) 0%, var(--aether-meter-s25) 25%, var(--aether-meter-s45) 45%, var(--aether-meter-s60) 60%,
         var(--aether-meter-s72) 72%, var(--aether-meter-s84) 84%, var(--aether-meter-s92) 92%, var(--aether-meter-s100) 100%);
+    /* How light the usage bars and Dashboard rings are drawn, as a lightness shift from their
+       status colour: the start of each fill, then its tip.  One pair for both, so they match. */
+    --aether-fill-start: -0.12;
+    --aether-fill-start-chroma: 1.08;   /* how colourful the start is, against the status colour */
+    --aether-fill-start-hue: -18;       /* degrees round the colour wheel at the start: the ring's turn (green starts olive) */
+    --aether-fill-end: 0.04;
     /* Glass sheen over the fill: a light top edge and a slightly darker bottom */
     --aether-meter-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 45%, rgba(0, 0, 0, 0.18) 100%);
 }
@@ -4526,20 +4538,23 @@ body :is(.usage-disk, .usage-bar) > span:first-child:is([style*="width:98%"], [s
 body :is(.usage-disk, .usage-bar) > span:first-child:is([style*="width:99%"], [style*="width: 99%"], [style*="width:99."], [style*="width: 99."]) { --aether-bar-v: 99; --aether-bar-c: var(--aether-bar-99); }
 body :is(.usage-disk, .usage-bar) > span:first-child:is([style*="width:100%"], [style*="width: 100%"]) { --aether-bar-v: 100; --aether-bar-c: var(--aether-bar-100); }
 /* BAR-COLOURS:END */
-/* The fill.  Same colour shift as the ring: the start is a little darker, more saturated and
-   18 degrees round the colour wheel; the tip a little brighter.  Short fills shift less (full
-   shift from 25%), so a small bar is one smooth pill rather than a dark end and a light end.
+/* The fill: the Dashboard ring drawn straight ("Ring, flat", Ben's pick 2026-11-16).  The start is
+   a little darker, a touch more colourful and turned 18 degrees round the colour wheel; the tip a
+   little brighter.  Flat: no gloss on top.  A soft glow in the bar's colour, like the ring's.  Short
+   fills shift less (full shift from 25%), so a small bar is one smooth pill.  The amounts are the
+   --aether-fill-* settings in the meter block, shared with the rings.
    Bars that opt into "neutral" or "gain" (see "Bar types" at the end) keep their own colours. */
 body .usage-disk:not(.aether-bar-neutral, .aether-bar-gain) > span:first-child:is(.greenbar, .orangebar, .redbar),
 body .usage-disk.sys:not(.none, .aether-bar-neutral, .aether-bar-gain) > span:first-child,
 body .usage-disk.mm:not(.aether-bar-neutral, .aether-bar-gain) > span:first-child,
 body .usage-bar > span:is(.greenbar, .orangebar, .redbar) {
-    --_c: var(--aether-bar-c, oklch(from var(--aether-good) calc(l - 0.0986) calc(c * 0.8196) calc(h + 3.44)));   /* no width written yet: the 0% colour */
-    --_tip: oklch(from var(--_c) calc(l + 0.04) c h);
-    --_deep: oklch(from var(--_c) calc(l - 0.12) calc(c * 1.08) calc(h - 18));
-    background: var(--aether-meter-sheen),
-        linear-gradient(90deg in oklch, color-mix(in oklch, var(--_deep) calc(clamp(0, var(--aether-bar-v, 0) * 4, 100) * 1%), var(--_tip)), var(--_tip));
-    box-shadow: none;
+    --_c: var(--aether-bar-c, var(--aether-bar-0));   /* no width written yet: the 0% colour */
+    --_tip: oklch(from var(--_c) calc(l + var(--aether-fill-end)) c h);
+    --_deep: oklch(from var(--_c) calc(l + var(--aether-fill-start)) calc(c * var(--aether-fill-start-chroma)) calc(h + var(--aether-fill-start-hue)));
+    background: linear-gradient(90deg in oklch, color-mix(in oklch, var(--_deep) calc(clamp(0, var(--aether-bar-v, 0) * 4, 100) * 1%), var(--_tip)), var(--_tip));
+    /* a box-shadow, not the ring's drop-shadow filter: a filter would lift the track (drawn by
+       this fill's ::before, behind it) up over the fill */
+    box-shadow: 0 0 4px color-mix(in oklch, var(--_c) 40%, transparent);
 }
 /* The track.  It is drawn by the fill, not by the bar, because only the fill knows the
    colour.  It sits behind the fill (z-index -1 inside the bar, which is "isolated" above) and
@@ -4933,7 +4948,7 @@ html body .sweet-alert.nchan :is(h1, h2, h3) #pluginProgressTitle i {
    the real version into the marked line below before it hashes this file, so the text
    always matches the installed release. */
 body #copyright::before {
-    content: "Aether Glass 2026.11.16a-dev"; /* AETHER-GLASS-VERSION */
+    content: "Aether Glass 2026.11.16b-dev"; /* AETHER-GLASS-VERSION */
     margin-right: 0.75em;
     padding-right: 0.75em;
     border-right: 1px solid var(--glass-edge);
@@ -5123,7 +5138,7 @@ body .usage-disk.sys:not(.none) > span:first-child:is([style*="width:0."], [styl
 html body #menu .usage-bar > span:not([class]) {
     background: none;
     box-shadow: none;
-    color: var(--aether-critical);
+    color: var(--aether-critical-text);
     text-align: center;
     font-weight: 600;
     text-shadow: 0 0 6px rgb(from var(--aether-critical) r g b / 0.35);
@@ -5242,14 +5257,14 @@ body input[name="cmdStop"]:not([disabled]):hover {
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 14px rgb(from var(--aether-warning) r g b / 0.45);
 }
 body form[name="shutdownOps"] input:is([name="reboot"], [name="shutdown"]):not([disabled]) {
-    color: oklch(from var(--aether-critical) calc(l + 0.1637) calc(c * 0.4974) calc(h - 5.70));
-    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.2);
-    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.45);
+    color: var(--aether-critical-text);
+    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.14);
+    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.35);
 }
 body form[name="shutdownOps"] input:is([name="reboot"], [name="shutdown"]):not([disabled]):hover {
-    color: #ffffff;
-    background: var(--pill-sheen), linear-gradient(180deg, oklch(from var(--aether-critical) calc(l + 0.0743) calc(c * 0.7890) calc(h - 3.84)) 0, var(--aether-critical) 55%, oklch(from var(--aether-critical) calc(l - 0.0750) calc(c * 0.9423) calc(h + 0.18)) 100%);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 14px rgb(from var(--aether-critical) r g b / 0.45);
+    color: var(--aether-critical-text);
+    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.26);
+    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.6), 0 0 14px rgb(from var(--aether-critical) r g b / 0.45);
 }
 
 /* Confirm pop-ups: why Proceed looked darker than Cancel.  When a dialog opens, sweetalert
@@ -5320,15 +5335,15 @@ body .sweet-alert .sa-icon.sa-error .sa-line {
 }
 /* Confirm button on a risky confirm: rose like the Reboot and Shutdown buttons */
 body .sweet-alert:not(.nchan)[data-has-cancel-button="true"]:has(.sa-icon.sa-warning.pulseWarning) button.confirm:not(.unapi *) {
-    color: oklch(from var(--aether-critical) calc(l + 0.1637) calc(c * 0.4974) calc(h - 5.70));
-    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.2);
-    background-color: rgb(from var(--aether-critical) r g b / 0.2) !important;
-    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.45) !important;
+    color: var(--aether-critical-text);
+    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.14);
+    background-color: rgb(from var(--aether-critical) r g b / 0.14) !important;
+    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.35) !important;
 }
 body .sweet-alert:not(.nchan)[data-has-cancel-button="true"]:has(.sa-icon.sa-warning.pulseWarning) button.confirm:not(.unapi *):hover {
-    color: #ffffff;
-    background: var(--pill-sheen), linear-gradient(180deg, oklch(from var(--aether-critical) calc(l + 0.0743) calc(c * 0.7890) calc(h - 3.84)) 0, var(--aether-critical) 55%, oklch(from var(--aether-critical) calc(l - 0.0750) calc(c * 0.9423) calc(h + 0.18)) 100%);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 14px rgb(from var(--aether-critical) r g b / 0.45) !important;
+    color: var(--aether-critical-text);
+    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.26);
+    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.6), 0 0 14px rgb(from var(--aether-critical) r g b / 0.45) !important;
 }
 
 /* Plugin install/update window: the button lights up violet once the job ends.  While it
@@ -5362,15 +5377,15 @@ body input[type="button"].update[data$=".plg"]:not([disabled]):hover {
 }
 body input[type="button"]:is(.remove, .delete)[data$=".plg"]:not([disabled]),
 body #removeall input[type="button"] {
-    color: oklch(from var(--aether-critical) calc(l + 0.1637) calc(c * 0.4974) calc(h - 5.70));
-    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.2);
-    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.45);
+    color: var(--aether-critical-text);
+    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.14);
+    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.35);
 }
 body input[type="button"]:is(.remove, .delete)[data$=".plg"]:not([disabled]):hover,
 body #removeall input[type="button"]:hover {
-    color: #ffffff;
-    background: var(--pill-sheen), linear-gradient(180deg, oklch(from var(--aether-critical) calc(l + 0.0743) calc(c * 0.7890) calc(h - 3.84)) 0, var(--aether-critical) 55%, oklch(from var(--aether-critical) calc(l - 0.0750) calc(c * 0.9423) calc(h + 0.18)) 100%);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 14px rgb(from var(--aether-critical) r g b / 0.45);
+    color: var(--aether-critical-text);
+    background: var(--pill-sheen), rgb(from var(--aether-critical) r g b / 0.26);
+    box-shadow: inset 0 0 0 1px rgb(from var(--aether-critical) r g b / 0.6), 0 0 14px rgb(from var(--aether-critical) r g b / 0.45);
 }
 
 /*
@@ -5522,8 +5537,12 @@ body .usage-disk.aether-bar-gain > span:first-child {
 @media (aether-glow-static), (aether-glow-off) {
     body .greenbar,
     body .orangebar,
-    body .redbar {
-        box-shadow: none;
+    body .redbar,
+    body .usage-disk:not(.aether-bar-neutral, .aether-bar-gain) > span:first-child:is(.greenbar, .orangebar, .redbar),
+    body .usage-disk.sys:not(.none, .aether-bar-neutral, .aether-bar-gain) > span:first-child,
+    body .usage-disk.mm:not(.aether-bar-neutral, .aether-bar-gain) > span:first-child,
+    body .usage-bar > span:is(.greenbar, .orangebar, .redbar) {
+        box-shadow: none;   /* the same selectors as the bar fill, so this wins over its glow */
     }
     body div.pie > span:first-child::before {
         filter: none;

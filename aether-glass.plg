@@ -2,17 +2,17 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.16a-dev">
+<!ENTITY version   "2026.11.16b-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "3fefde56bdfc0013e4bc94431e8133624fb3c6a75acb5214f695abe1935b8962">
-<!ENTITY sha_login   "534a5758fe446f15aef1049b8d8a8bbc6b568d8ccfcdca4ff547936a6e22db00">
-<!ENTITY sha_logging "c3e64c3f428d67335fb4211d1987f885fe5b1a5b09e66c61f042348783457b68">
+<!ENTITY sha_css     "06f902a1cd581ca8ca65f3125a015a808253ff058dcc156eb5330472caa0f884">
+<!ENTITY sha_login   "3f1f5c352b832a282724859aff1d582890005688a59d1a294eea37a486f96216">
+<!ENTITY sha_logging "0a243052449bf308bab6116d5140b947d47debed2d5dfe3cf5f258dc55924ff7">
 <!ENTITY sha_apply   "58288a2c5c9c8e2d77d51b392a250cbd0e2b77f4981c60400fb402a3611c3205">
-<!ENTITY sha_page    "ac6f9c3c16120e211cd808ba01972e55c826e4b868f11aa5d6ebb7819ae15cc9">
+<!ENTITY sha_page    "7598154d518786fdba9e77e0d2cf8e6d6dad717a9ad48941f38e8b7cdc643a1c">
 <!ENTITY sha_icon    "ec8be7110f1cc9d0fe440edfb2d4d3de394dc482519ba26eccbd7a7e2e2d6159">
 ]>
 
@@ -26,6 +26,15 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.11.16b
+- New status colours, Runenir's hues at the theme's usual brightness: Healthy #14c98e, Attention #e2aa00 (a deeper gold), and Runenir's one red #fc094c for Problem.  Everywhere status shows: text, icons, dots, rings and usage bars.
+- Usage bars run in a straight line from Healthy at 0% through Attention at 72% to Problem at 100%, changing every 1%, and are drawn like the Dashboard rings laid flat: a dim track in the bar's colour, a deeper start easing into a lighter tip, no gloss, and a soft glow (off with Glows set to Off or Still things).
+- Red words (errors, Reboot, Shutdown, Delete) use the red-word shade #fe5166 so small text reads.  Reboot, Shutdown and Delete are a red word on a red wash, never a solid red fill.
+- Colour schemes are jewel tones again, one per colour family: Iris (the default violet), Ocean, Lagoon, Emerald, Citrine, Ember, Crimson, Sakura and Obsidian.
+- Each scheme's icon is a cut gem: its dark background and panel on one side, its glow and accent on the other, and a line of its brand gradient along the cut.
+- The colour pickers always show, so any scheme can be fine-tuned, and each circle shows its exact colour (Safari washed them out).
+- If you applied colours with 2026.11.16 or 16a, the old status colours were saved with them: click Restore Default Colours to get the new ones.
+
 ### 2026.11.16a
 - Appearance: Apply now works after picking colours (Unraid only switched it on for some kinds of field).
 - A colour scheme for each colour family: Purple, Blue, Teal, Green, Yellow, Orange, Red, Pink and Black.  Custom shows the colour pickers, starting from the current colours.
