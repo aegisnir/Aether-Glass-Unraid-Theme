@@ -2,17 +2,17 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.16-dev">
+<!ENTITY version   "2026.11.16a-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "4b465e946776ad13c6c8d719460afddb74e4b0dec49a8a879f22ad3a1f0b9132">
-<!ENTITY sha_login   "efb5ba93c4b84c0199a3d983190b6bddd82925b665b4d03c54ebf92b1b30800d">
-<!ENTITY sha_logging "1cb56c6b6764e4423889280efa74461bc1780e0e9ac2a195f8dac0ca15139fcb">
+<!ENTITY sha_css     "3fefde56bdfc0013e4bc94431e8133624fb3c6a75acb5214f695abe1935b8962">
+<!ENTITY sha_login   "534a5758fe446f15aef1049b8d8a8bbc6b568d8ccfcdca4ff547936a6e22db00">
+<!ENTITY sha_logging "c3e64c3f428d67335fb4211d1987f885fe5b1a5b09e66c61f042348783457b68">
 <!ENTITY sha_apply   "58288a2c5c9c8e2d77d51b392a250cbd0e2b77f4981c60400fb402a3611c3205">
-<!ENTITY sha_page    "e0e2c510afc967623aaf8d85504ea226f35e50b93d30d2446ed6cd662bc31170">
+<!ENTITY sha_page    "ac6f9c3c16120e211cd808ba01972e55c826e4b868f11aa5d6ebb7819ae15cc9">
 <!ENTITY sha_icon    "ec8be7110f1cc9d0fe440edfb2d4d3de394dc482519ba26eccbd7a7e2e2d6159">
 ]>
 
@@ -26,6 +26,12 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.11.16a
+- Appearance: Apply now works after picking colours (Unraid only switched it on for some kinds of field).
+- A colour scheme for each colour family: Purple, Blue, Teal, Green, Yellow, Orange, Red, Pink and Black.  Custom shows the colour pickers, starting from the current colours.
+- Status colours renamed Healthy, Attention and Problem, with plainer warnings.
+- Text, lines and the settings page's own highlights follow the accent too, so no violet is left behind under another scheme.
+
 ### 2026.11.16
 - New Appearance section in Settings -> Aether Glass: usage bar style, colour schemes (Violet, Black, Emerald, Crimson, Ocean) and a colour picker for the accent, background, panels, glow and the Good / Warning / Critical colours.  The page previews colours live as you pick, and Restore Default Colours puts them back.
 - Usage bars (disks, array, CPU, RAM, the header array bar, Docker and VM CPU) default to the new Status style, like the Dashboard rings: one colour per bar, picked from its value in 1% steps from green through amber to rose, on a dim track of the same colour.  A 95% disk is rose from end to end.  The previous look is still there as Spectrum.

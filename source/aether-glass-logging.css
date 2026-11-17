@@ -27,8 +27,8 @@
 
     color-scheme: dark;
     --lg-bg: oklch(from var(--aether-panel) calc(l - 0.0208) calc(c * 0.7987) calc(h - 3.08));
-    --lg-text: #e6ebf7;
-    --lg-dim: #8b95b5;
+    --lg-text: oklch(from var(--aether-accent) calc(l + 0.3407) calc(c * 0.0742) calc(h - 18.42));
+    --lg-dim: oklch(from var(--aether-accent) calc(l + 0.0740) calc(c * 0.2123) calc(h - 14.77));
     --lg-violet: var(--aether-accent);
     --lg-ok: var(--aether-good);
     --lg-attention: var(--aether-warning);

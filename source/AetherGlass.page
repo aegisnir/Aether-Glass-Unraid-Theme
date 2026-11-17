@@ -52,12 +52,18 @@ preg_match_all('/\b(accent|base|panel|glow|good|warning|critical) (#[0-9a-f]{6})
 foreach ($ag_m as [, $k, $v]) $ag_cols[$k] = $v;
 // Colour schemes: each one only fills in the pickers.  Status colours stay the theme's own.
 $ag_status = array_slice($ag_default, 4);
+// One scheme per colour family.  Each sets the accent and a background, panel and glow of the
+// same hue (darkness and strength matched to Purple); the status colours stay the theme's own.
 $ag_schemes = [
-  'violet'  => [_('Violet'),  $ag_default],
-  'black'   => [_('Black'),   ['accent' => '#a1a1aa', 'base' => '#000000', 'panel' => '#18181b', 'glow' => '#3f3f46'] + $ag_status],
-  'emerald' => [_('Emerald'), ['accent' => '#10b981', 'base' => '#02110c', 'panel' => '#0a1f18', 'glow' => '#047857'] + $ag_status],
-  'crimson' => [_('Crimson'), ['accent' => '#f43f5e', 'base' => '#12040a', 'panel' => '#220a14', 'glow' => '#9f1239'] + $ag_status],
-  'ocean'   => [_('Ocean'),   ['accent' => '#0ea5e9', 'base' => '#020c17', 'panel' => '#071a2b', 'glow' => '#0369a1'] + $ag_status],
+  'purple' => [_('Purple'), $ag_default],
+  'blue'   => [_('Blue'),   ['accent' => '#3b82f6', 'base' => '#01081b', 'panel' => '#03122f', 'glow' => '#0c58c8'] + $ag_status],
+  'teal'   => [_('Teal'),   ['accent' => '#14b8a6', 'base' => '#000c09', 'panel' => '#001815', 'glow' => '#027065'] + $ag_status],
+  'green'  => [_('Green'),  ['accent' => '#4ade80', 'base' => '#000c03', 'panel' => '#001a08', 'glow' => '#057439'] + $ag_status],
+  'yellow' => [_('Yellow'), ['accent' => '#facc15', 'base' => '#0d0800', 'panel' => '#1a1300', 'glow' => '#755e03'] + $ag_status],
+  'orange' => [_('Orange'), ['accent' => '#fb7d2c', 'base' => '#140400', 'panel' => '#250a00', 'glow' => '#994403'] + $ag_status],
+  'red'    => [_('Red'),    ['accent' => '#e5383b', 'base' => '#170202', 'panel' => '#290505', 'glow' => '#b6021b'] + $ag_status],
+  'pink'   => [_('Pink'),   ['accent' => '#ec4899', 'base' => '#16020a', 'panel' => '#270515', 'glow' => '#ad0367'] + $ag_status],
+  'black'  => [_('Black'),  ['accent' => '#a1a1aa', 'base' => '#000000', 'panel' => '#18181b', 'glow' => '#3f3f46'] + $ag_status],
 ];
 $ag_scheme_now = 'custom';
 foreach ($ag_schemes as $key => [, $cols]) if ($cols == $ag_cols) $ag_scheme_now = $key;
@@ -66,9 +72,9 @@ $ag_fields = [
   'base'     => [_('Background'), _('Behind everything')],
   'panel'    => [_('Panels'),     _('Glass tiles, menus, title bars')],
   'glow'     => [_('Glow'),       _('The aurora behind the glass')],
-  'good'     => [_('Good'),       _('Healthy, started, low usage')],
-  'warning'  => [_('Warning'),    _('Past the warning level')],
-  'critical' => [_('Critical'),   _('Past the critical level, errors')],
+  'good'     => [_('Healthy'),    _('Running, healthy, low usage')],
+  'warning'  => [_('Attention'),  _('Getting full, updating, worth a look')],
+  'critical' => [_('Problem'),    _('Full, stopped, errors')],
 ];
 
 // Hidden fields every form needs
@@ -180,8 +186,8 @@ function ag_fx_css($fx, $names) {
 <style>
 /* Colours come from Aether Glass's variables where it is active, with Unraid's own blue as
    the fallback on other themes.  Sizes follow the page's font size (rem). */
-.ag { --ag-accent: var(--aether-violet, #486dba); --ag-ok: var(--aether-ok, #4caf50); --ag-warn: var(--aether-attention, #ff8c2f);
-  --ag-line: rgba(200, 190, 255, 0.14); --ag-dim: rgba(230, 235, 247, 0.66);
+.ag { --ag-accent: var(--aether-violet, oklch(from var(--aether-accent, #7c5cff) calc(l - 0.0541) calc(c * 0.5556) calc(h - 22.80))); --ag-ok: var(--aether-ok, oklch(from var(--aether-good, #10c98f) calc(l - 0.0676) calc(c * 1.0359) calc(h - 19.29))); --ag-warn: var(--aether-attention, oklch(from var(--aether-warning, #f59e0b) calc(l - 0.0165) calc(c * 1.0350) calc(h - 15.89)));
+  --ag-line: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.2331) calc(c * 0.3943) calc(h + 5.14) / 0.14); --ag-dim: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.3407) calc(c * 0.0742) calc(h - 18.42) / 0.66);
   /* Same gap from the edge as the section title pills (the theme's --inset), so text lines up under the titles */
   padding: 0.8rem var(--inset, 1.2rem) 2rem; font-size: 1.35rem; line-height: 1.55; }
 .ag p { margin: 0 0 1.2rem; color: var(--ag-dim); max-width: 110rem; }
@@ -208,7 +214,7 @@ function ag_fx_css($fx, $names) {
 .ag-switch .ag-track { position: relative; width: 4.6rem; height: 2.6rem; border-radius: 999px; background: rgba(255, 255, 255, 0.14);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5); transition: background 0.25s; }
 .ag-switch .ag-track::before { content: ""; position: absolute; top: 0.3rem; left: 0.3rem; width: 2rem; height: 2rem; border-radius: 50%;
-  background: linear-gradient(180deg, #fff, #e4e0f5); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  background: linear-gradient(180deg, #fff, oklch(from var(--aether-accent, #7c5cff) calc(l + 0.3171) calc(c * 0.1245) calc(h + 8.36))); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .ag-switch.on .ag-track { background: var(--ag-accent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 14px -2px var(--ag-accent); }
 .ag-switch.on .ag-track::before { transform: translateX(2rem); }
 .ag-switch:focus-visible .ag-track { outline: 2px solid var(--ag-accent); outline-offset: 3px; }
@@ -223,27 +229,27 @@ function ag_fx_css($fx, $names) {
 .ag-lvl { position: relative; height: 4.4rem; }   /* bar, ticks, words */
 .ag-lvl input { position: absolute; opacity: 0; pointer-events: none; }
 .ag-lvl label { position: absolute; top: -0.6rem; bottom: 0; cursor: pointer; z-index: 2; }   /* reaches up over the bar */
-.ag-cap { position: absolute; top: 2.6rem; font-size: 1.2rem; color: #b4bad6; white-space: nowrap; }
+.ag-cap { position: absolute; top: 2.6rem; font-size: 1.2rem; color: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.1942) calc(c * 0.1747) calc(h - 10.32)); white-space: nowrap; }
 .ag-mid .ag-cap { left: 50%; transform: translateX(-50%); }
 .ag-start .ag-cap { left: 0; transform: translateX(-50%); }    /* centred on the bar's start, so it runs out past the end */
 .ag-end .ag-cap { right: 0; transform: translateX(50%); }      /* centred on the bar's end */
 /* a short tick under the line at each stop, like a ruler */
-.ag-tick { position: absolute; top: 1.3rem; width: 2px; height: 0.6rem; margin-left: -1px; border-radius: 1px; background: rgba(200, 190, 255, 0.35); }
+.ag-tick { position: absolute; top: 1.3rem; width: 2px; height: 0.6rem; margin-left: -1px; border-radius: 1px; background: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.2331) calc(c * 0.3943) calc(h + 5.14) / 0.35); }
 .ag-tick:first-of-type { margin-left: 0; }
 .ag-tick:last-of-type { margin-left: -2px; }
 .ag-sl { display: grid; grid-template-columns: 2rem minmax(0, 1fr) 2.6rem; align-items: start; gap: 0 1rem; }
-.ag-sl > .fa { color: #b4bad6; text-align: center; line-height: 1rem; }
+.ag-sl > .fa { color: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.1942) calc(c * 0.1747) calc(h - 10.32)); text-align: center; line-height: 1rem; }
 .ag-less { font-size: 1.1rem; }
 .ag-more { font-size: 1.8rem; }
 /* one bar: a dim track with a cyan-to-violet fill that grows to the picked level */
 .ag-track { position: absolute; left: 0; right: 0; top: 0; height: 1rem; border-radius: 999px; pointer-events: none;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--aether-cyan, #486dba) 20%, #150d2c), color-mix(in srgb, var(--ag-accent) 20%, #150d2c)); }
+  background: linear-gradient(90deg, color-mix(in srgb, var(--aether-cyan, oklch(from var(--aether-accent, #7c5cff) calc(l - 0.0541) calc(c * 0.5556) calc(h - 22.80))) 20%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))), color-mix(in srgb, var(--ag-accent) 20%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04)))); }
 .ag-fill { position: absolute; inset: 0 auto 0 0; border-radius: inherit; transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); container-type: inline-size; width: 0;
-  background: linear-gradient(90deg, var(--aether-cyan, #486dba), var(--ag-accent)); }
+  background: linear-gradient(90deg, var(--aether-cyan, oklch(from var(--aether-accent, #7c5cff) calc(l - 0.0541) calc(c * 0.5556) calc(h - 22.80))), var(--ag-accent)); }
 /* The knob, Apple-style: hidden until you point at the bar, then it fades in at the end of
    the fill and glides to whichever level you point at.  Same knob as the theme's toggles. */
 .ag-knob { position: absolute; top: -0.4rem; left: 0; width: 1.8rem; height: 1.8rem; border-radius: 50%;
-  pointer-events: none; z-index: 3; background: linear-gradient(180deg, #fff, #e4e0f5);
+  pointer-events: none; z-index: 3; background: linear-gradient(180deg, #fff, oklch(from var(--aether-accent, #7c5cff) calc(l + 0.3171) calc(c * 0.1245) calc(h + 8.36)));
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(0, 0, 0, 0.15);
   opacity: 0; transform: scale(0.6);
   /* a slight overshoot, so a click snaps the knob into its stop like a detent */
@@ -260,7 +266,7 @@ function ag_fx_css($fx, $names) {
 .ag-result { padding: 1.1rem 0 0; }
 .ag-mix b { display: block; font-size: 1.15rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ag-dim); font-weight: 600; }
 .ag-mix [data-mix] { display: none; font-size: 2.6rem; font-weight: 700;
-  background: linear-gradient(90deg, #a9e3ff, #cdb9ff, #ffc2e2); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  background: linear-gradient(90deg, oklch(from var(--aether-accent, #7c5cff) calc(l + 0.2866) calc(c * 0.3067) calc(h - 56.93)), oklch(from var(--aether-accent, #7c5cff) calc(l + 0.2278) calc(c * 0.4298) calc(h + 11.10)), oklch(from var(--aether-accent, #7c5cff) calc(l + 0.2790) calc(c * 0.3498) calc(h + 59.87))); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .ag-mix small { display: block; color: var(--ag-dim); }
 
 /* Visuals and Speed are readouts, not controls, so they are rings like the Dashboard's:
@@ -274,9 +280,9 @@ function ag_fx_css($fx, $names) {
   background:
     radial-gradient(circle at calc(50% + var(--r) * sin(var(--a))) calc(50% - var(--r) * cos(var(--a))),
       var(--ag-accent) calc(var(--t) / 2 - 0.5px), transparent calc(var(--t) / 2)),
-    radial-gradient(circle at 50% calc(var(--t) / 2), var(--aether-cyan, #486dba) calc(var(--t) / 2 - 0.5px), transparent calc(var(--t) / 2)),
-    conic-gradient(var(--aether-cyan, #486dba) 0%, var(--ag-accent) calc(var(--p) * 1%),
-      color-mix(in srgb, var(--ag-accent) 20%, #150d2c) calc(var(--p) * 1%) 100%);
+    radial-gradient(circle at 50% calc(var(--t) / 2), var(--aether-cyan, oklch(from var(--aether-accent, #7c5cff) calc(l - 0.0541) calc(c * 0.5556) calc(h - 22.80))) calc(var(--t) / 2 - 0.5px), transparent calc(var(--t) / 2)),
+    conic-gradient(var(--aether-cyan, oklch(from var(--aether-accent, #7c5cff) calc(l - 0.0541) calc(c * 0.5556) calc(h - 22.80))) 0%, var(--ag-accent) calc(var(--p) * 1%),
+      color-mix(in srgb, var(--ag-accent) 20%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))) calc(var(--p) * 1%) 100%);
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--t)), #000 calc(100% - var(--t) + 1px));
   mask: radial-gradient(farthest-side, transparent calc(100% - var(--t)), #000 calc(100% - var(--t) + 1px)); }
 /* Each ring animates its own value, so changing a level sweeps the ring and counts the
@@ -293,11 +299,11 @@ function ag_fx_css($fx, $names) {
 
 /* Apply turns green while something is picked that isn't applied yet */
 .ag form:has(input[type="radio"]:checked:not(.ag-saved)) input[type="submit"] {
-  color: #04130d; background: linear-gradient(180deg, #4ade9c 0, #10c98f 55%, #0aa676 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgba(16, 201, 143, 0.6); }
+  color: oklch(from var(--aether-good, #10c98f) calc(l - 0.5706) calc(c * 0.1652) calc(h + 3.50)); background: linear-gradient(180deg, oklch(from var(--aether-good, #10c98f) calc(l + 0.0652) calc(c * 1.0029) calc(h - 3.50)) 0, var(--aether-good, #10c98f) 55%, oklch(from var(--aether-good, #10c98f) calc(l - 0.0981) calc(c * 0.8653) calc(h + 0.29)) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgb(from var(--aether-good, #10c98f) r g b / 0.6); }
 .ag code { font-size: 1.15rem; }
 /* Benchmark: a plain HTML disclosure (no script) holding the steps and the code to copy */
-.ag-bench summary { cursor: pointer; color: #c4b5fd; font-weight: 600; margin-bottom: 1rem; }
+.ag-bench summary { cursor: pointer; color: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.2121) calc(c * 0.4405) calc(h + 7.37)); font-weight: 600; margin-bottom: 1rem; }
 .ag-bench ol { margin: 0 0 1.2rem; padding-left: 2rem; color: var(--ag-dim); max-width: 90rem; }
 .ag-bench li { margin-bottom: 0.6rem; }
 .ag .ag-code { display: block; width: 100%; max-width: 90rem; font: 1.15rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -307,8 +313,8 @@ function ag_fx_css($fx, $names) {
 .ag-preset label { color: var(--ag-dim); }
 .ag .ag-preset select { width: auto; min-width: 16rem; max-width: 24rem; margin: 0; }
 .ag form.ag-preset:has(option:checked:not(.ag-saved)) input[type="submit"] {
-  color: #04130d; background: linear-gradient(180deg, #4ade9c 0, #10c98f 55%, #0aa676 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgba(16, 201, 143, 0.6); }
+  color: oklch(from var(--aether-good, #10c98f) calc(l - 0.5706) calc(c * 0.1652) calc(h + 3.50)); background: linear-gradient(180deg, oklch(from var(--aether-good, #10c98f) calc(l + 0.0652) calc(c * 1.0029) calc(h - 3.50)) 0, var(--aether-good, #10c98f) 55%, oklch(from var(--aether-good, #10c98f) calc(l - 0.0981) calc(c * 0.8653) calc(h + 0.29)) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgb(from var(--aether-good, #10c98f) r g b / 0.6); }
 /* ---- Appearance: a picture for each choice, like macOS's Light / Dark picker ----
    Each option is a radio button drawn as a small glass card showing three sample bars
    (about 30%, 75% and 95%) in that style.  The samples carry their own colours, so they
@@ -318,25 +324,25 @@ function ag_fx_css($fx, $names) {
 .ag-pick input { position: absolute; opacity: 0; pointer-events: none; }
 .ag-pick label { display: grid; gap: 0.8rem; justify-items: center; cursor: pointer; }
 .ag-pickcard { display: grid; gap: 0.9rem; width: 19rem; padding: 1.5rem 1.6rem; border-radius: 1.4rem;
-  background: rgba(22, 16, 51, 0.7); box-shadow: 0 0 0 1px var(--ag-line); transition: box-shadow 0.2s; }
-.ag-pick label:hover .ag-pickcard { box-shadow: 0 0 0 1px rgba(200, 190, 255, 0.35); }
+  background: oklch(from var(--aether-panel, #140c2e) calc(l + 0.0154) calc(c * 1.0183) calc(h - 2.65) / 0.7); box-shadow: 0 0 0 1px var(--ag-line); transition: box-shadow 0.2s; }
+.ag-pick label:hover .ag-pickcard { box-shadow: 0 0 0 1px oklch(from var(--aether-accent, #7c5cff) calc(l + 0.2331) calc(c * 0.3943) calc(h + 5.14) / 0.35); }
 .ag-pick input:checked + label .ag-pickcard { box-shadow: 0 0 0 2px var(--ag-accent), 0 0 18px -4px var(--ag-accent); }
 .ag-pick input:focus-visible + label .ag-pickcard { outline: 2px solid var(--ag-accent); outline-offset: 4px; }
-.ag-pick .ag-cap2 { font-size: 1.3rem; color: #b4bad6; }
+.ag-pick .ag-cap2 { font-size: 1.3rem; color: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.1942) calc(c * 0.1747) calc(h - 10.32)); }
 .ag-pick input:checked + label .ag-cap2 { color: #fff; font-weight: 600; }
 .ag-sb { position: relative; height: 0.9rem; border-radius: 999px; overflow: hidden; container-type: inline-size; }
 .ag-sb > i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; }
 .ag-sb.s30 > i { width: 30%; } .ag-sb.s74 > i { width: 74%; } .ag-sb.s94 > i { width: 94%; }
 /* Status: one colour per bar, deeper at the start, on a dim track of that colour */
-.ag-status .s30 { background: color-mix(in srgb, #51c889 20%, #150d2c); }
-.ag-status .s30 > i { background: linear-gradient(90deg in oklch, oklch(from #51c889 calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from #51c889 calc(l + 0.04) c h)); }
-.ag-status .s74 { background: color-mix(in srgb, #f09a3b 20%, #150d2c); }
-.ag-status .s74 > i { background: linear-gradient(90deg in oklch, oklch(from #f09a3b calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from #f09a3b calc(l + 0.04) c h)); }
-.ag-status .s94 { background: color-mix(in srgb, #e94178 20%, #150d2c); }
-.ag-status .s94 > i { background: linear-gradient(90deg in oklch, oklch(from #e94178 calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from #e94178 calc(l + 0.04) c h)); }
+.ag-status .s30 { background: color-mix(in srgb, oklch(from var(--aether-good, #10c98f) calc(l + 0.0082) calc(c * 0.9027) calc(h - 6.42)) 20%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))); }
+.ag-status .s30 > i { background: linear-gradient(90deg in oklch, oklch(from oklch(from var(--aether-good, #10c98f) calc(l + 0.0082) calc(c * 0.9027) calc(h - 6.42)) calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from oklch(from var(--aether-good, #10c98f) calc(l + 0.0082) calc(c * 0.9027) calc(h - 6.42)) calc(l + 0.04) c h)); }
+.ag-status .s74 { background: color-mix(in srgb, oklch(from var(--aether-warning, #f59e0b) calc(l - 0.0109) calc(c * 0.8952) calc(h - 5.76)) 20%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))); }
+.ag-status .s74 > i { background: linear-gradient(90deg in oklch, oklch(from oklch(from var(--aether-warning, #f59e0b) calc(l - 0.0109) calc(c * 0.8952) calc(h - 5.76)) calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from oklch(from var(--aether-warning, #f59e0b) calc(l - 0.0109) calc(c * 0.8952) calc(h - 5.76)) calc(l + 0.04) c h)); }
+.ag-status .s94 { background: color-mix(in srgb, oklch(from var(--aether-critical, #f43f6e) calc(l - 0.0138) calc(c * 0.9535) calc(h - 5.11)) 20%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.0014) calc(c * 0.9216) calc(h + 2.04))); }
+.ag-status .s94 > i { background: linear-gradient(90deg in oklch, oklch(from oklch(from var(--aether-critical, #f43f6e) calc(l - 0.0138) calc(c * 0.9535) calc(h - 5.11)) calc(l - 0.12) calc(c * 1.08) calc(h - 18)), oklch(from oklch(from var(--aether-critical, #f43f6e) calc(l - 0.0138) calc(c * 0.9535) calc(h - 5.11)) calc(l + 0.04) c h)); }
 /* Spectrum: one green-to-rose gradient across the whole bar, revealed by the fill */
-.ag-spectrum .ag-sb { background: linear-gradient(90deg, #1d2a3a, #24283a 45%, #2f2a35 60%, #3a2a2f 72%, #3b222f 90%, #3a2035); }
-.ag-spectrum .ag-sb > i { background: linear-gradient(90deg, #12a57c 0%, #3cc48e 25%, #8fd27a 45%, #d4c457 60%, #f0a23a 72%, #f2733f 84%, #ec4470 92%, #e0388f 100%);
+.ag-spectrum .ag-sb { background: linear-gradient(90deg, oklch(from var(--aether-accent, #7c5cff) calc(l - 0.3182) calc(c * 0.1509) calc(h - 32.17)), oklch(from var(--aether-panel, #140c2e) calc(l + 0.0924) calc(c * 0.5181) calc(h - 15.14)) 45%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.1060) calc(c * 0.3198) calc(h + 16.21)) 60%, oklch(from var(--aether-accent, #7c5cff) calc(l - 0.2936) calc(c * 0.1092) calc(h + 71.94)) 72%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.1002) calc(c * 0.6661) calc(h + 58.15)) 90%, oklch(from var(--aether-panel, #140c2e) calc(l + 0.0974) calc(c * 0.8035) calc(h + 44.67))); }
+.ag-spectrum .ag-sb > i { background: linear-gradient(90deg, oklch(from var(--aether-good, #10c98f) calc(l - 0.0986) calc(c * 0.8196) calc(h + 3.44)) 0%, oklch(from var(--aether-good, #10c98f) calc(l - 0.0066) calc(c * 0.8986) calc(h - 1.13)) 25%, oklch(from var(--aether-good, #10c98f) calc(l + 0.0573) calc(c * 0.8736) calc(h - 24.99)) 45%, oklch(from var(--aether-warning, #f59e0b) calc(l + 0.0439) calc(c * 0.7928) calc(h + 30.94)) 60%, oklch(from var(--aether-warning, #f59e0b) calc(l + 0.0034) calc(c * 0.8901) calc(h - 0.52)) 72%, oklch(from var(--aether-warning, #f59e0b) calc(l - 0.0710) calc(c * 1.0316) calc(h - 28.52)) 84%, oklch(from var(--aether-critical, #f43f6e) calc(l - 0.0083) calc(c * 0.9454) calc(h - 1.05)) 92%, oklch(from var(--aether-critical, #f43f6e) calc(l - 0.0288) calc(c * 0.9966) calc(h - 16.88)) 100%);
   background-size: 100cqw 100%; background-repeat: no-repeat; }
 /* ---- Appearance: colours.  One row per colour, like a System Settings list: name and a short
    hint on the left, the picker and its hex value on the right.  The colour schemes above the
@@ -347,7 +353,7 @@ function ag_fx_css($fx, $names) {
 /* The theme (and Unraid) style every <button> as a pill; these are swatches, so undo that.
    !important because the button rules are far more specific than anything sensible here. */
 .ag .ag-schemes .ag-scheme, .ag .ag-schemes .ag-scheme:hover, .ag .ag-schemes .ag-scheme:focus {
-  all: unset; display: grid !important; justify-items: center; gap: 0.6rem; cursor: pointer; font-size: 1.2rem; color: #b4bad6;
+  all: unset; display: grid !important; justify-items: center; gap: 0.6rem; cursor: pointer; font-size: 1.2rem; color: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.1942) calc(c * 0.1747) calc(h - 10.32));
   background: none !important; box-shadow: none !important; border: 0 !important; padding: 0 !important; margin: 0 !important;
   min-width: 0 !important; height: auto !important; animation: none !important; text-transform: none !important; }
 .ag-scheme i { width: 4.2rem; height: 4.2rem; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14); }
@@ -355,11 +361,15 @@ function ag_fx_css($fx, $names) {
 .ag-scheme[aria-pressed="true"] i { box-shadow: 0 0 0 2px #0b0b10, 0 0 0 4px #fff; }
 .ag-scheme:focus-visible i { outline: 2px solid var(--ag-accent); outline-offset: 4px; }
 .ag-cols { max-width: 62rem; margin-top: 1rem; }
+/* With the script, the pickers show only under Custom (or when the saved colours are custom);
+   without it they always show, since the schemes can't work then. */
+.ag.ag-js .ag-cols { display: none; }
+.ag.ag-js .ag-cols.ag-open { display: block; }
 .ag-colhead { font-size: 1.1rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ag-dim); margin: 1.6rem 0 0.2rem; }
 .ag-col { display: grid; grid-template-columns: 1fr auto; gap: 1.2rem; align-items: center; padding: 0.9rem 0; border-bottom: 1px solid var(--ag-line); }
 .ag-col label b { display: block; font-size: 1.35rem; }
 .ag-col label small { color: var(--ag-dim); font-size: 1.15rem; }
-.ag-col .ag-warn2 { grid-column: 1 / -1; margin-top: -0.4rem; font-size: 1.15rem; color: #fbbf24; }
+.ag-col .ag-warn2 { grid-column: 1 / -1; margin-top: -0.4rem; font-size: 1.15rem; color: oklch(from var(--aether-warning, #f59e0b) calc(l + 0.0683) calc(c * 0.9986) calc(h + 14.35)); }
 .ag-swatch { display: inline-flex; align-items: center; gap: 0.8rem; }
 .ag-swatch code { font: 1.2rem ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ag-dim); min-width: 6.4rem; }
 .ag .ag-swatch input[type="color"] { -webkit-appearance: none; appearance: none; width: 2.8rem; height: 2.8rem; min-width: 0; margin: 0; padding: 0;
@@ -371,10 +381,10 @@ function ag_fx_css($fx, $names) {
 /* Apply turns green and Cancel shows once a colour is changed (the script marks the form) */
 .ag form.ag-dirty .ag-cancel { display: inline-block; }
 .ag form.ag-dirty input[type="submit"] {
-  color: #04130d; background: linear-gradient(180deg, #4ade9c 0, #10c98f 55%, #0aa676 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgba(16, 201, 143, 0.6); }
+  color: oklch(from var(--aether-good, #10c98f) calc(l - 0.5706) calc(c * 0.1652) calc(h + 3.50)); background: linear-gradient(180deg, oklch(from var(--aether-good, #10c98f) calc(l + 0.0652) calc(c * 1.0029) calc(h - 3.50)) 0, var(--aether-good, #10c98f) 55%, oklch(from var(--aether-good, #10c98f) calc(l - 0.0981) calc(c * 0.8653) calc(h + 0.29)) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 14px -2px rgb(from var(--aether-good, #10c98f) r g b / 0.6); }
 .ag-reset { margin-top: 1.2rem; }
-.ag-reset input[type="submit"] { background: none; box-shadow: none; color: #c4b5fd; padding: 0; min-width: 0; }
+.ag-reset input[type="submit"] { background: none; box-shadow: none; color: oklch(from var(--aether-accent, #7c5cff) calc(l + 0.2121) calc(c * 0.4405) calc(h + 7.37)); padding: 0; min-width: 0; }
 <?=ag_fx_css($ag_fx, $ag_names)?>
 </style>
 
@@ -477,9 +487,9 @@ Main pages need <b>Settings &rarr; Display Settings &rarr; Dynamix color theme =
       <button type="button" class="ag-scheme ag-custom" aria-pressed="<?=$ag_scheme_now === 'custom' ? 'true' : 'false'?>">
         <i style="background: conic-gradient(#f43f5e, #f59e0b, #10b981, #0ea5e9, #7c5cff, #f43f5e)"></i>_(Custom)_</button>
     </div>
-    <div class="ag-cols">
+    <div class="ag-cols<?=$ag_scheme_now === 'custom' ? ' ag-open' : ''?>">
       <?php $n = 2; foreach ($ag_fields as $key => [$label, $hint]): ?>
-      <?php if ($key === 'good'): ?><div class="ag-colhead">_(Status)_</div><?php endif; ?>
+      <?php if ($key === 'good'): ?><div class="ag-colhead">_(Status colours)_</div><?php endif; ?>
       <div class="ag-col">
         <label for="ag-col-<?=$key?>"><b><?=$label?></b><small><?=$hint?></small></label>
         <span class="ag-swatch">
@@ -509,6 +519,10 @@ Main pages need <b>Settings &rarr; Display Settings &rarr; Dynamix color theme =
 (function () {
   var box = document.querySelector('.ag-ap'); if (!box) return;
   var root = document.documentElement, form = box, pickers = form.querySelectorAll('input[type="color"]');
+  var cols = form.querySelector('.ag-cols'), custom = form.querySelector('.ag-custom');
+  // Unraid switches a form's Apply button on only when certain kinds of field change, and
+  // colour pickers (or a scheme filled in by script) aren't among them, so do it here.
+  function enableApply() { form.querySelectorAll('input[type="submit"]').forEach(function (b) { b.disabled = false; }); }
   box.parentNode.classList.add('ag-js');
   function rgb(h) { return [1, 3, 5].map(function (i) { return parseInt(h.substr(i, 2), 16) / 255; }); }
   function lin(c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
@@ -526,11 +540,11 @@ Main pages need <b>Settings &rarr; Display Settings &rarr; Dynamix color theme =
   function val(k) { return form.querySelector('[data-key="' + k + '"]').value; }
   function warn(k, text) { var w = document.getElementById('ag-warn-' + k); w.hidden = !text; w.textContent = text || ''; }
   function check() {
-    var names = { good: 'Good', warning: 'Warning', critical: 'Critical' }, near = null, d = 9;
+    var names = { good: 'Healthy', warning: 'Attention', critical: 'Problem' }, near = null, d = 9;
     ['good', 'warning', 'critical'].forEach(function (k) { var x = dist(val('accent'), val(k)); if (x < d) { d = x; near = k; } });
-    warn('accent', d < 0.1 ? '\u26a0\ufe0f ' + 'Close to ' + names[near] + ': ' + 'an accent button may read as a status.' : '');
+    warn('accent', d < 0.1 ? '\u26a0\ufe0f Almost the same as the ' + names[near] + ' colour, so buttons and links may look like status lights.' : '');
     var panelOnBase = mix(val('base'), val('panel'), 0.62);
-    warn('panel', contrast('#e6ebf7', panelOnBase) < 4.5 ? '\u26a0\ufe0f ' + 'Text on panels is hard to read.' : '');
+    warn('panel', contrast('#e6ebf7', panelOnBase) < 4.5 ? '\u26a0\ufe0f Text on these panels will be hard to read.' : '');
   }
   function show(k, v) {
     root.style.setProperty('--aether-' + k, v);
@@ -541,24 +555,31 @@ Main pages need <b>Settings &rarr; Display Settings &rarr; Dynamix color theme =
     var dirty = false;
     pickers.forEach(function (p) { if (p.value !== p.defaultValue) dirty = true; });
     form.classList.toggle('ag-dirty', dirty);
-    var cols = {}; pickers.forEach(function (p) { cols[p.dataset.key] = p.value; });
+    var picked = {}; pickers.forEach(function (p) { picked[p.dataset.key] = p.value; });
     var match = null;
     form.querySelectorAll('.ag-scheme[data-cols]').forEach(function (b) {
-      var s = JSON.parse(b.dataset.cols), same = Object.keys(s).every(function (k) { return s[k] === cols[k]; });
+      var s = JSON.parse(b.dataset.cols), same = Object.keys(s).every(function (k) { return s[k] === picked[k]; });
       b.setAttribute('aria-pressed', same); if (same) match = b; });
-    form.querySelector('.ag-custom').setAttribute('aria-pressed', !match);
+    custom.setAttribute('aria-pressed', !match || cols.classList.contains('ag-open'));
+    if (match && !cols.classList.contains('ag-open')) form.querySelectorAll('.ag-scheme[data-cols]').forEach(function (b) { b.setAttribute('aria-pressed', b === match); });
+    else if (cols.classList.contains('ag-open')) form.querySelectorAll('.ag-scheme[data-cols]').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
     check();
   }
-  pickers.forEach(function (p) { p.addEventListener('input', function () { show(p.dataset.key, p.value); changed(); }); });
+  pickers.forEach(function (p) { p.addEventListener('input', function () { show(p.dataset.key, p.value); enableApply(); changed(); }); });
   form.querySelectorAll('.ag-scheme[data-cols]').forEach(function (b) {
     b.addEventListener('click', function () { var s = JSON.parse(b.dataset.cols);
-      pickers.forEach(function (p) { p.value = s[p.dataset.key]; show(p.dataset.key, p.value); }); changed(); });
+      cols.classList.remove('ag-open');
+      pickers.forEach(function (p) { p.value = s[p.dataset.key]; show(p.dataset.key, p.value); }); enableApply(); changed(); });
   });
+  // Custom: show the pickers, starting from whatever is picked now
+  custom.addEventListener('click', function () { cols.classList.add('ag-open'); changed(); pickers[0].focus(); });
+  form.addEventListener('change', enableApply);   // the bar style cards
+  var openAtLoad = cols.classList.contains('ag-open');
   form.addEventListener('reset', function () { setTimeout(function () {
     pickers.forEach(function (p) { root.style.removeProperty('--aether-' + p.dataset.key);
       document.getElementById('ag-hex-' + p.dataset.key).textContent = p.value; });
-    root.style.removeProperty('--aether-accent-ink'); changed(); }); });
-  check();
+    root.style.removeProperty('--aether-accent-ink'); cols.classList.toggle('ag-open', openAtLoad); changed(); }); });
+  changed();
 })();
 </script>
 

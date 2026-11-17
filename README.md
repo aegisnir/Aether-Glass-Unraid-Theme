@@ -106,11 +106,11 @@ Looks that don't affect speed.  Saved on the flash drive (`appearance.cfg`) and 
 | Setting | Choices |
 |---|---|
 | Usage bars | **Status** (default): one colour per bar, from its value in 1% steps (green, amber, red), like the Dashboard rings.  **Spectrum**: one green-to-red gradient across the whole bar, revealed as it fills |
-| Colours | A colour scheme (Violet, Black, Emerald, Crimson, Ocean) or your own colour for each of: **Accent** (buttons, toggles, selected tabs, links), **Background**, **Panels** (glass tiles, menus, title bars), **Glow** (the aurora), and the status colours **Good**, **Warning** and **Critical** |
+| Colours | A colour scheme (Purple, Blue, Teal, Green, Yellow, Orange, Red, Pink, Black), or **Custom** for your own colour for each of: **Accent** (buttons, toggles, selected tabs, links), **Background**, **Panels** (glass tiles, menus, title bars), **Glow** (the aurora), and the status colours **Healthy**, **Attention** and **Problem** |
 
 The % numbers next to Dashboard bars take their bar's colour in both styles.  Usage bars, rings and status dots follow the three status colours.
 
-The page previews colours live while you pick (a small script on the Settings page; the theme itself stays CSS only).  It warns, without blocking, when an accent is close to a status colour or panels are too light for text.  **Restore Default Colours** puts all seven back.
+The page previews colours live while you pick (a small script on the Settings page; the theme itself stays CSS only).  Under Custom it warns, without blocking, when the accent is almost the same as a status colour (buttons could look like status lights) or panels are too light for text.  Text and lines take a faint tint of the accent, so nothing stays violet under another scheme.  **Restore Default Colours** puts all seven back.
 
 From a terminal:
 

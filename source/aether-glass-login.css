@@ -32,8 +32,8 @@ html:has(#login) {
     --aether-pink: oklch(from var(--aether-accent) calc(l + 0.0781) calc(c * 1.0353) calc(h + 70.58));
     --aether-gradient: linear-gradient(90deg, var(--aether-cyan) 0, var(--aether-violet) 50%, var(--aether-pink) 100%);
     --aether-bg: var(--aether-base);
-    --aether-text: #e6ebf7;
-    --aether-text-dim: #8b95b5;
+    --aether-text: oklch(from var(--aether-accent) calc(l + 0.3407) calc(c * 0.0742) calc(h - 18.42));
+    --aether-text-dim: oklch(from var(--aether-accent) calc(l + 0.0740) calc(c * 0.2123) calc(h - 14.77));
     --aether-link: oklch(from var(--aether-accent) calc(l + 0.0812) calc(c * 0.6600) calc(h - 12.85));
     --aether-problem: var(--aether-critical);
     --aether-font: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
