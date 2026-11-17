@@ -2,13 +2,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "aether-glass">
 <!ENTITY author    "aegisnir">
-<!ENTITY version   "2026.11.16b-dev">
+<!ENTITY version   "2026.11.16c-dev">
 <!ENTITY repo      "https://raw.githubusercontent.com/aegisnir/Aether-Glass-Unraid-Theme">
 <!ENTITY src       "&repo;/&version;/source">
 <!ENTITY cfg       "/boot/config/plugins/&name;">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 <!-- SHA256 of each file in source/ at this version.  tools/release.sh fills these in. -->
-<!ENTITY sha_css     "06f902a1cd581ca8ca65f3125a015a808253ff058dcc156eb5330472caa0f884">
+<!ENTITY sha_css     "f7cacb93e9859f43d8d2fec21f41856b56fa001518f29f47a3d199312a5e4e4e">
 <!ENTITY sha_login   "3f1f5c352b832a282724859aff1d582890005688a59d1a294eea37a486f96216">
 <!ENTITY sha_logging "0a243052449bf308bab6116d5140b947d47debed2d5dfe3cf5f258dc55924ff7">
 <!ENTITY sha_apply   "58288a2c5c9c8e2d77d51b392a250cbd0e2b77f4981c60400fb402a3611c3205">
@@ -26,6 +26,9 @@
         min="7.2.0">
 
 <CHANGES>
+### 2026.11.16c
+- Reboot, Shutdown, Delete and risky confirm buttons fill solid red on hover again, like every other button fills on hover (16b had left them as a red wash).
+
 ### 2026.11.16b
 - New status colours, Runenir's hues at the theme's usual brightness: Healthy #14c98e, Attention #e2aa00 (a deeper gold), and Runenir's one red #fc094c for Problem.  Everywhere status shows: text, icons, dots, rings and usage bars.
 - Usage bars run in a straight line from Healthy at 0% through Attention at 72% to Problem at 100%, changing every 1%, and are drawn like the Dashboard rings laid flat: a dim track in the bar's colour, a deeper start easing into a lighter tip, no gloss, and a soft glow (off with Glows set to Off or Still things).
